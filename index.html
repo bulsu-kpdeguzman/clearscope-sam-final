@@ -1,0 +1,2993 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>ClearScope Technologies — 3D Architectural Walkthrough & Network Model</title>
+<style>
+:root {
+  color-scheme: dark;
+  --glass-bg: rgba(10, 18, 34, 0.78);
+  --glass-border: rgba(56, 189, 248, 0.22);
+  --glass-hover: rgba(56, 189, 248, 0.15);
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --cyan-accent: #38bdf8;
+  --green-accent: #34d399;
+  --amber-accent: #fbbf24;
+  --red-accent: #f87171;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: #020617;
+  color: var(--text-main);
+  font: 13px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  overflow: hidden;
+  user-select: none;
+}
+#scene { position: fixed; inset: 0; }
+
+/* Frosted Glass Floating Panels */
+.glass {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-radius: 12px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55);
+}
+
+/* TOP FLOATING NAV BAR */
+#topNav {
+  position: fixed;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+}
+.nav-capsule {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.nav-brand {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--cyan-accent);
+  padding: 0 10px 0 6px;
+  border-right: 1px solid rgba(148, 163, 184, 0.25);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.nav-brand-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--cyan-accent);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--cyan-accent);
+}
+.nav-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+.nav-btn:hover {
+  color: #fff;
+  background: var(--glass-hover);
+}
+.nav-btn.active {
+  background: rgba(14, 165, 233, 0.25);
+  border-color: rgba(56, 189, 248, 0.4);
+  color: var(--cyan-accent);
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.2);
+}
+
+/* FLOOR SELECTOR SUB-BAR */
+#floorSubNav {
+  pointer-events: auto;
+  display: none;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  animation: fadeIn 0.25s ease;
+}
+.floor-lbl {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 0 6px;
+}
+.floor-pill {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.floor-pill:hover { color: #fff; background: var(--glass-hover); }
+.floor-pill.active {
+  background: rgba(52, 211, 153, 0.2);
+  border-color: rgba(52, 211, 153, 0.4);
+  color: var(--green-accent);
+}
+
+/* FLOATING BOTTOM DOCK */
+#bottomDock {
+  position: fixed;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 999px;
+}
+.dock-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 6px 11px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.dock-btn:hover { color: #fff; background: var(--glass-hover); }
+.dock-btn.active {
+  background: rgba(14, 165, 233, 0.2);
+  border-color: rgba(56, 189, 248, 0.35);
+  color: var(--cyan-accent);
+}
+.dock-sep {
+  width: 1px;
+  height: 14px;
+  background: rgba(148, 163, 184, 0.25);
+}
+.dock-stat {
+  font-size: 11px;
+  font-family: Consolas, monospace;
+  color: var(--cyan-accent);
+  padding: 0 4px;
+}
+
+/* POPUP TEST DRAWER (BOTTOM LEFT) */
+#testDrawer {
+  position: fixed;
+  bottom: 60px;
+  left: 18px;
+  width: 388px;
+  z-index: 50;
+  padding: 14px;
+  display: none;
+  animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+}
+.drawer-title {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.drawer-close {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 14px;
+  cursor: pointer;
+}
+.drawer-close:hover { color: #fff; }
+.test-btn-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.t-btn {
+  background: #0b1324;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  color: #e2e8f0;
+  padding: 7px 9px;
+  border-radius: 7px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.t-btn:hover { background: #1e293b; border-color: var(--cyan-accent); color: #fff; }
+.t-btn.sim-active {
+  background: #0f2744;
+  border-color: var(--cyan-accent);
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+  color: #fff;
+}
+.t-btn-red { background: #450a0a; border-color: #ef4444; color: #fca5a5; }
+.t-btn-red:hover { background: #7f1d1d; color: #fff; }
+.t-btn-red.sim-active {
+  background: #7f1d1d;
+  border-color: #f87171;
+  box-shadow: 0 0 14px rgba(239, 68, 68, 0.55);
+  color: #fff;
+}
+.sim-console {
+  background: #020617;
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: 7px;
+  padding: 8px 10px;
+  font-family: Consolas, 'SF Mono', monospace;
+  font-size: 10.5px;
+  color: var(--cyan-accent);
+  min-height: 72px;
+  max-height: 120px;
+  overflow-y: auto;
+  line-height: 1.45;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.5);
+}
+
+/* CINEMATIC CHASE TRACKING PILL */
+#simTrackingPill {
+  position: fixed;
+  top: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 45;
+  padding: 6px 16px;
+  display: none;
+  background: rgba(8, 15, 30, 0.88);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(56, 189, 248, 0.45);
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #f8fafc;
+  pointer-events: none;
+  align-items: center;
+  gap: 8px;
+  animation: fadeIn 0.2s ease;
+}
+.tracking-pulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #38bdf8;
+  box-shadow: 0 0 10px #38bdf8;
+  animation: blink 0.8s infinite alternate;
+}
+@keyframes blink {
+  from { opacity: 0.3; transform: scale(0.85); }
+  to { opacity: 1; transform: scale(1.2); }
+}
+
+/* EXECUTIVE DEFENSE DEBRIEF MODAL (NO SCROLLBAR, GORGEOUS GLASS) */
+#simBigScreen {
+  position: fixed;
+  top: 76px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(680px, calc(100vw - 32px));
+  z-index: 55;
+  padding: 20px 24px;
+  display: none;
+  background: rgba(10, 16, 32, 0.88);
+  backdrop-filter: blur(24px) saturate(190%);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-radius: 16px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8), 0 0 35px rgba(56, 189, 248, 0.12);
+  animation: debriefPop 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: auto;
+}
+
+@keyframes debriefPop {
+  from { opacity: 0; transform: translate(-50%, -10px) scale(0.97); }
+  to { opacity: 1; transform: translate(-50%, 0) scale(1); }
+}
+
+.big-screen-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+}
+.big-screen-icon {
+  font-size: 22px;
+  display: flex;
+  align-items: center;
+}
+.big-screen-title {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.3px;
+}
+.big-screen-subtitle {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  margin-top: 1px;
+}
+.big-screen-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 7px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.badge-success { background: rgba(6, 78, 59, 0.9); color: #6ee7b7; border: 1px solid #10b981; }
+.badge-danger  { background: rgba(127, 29, 29, 0.9); color: #fca5a5; border: 1px solid #ef4444; }
+.badge-sync    { background: rgba(12, 74, 110, 0.9); color: #7dd3fc; border: 1px solid #38bdf8; }
+.badge-amber   { background: rgba(120, 53, 15, 0.9); color: #fde68a; border: 1px solid #f59e0b; }
+
+/* Clean Flex-Wrap Breadcrumbs (Zero Ugly Scrollbar) */
+.big-screen-hops {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.hop-step {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #94a3b8;
+}
+.hop-step.completed {
+  border-color: rgba(52, 211, 153, 0.4);
+  color: #6ee7b7;
+  background: rgba(6, 78, 59, 0.3);
+}
+.hop-step.completed-red {
+  border-color: rgba(239, 68, 68, 0.5);
+  color: #fca5a5;
+  background: rgba(127, 29, 29, 0.35);
+}
+.hop-arrow {
+  color: rgba(148, 163, 184, 0.35);
+  font-size: 10px;
+}
+
+.big-screen-desc {
+  font-size: 12px;
+  line-height: 1.6;
+  color: #e2e8f0;
+  margin-bottom: 12px;
+  background: rgba(2, 6, 23, 0.6);
+  padding: 11px 14px;
+  border-radius: 8px;
+  border-left: 3px solid var(--cyan-accent);
+}
+.big-screen-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.bs-meta-item {
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  padding: 7px 10px;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.bs-meta-label {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 3px;
+  font-weight: 600;
+}
+.bs-meta-val {
+  font-size: 11.5px;
+  color: #f8fafc;
+  font-family: inherit;
+  font-weight: 600;
+  white-space: normal;
+  word-break: break-word;
+  line-height: 1.35;
+}
+
+.big-screen-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(148, 163, 184, 0.15);
+}
+.bs-act-btn {
+  background: #1e293b;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  color: #f8fafc;
+  padding: 6px 14px;
+  border-radius: 7px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.bs-act-btn:hover {
+  background: #334155;
+  border-color: var(--cyan-accent);
+}
+.bs-act-primary {
+  background: #0284c7;
+  border-color: #38bdf8;
+  color: #fff;
+}
+.bs-act-primary:hover {
+  background: #0369a1;
+}
+
+/* SLIDE-OVER DEVICE INSPECTOR (RIGHT) */
+#inspectorDrawer {
+  position: fixed;
+  top: 14px;
+  right: 14px;
+  width: 340px;
+  max-height: calc(100vh - 28px);
+  z-index: 50;
+  padding: 16px;
+  display: none;
+  overflow-y: auto;
+  animation: slideLeft 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.insp-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+}
+.insp-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+}
+.insp-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.insp-badge {
+  font-size: 9.5px;
+  font-family: Consolas, monospace;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: rgba(56, 189, 248, 0.15);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  color: var(--cyan-accent);
+}
+.insp-card {
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin-bottom: 10px;
+}
+.spec-line {
+  display: flex;
+  justify-content: space-between;
+  padding: 3.5px 0;
+  border-bottom: 1px dotted rgba(148, 163, 184, 0.12);
+  font-size: 11px;
+}
+.spec-line:last-child { border-bottom: none; }
+.sk { color: var(--text-muted); }
+.sv { color: #f8fafc; font-weight: 600; font-family: Consolas, monospace; }
+.insp-desc {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.45;
+  padding: 4px;
+}
+
+/* CROSSHAIR FOR WALK MODE */
+#crosshair {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  display: none;
+}
+#crosshair::before, #crosshair::after {
+  content: "";
+  position: absolute;
+  background: var(--cyan-accent);
+}
+#crosshair::before { left: 5px; top: 0; width: 2px; height: 12px; }
+#crosshair::after { top: 5px; left: 0; height: 2px; width: 12px; }
+
+/* ANIMATIONS */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideLeft { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: translateX(0); } }
+
+/* ==========================================================================
+   MOBILE & RESPONSIVE LAYOUT + VIRTUAL JOYSTICK
+   ========================================================================== */
+#mobileJoystickContainer {
+  position: absolute;
+  bottom: 85px;
+  left: 20px;
+  width: 120px;
+  height: 120px;
+  display: none;
+  z-index: 900;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+#mobileJoystickBase {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.6);
+  border: 2px solid rgba(56, 189, 248, 0.4);
+  backdrop-filter: blur(8px);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+#mobileJoystickKnob {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: rgba(56, 189, 248, 0.85);
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.6);
+  position: absolute;
+  pointer-events: none;
+  transition: transform 0.04s ease-out;
+}
+.joystick-hint {
+  text-align: center;
+  font-size: 9px;
+  font-weight: 700;
+  color: rgba(226, 232, 240, 0.7);
+  letter-spacing: 0.12em;
+  margin-top: 6px;
+}
+
+/* Close icon svg utility */
+.svg-icon {
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  #topNav {
+    top: 8px;
+    width: 96vw;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .nav-capsule {
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    max-width: 100%;
+    padding: 6px 10px;
+    gap: 6px;
+    justify-content: flex-start;
+    border-radius: 14px;
+  }
+  .nav-capsule::-webkit-scrollbar {
+    display: none;
+  }
+  .nav-brand {
+    font-size: 11px;
+    padding-right: 8px;
+    flex-shrink: 0;
+  }
+  .nav-btn {
+    font-size: 11px;
+    padding: 5px 9px;
+    flex-shrink: 0;
+    border-radius: 8px;
+  }
+  #floorSubNav {
+    overflow-x: auto;
+    white-space: nowrap;
+    max-width: 100%;
+    padding: 4px 8px;
+    margin-top: 5px;
+    border-radius: 10px;
+  }
+
+  #bottomDock {
+    bottom: 10px;
+    width: 96vw;
+    max-width: 430px;
+    padding: 6px 8px;
+    gap: 4px;
+    justify-content: space-around;
+    border-radius: 16px;
+  }
+  .dock-btn {
+    padding: 5px 8px;
+    font-size: 11px;
+    gap: 4px;
+    border-radius: 8px;
+  }
+  .dock-sep {
+    display: none;
+  }
+  .dock-stat {
+    display: none;
+  }
+
+  #testDrawer {
+    width: 100vw;
+    max-width: 100vw;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 18px 18px 0 0;
+    padding: 16px;
+    box-sizing: border-box;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  .test-btn-grid {
+    grid-template-columns: 1fr;
+  }
+
+  #simBigScreen {
+    width: 95vw;
+    max-width: 95vw;
+    padding: 16px;
+    max-height: 86vh;
+    overflow-y: auto;
+  }
+  .big-screen-hops {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  .bs-meta-grid {
+    grid-template-columns: 1fr;
+  }
+
+  #inspectorDrawer {
+    width: 100vw;
+    right: 0;
+    bottom: 0;
+    top: auto;
+    border-radius: 18px 18px 0 0;
+    max-height: 65vh;
+  }
+}
+
+</style>
+
+<script src="./vendor/three.min.js"></script>
+<script src="./vendor/PointerLockControls.js"></script>
+<script src="./vendor/OrbitControls.js"></script>
+<script>
+if (typeof THREE === 'undefined') {
+  document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"><\/script>');
+  document.write('<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/PointerLockControls.js"><\/script>');
+  document.write('<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"><\/script>');
+}
+</script>
+</head>
+<body>
+<div id="scene"></div>
+<div id="crosshair"></div>
+<!-- MOBILE VIRTUAL JOYSTICK (SHOWN IN WALK MODE ON TOUCH/MOBILE) -->
+<div id="mobileJoystickContainer">
+  <div id="mobileJoystickBase">
+    <div id="mobileJoystickKnob"></div>
+  </div>
+  <div class="joystick-hint">MOVE</div>
+</div>
+
+
+<!-- TOP FLOATING NAVIGATION -->
+<div id="topNav">
+  <div class="glass nav-capsule">
+    <div class="nav-brand">
+      <span class="nav-brand-dot"></span>
+      <span>ClearScope BIM</span>
+    </div>
+    <button class="nav-btn active" id="btnNavOverview" onclick="focusFacility('overview')">All Facilities</button>
+    <button class="nav-btn" id="btnNavServer" onclick="focusFacility('datacenter')">Studio Server Room</button>
+    <button class="nav-btn" id="btnNavEmp" onclick="focusFacility('emp')">Employees' Bldg (5F)</button>
+    <button class="nav-btn" id="btnNavAdmin" onclick="focusFacility('admin')">Admin Bldg (2F)</button>
+    <button class="nav-btn" id="btnNavBranch" onclick="focusFacility('branch')">Second Branch (35 PCs)</button>
+  </div>
+
+  <!-- Floor Selector Sub-Bar (Appears for Employees Building) -->
+  <div class="glass" id="floorSubNav">
+    <span class="floor-lbl">Level:</span>
+    <button class="floor-pill active" id="fpAll" onclick="selectFloor('all')">All (5F)</button>
+    <button class="floor-pill" id="fp1" onclick="selectFloor(1)">Floor 1</button>
+    <button class="floor-pill" id="fp2" onclick="selectFloor(2)">Floor 2</button>
+    <button class="floor-pill" id="fp3" onclick="selectFloor(3)">Floor 3</button>
+    <button class="floor-pill" id="fp4" onclick="selectFloor(4)">Floor 4</button>
+    <button class="floor-pill" id="fp5" onclick="selectFloor(5)">Floor 5</button>
+  </div>
+</div>
+
+<!-- FLOATING BOTTOM DOCK (CLEANED - NO EMOJIS, CRISP ICONS) -->
+<div class="glass" id="bottomDock">
+  <button class="dock-btn active" id="btnDockOrbit" onclick="setNavMode('orbit')">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18v-9h9"/></svg>
+    <span>Orbit</span>
+  </button>
+  <button class="dock-btn" id="btnDockWalk" onclick="setNavMode('walk')">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 4v16"/><path d="M17 8l-4-4-4 4"/></svg>
+    <span id="lblWalkText">Walk</span>
+  </button>
+
+  <div class="dock-sep"></div>
+
+  <button class="dock-btn" id="btnDockTags" onclick="cycleLabels()">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><circle cx="7" cy="7" r="1.5"/></svg>
+    <span>Labels: <strong id="lblModeText">Smart</strong></span>
+  </button>
+  <button class="dock-btn" id="btnDockStyle" onclick="toggleStyleMode()">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+    <span id="lblStyleText">Campus</span>
+  </button>
+
+  <div class="dock-sep"></div>
+
+  <button class="dock-btn" onclick="toggleTestDrawer()">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+    <span>Tests <span style="font-size:9px;opacity:0.7;">▼</span></span>
+  </button>
+
+  <div class="dock-sep"></div>
+  <div class="dock-stat" id="dockCoords">165 Desktops · Online</div>
+</div>
+
+<!-- LIVE DRONE CHASE TRACKING PILL (MINIMAL TOP HUD) -->
+<div id="simTrackingPill">
+  <div class="tracking-pulse"></div>
+  <span id="trackLabel">Tracing Network Packet...</span>
+</div>
+
+<!-- EXECUTIVE DEFENSE DEBRIEF MODAL (CLEANED - NO EMOJIS) -->
+<div class="glass" id="simBigScreen">
+  <div class="big-screen-header">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span class="big-screen-icon" id="bsIcon" style="font-size:11px;font-weight:800;letter-spacing:0.05em;padding:4px 8px;border-radius:6px;background:rgba(56,189,248,0.15);color:var(--cyan-accent);border:1px solid rgba(56,189,248,0.3);">TEST</span>
+      <div>
+        <div class="big-screen-title" id="bsTitle">TEST TITLE</div>
+        <div class="big-screen-subtitle" id="bsSubtitle">Test Subtitle</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span class="big-screen-badge badge-success" id="bsVerdictBadge">COMPLETED</span>
+      <button class="drawer-close" onclick="closeBigScreen()" title="Close">×</button>
+    </div>
+  </div>
+
+  <!-- Completed Route Hop Timeline (No Scrollbars) -->
+  <div class="big-screen-hops" id="bsHopsContainer"></div>
+
+  <!-- Architectural Explanation & Telemetry -->
+  <div class="big-screen-desc" id="bsExplanation"></div>
+  <div class="big-screen-meta" id="bsMetaGrid"></div>
+
+  <!-- Actions -->
+  <div class="big-screen-actions">
+    <button class="bs-act-btn" id="bsReplayBtn" onclick="replayActiveTest()">▶ Replay Trace</button>
+    <button class="bs-act-btn bs-act-primary" onclick="closeBigScreen()">Close Report</button>
+  </div>
+</div>
+
+<!-- TEST DRAWER POPUP (CLEANED - NO EMOJIS) -->
+<div class="glass" id="testDrawer">
+  <div class="drawer-header">
+    <div class="drawer-title">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="color:var(--cyan-accent);vertical-align:middle;margin-right:6px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      Interactive Network Tests
+    </div>
+    <button class="drawer-close" onclick="toggleTestDrawer()" title="Close">×</button>
+  </div>
+  <div class="test-btn-grid">
+    <button class="t-btn" id="btnSim1" onclick="runSim('inter_vlan')">
+      <span style="color:#34d399;font-size:11px;">●</span> 1. Employee PC to Server
+    </button>
+    <button class="t-btn t-btn-red" id="btnSim2" onclick="runSim('acl_block')">
+      <span style="color:#ef4444;font-size:11px;">●</span> 2. Block Guest Access
+    </button>
+    <button class="t-btn" id="btnSim3" onclick="runSim('wan_sync')">
+      <span style="color:#38bdf8;font-size:11px;">●</span> 3. Main to Branch Link
+    </button>
+    <button class="t-btn" id="btnSim4" onclick="runSim('branch_dia')">
+      <span style="color:#34d399;font-size:11px;">●</span> 4. Branch Direct Internet
+    </button>
+  </div>
+  <button class="t-btn" id="btnFailover" style="width:100%;margin-bottom:8px;" onclick="toggleHSRP()">
+    <span style="color:#f59e0b;font-size:11px;">●</span> 5. Test Internet Backup (Failover)
+  </button>
+  <div class="sim-console" id="simConsole"><span style="color:#64748b;">[READY]</span> Select any test above to watch data travel through the facility in 3D.</div>
+</div>
+
+<!-- SLIDE-OVER DEVICE INSPECTOR (RIGHT) -->
+<div class="glass" id="inspectorDrawer">
+  <div class="insp-head">
+    <div>
+      <div class="insp-name" id="inspName">PC-DEV-F1-01</div>
+      <div class="insp-sub" id="inspSub">Frontend Engineering</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;">
+      <span class="insp-badge" id="inspVlan">VLAN 10</span>
+      <button class="drawer-close" onclick="closeInspector()">×</button>
+    </div>
+  </div>
+
+  <div class="insp-card" id="inspSpecs"></div>
+  <div class="insp-desc" id="inspDesc"></div>
+</div>
+
+<script>
+// SCENE SETUP - REALISTIC DAYLIGHT CAMPUS (OPTION A)
+var scene = new THREE.Scene();
+scene.background = new THREE.Color('#90caf9');
+scene.fog = new THREE.Fog('#dbeafe', 90, 290);
+
+var currentStyle = 'realistic'; // 'realistic' (Option A) or 'studio' (Option B)
+var labelMode = 'smart';        // 'smart', 'minimal', 'off'
+
+var camera = new THREE.PerspectiveCamera(52, window.innerWidth / window.innerHeight, 0.1, 800);
+camera.position.set(-28, 38, 54);
+
+var renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.15;
+document.getElementById('scene').appendChild(renderer.domElement);
+  if (isTouchDevice || window.innerWidth <= 768) {
+    var wl = document.getElementById('lblWalkText');
+    if (wl) wl.textContent = 'Walk';
+  } else {
+    var wl = document.getElementById('lblWalkText');
+    if (wl) wl.textContent = 'Walk (WASD)';
+  }
+
+
+// REALISTIC NATURAL DAYLIGHT LIGHTING
+var hemiLight = new THREE.HemisphereLight(0xbae6fd, 0x4d7c0f, 1.35);
+scene.add(hemiLight);
+
+var sunLight = new THREE.DirectionalLight(0xfff7ed, 2.2);
+sunLight.position.set(-45, 75, 40);
+sunLight.castShadow = true;
+sunLight.shadow.mapSize.width = 2048;
+sunLight.shadow.mapSize.height = 2048;
+sunLight.shadow.camera.near = 10;
+sunLight.shadow.camera.far = 220;
+sunLight.shadow.camera.left = -75;
+sunLight.shadow.camera.right = 75;
+sunLight.shadow.camera.top = 75;
+sunLight.shadow.camera.bottom = -75;
+scene.add(sunLight);
+
+// CONTROLS
+var orbit = new THREE.OrbitControls(camera, renderer.domElement);
+orbit.enableDamping = true;
+orbit.dampingFactor = 0.05;
+orbit.maxPolarAngle = Math.PI / 2.05;
+orbit.target.set(6, 2, 0);
+
+var walk = new THREE.PointerLockControls(camera, renderer.domElement);
+scene.add(walk.getObject());
+
+var activeNav = 'orbit';
+
+var joystickInput = { x: 0, y: 0 };
+var isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.innerWidth <= 768);
+
+function setNavMode(mode) {
+  activeNav = mode;
+  document.getElementById('btnDockOrbit').className = mode === 'orbit' ? 'dock-btn active' : 'dock-btn';
+  document.getElementById('btnDockWalk').className = mode === 'walk' ? 'dock-btn active' : 'dock-btn';
+  var crosshair = document.getElementById('crosshair');
+  var jContainer = document.getElementById('mobileJoystickContainer');
+
+  if (mode === 'orbit') {
+    walk.unlock();
+    orbit.enabled = true;
+    if (crosshair) crosshair.style.display = 'none';
+    if (jContainer) jContainer.style.display = 'none';
+  } else {
+    orbit.enabled = false;
+    if (crosshair) crosshair.style.display = 'block';
+    
+    // On touch/mobile, display virtual joystick
+    if (isTouchDevice || window.innerWidth <= 768) {
+      if (jContainer) jContainer.style.display = 'block';
+      document.getElementById('dockCoords').textContent = 'Use Joystick to Walk · Drag Screen to Turn';
+    } else {
+      walk.lock();
+    }
+  }
+}
+
+// SETUP MOBILE VIRTUAL JOYSTICK & TOUCH LOOK CONTROLS
+(function setupMobileControls() {
+  var jContainer = document.getElementById('mobileJoystickContainer');
+  var jBase = document.getElementById('mobileJoystickBase');
+  var jKnob = document.getElementById('mobileJoystickKnob');
+  if (!jContainer || !jBase || !jKnob) return;
+
+  var touchId = null;
+  var baseCenter = { x: 0, y: 0 };
+  var maxRadius = 40;
+
+  function updateBaseCenter() {
+    var rect = jBase.getBoundingClientRect();
+    baseCenter.x = rect.left + rect.width / 2;
+    baseCenter.y = rect.top + rect.height / 2;
+  }
+
+  jContainer.addEventListener('touchstart', function(e) {
+    if (touchId !== null) return;
+    var t = e.changedTouches[0];
+    touchId = t.identifier;
+    updateBaseCenter();
+    e.preventDefault();
+  }, { passive: false });
+
+  window.addEventListener('touchmove', function(e) {
+    if (touchId === null) return;
+    for (var i = 0; i < e.changedTouches.length; i++) {
+      var t = e.changedTouches[i];
+      if (t.identifier === touchId) {
+        var dx = t.clientX - baseCenter.x;
+        var dy = t.clientY - baseCenter.y;
+        var dist = Math.hypot(dx, dy);
+        var clampedDist = Math.min(dist, maxRadius);
+        var angle = Math.atan2(dy, dx);
+
+        var kx = Math.cos(angle) * clampedDist;
+        var ky = Math.sin(angle) * clampedDist;
+        jKnob.style.transform = 'translate(' + kx + 'px, ' + ky + 'px)';
+
+        joystickInput.x = kx / maxRadius;
+        joystickInput.y = ky / maxRadius;
+        e.preventDefault();
+        break;
+      }
+    }
+  }, { passive: false });
+
+  function resetJoystick() {
+    touchId = null;
+    jKnob.style.transform = 'translate(0px, 0px)';
+    joystickInput.x = 0;
+    joystickInput.y = 0;
+  }
+
+  window.addEventListener('touchend', function(e) {
+    for (var i = 0; i < e.changedTouches.length; i++) {
+      if (e.changedTouches[i].identifier === touchId) {
+        resetJoystick();
+        break;
+      }
+    }
+  });
+  window.addEventListener('touchcancel', resetJoystick);
+
+  // Touch look-around on right/upper portion of screen in Walk mode
+  var lookTouchId = null;
+  var lastLookPos = { x: 0, y: 0 };
+
+  renderer.domElement.addEventListener('touchstart', function(e) {
+    if (activeNav !== 'walk') return;
+    for (var i = 0; i < e.changedTouches.length; i++) {
+      var t = e.changedTouches[i];
+      // Only treat touches outside joystick area as look gestures
+      if (t.clientX > window.innerWidth * 0.35 || t.clientY < window.innerHeight - 200) {
+        if (lookTouchId === null) {
+          lookTouchId = t.identifier;
+          lastLookPos.x = t.clientX;
+          lastLookPos.y = t.clientY;
+          break;
+        }
+      }
+    }
+  }, { passive: true });
+
+  window.addEventListener('touchmove', function(e) {
+    if (activeNav !== 'walk' || lookTouchId === null) return;
+    for (var i = 0; i < e.changedTouches.length; i++) {
+      var t = e.changedTouches[i];
+      if (t.identifier === lookTouchId) {
+        var deltaX = t.clientX - lastLookPos.x;
+        var deltaY = t.clientY - lastLookPos.y;
+        lastLookPos.x = t.clientX;
+        lastLookPos.y = t.clientY;
+
+        // Apply camera rotation
+        var obj = walk.getObject();
+        obj.rotation.y -= deltaX * 0.004;
+        camera.rotation.x -= deltaY * 0.003;
+        camera.rotation.x = Math.max(-Math.PI / 2.3, Math.min(Math.PI / 2.3, camera.rotation.x));
+        break;
+      }
+    }
+  }, { passive: true });
+
+  window.addEventListener('touchend', function(e) {
+    for (var i = 0; i < e.changedTouches.length; i++) {
+      if (e.changedTouches[i].identifier === lookTouchId) {
+        lookTouchId = null;
+        break;
+      }
+    }
+  });
+})();
+
+walk.addEventListener('unlock', function() {
+  if (activeNav === 'walk') {
+    document.getElementById('dockCoords').textContent = 'Cursor Released';
+  }
+});
+
+// REALISTIC ARCHITECTURAL MATERIAL PALETTE (MATCHING CAD REFERENCE)
+var mats = {
+  // Real lush green lawn & paved pathways (Zero grid lines)
+  grass: new THREE.MeshStandardMaterial({ color: '#4d7c0f', roughness: 0.92, metalness: 0.05 }),
+  concrete: new THREE.MeshStandardMaterial({ color: '#e2e8f0', roughness: 0.65 }),
+  asphalt: new THREE.MeshStandardMaterial({ color: '#334155', roughness: 0.85 }),
+  striping: new THREE.MeshBasicMaterial({ color: '#ffffff' }),
+  
+  // Real architectural exterior materials
+  wallExterior: new THREE.MeshStandardMaterial({ color: '#f1eae0', roughness: 0.82 }), // warm cream/beige stucco
+  timber: new THREE.MeshStandardMaterial({ color: '#b46a38', roughness: 0.65 }),       // vertical cedar/timber slat accents
+  roofSlate: new THREE.MeshStandardMaterial({ color: '#334155', roughness: 0.75 }),    // dark slate roof shingles
+  roofFascia: new THREE.MeshStandardMaterial({ color: '#1e293b', roughness: 0.45 }),   // dark trim/fascia eaves
+  windowFrame: new THREE.MeshStandardMaterial({ color: '#0f172a', roughness: 0.35, metalness: 0.4 }),
+  
+  // Landscaping
+  treeLeaves: new THREE.MeshStandardMaterial({ color: '#2d6a1e', roughness: 0.85 }),
+  treeTrunk: new THREE.MeshStandardMaterial({ color: '#5c4033', roughness: 0.9 }),
+
+  tileLight: new THREE.MeshStandardMaterial({ color: '#cbd5e1', roughness: 0.45 }),
+  tileServer: new THREE.MeshStandardMaterial({ color: '#1e293b', roughness: 0.3, metalness: 0.2 }),
+  woodFloor: new THREE.MeshStandardMaterial({ color: '#78350f', roughness: 0.7 }),
+  
+  wallInterior: new THREE.MeshStandardMaterial({ color: '#f8fafc', roughness: 0.9 }),
+  corridorWall: new THREE.MeshStandardMaterial({ color: '#94a3b8', roughness: 0.85 }),
+  glassWall: new THREE.MeshStandardMaterial({ color: '#38bdf8', transparent: true, opacity: 0.24, roughness: 0.1 }),
+  
+  deskTop: new THREE.MeshStandardMaterial({ color: '#f1f5f9', roughness: 0.5 }),
+  deskLegs: new THREE.MeshStandardMaterial({ color: '#334155', roughness: 0.4, metalness: 0.6 }),
+  chair: new THREE.MeshStandardMaterial({ color: '#1e293b', roughness: 0.7 }),
+  
+  pcCase: new THREE.MeshStandardMaterial({ color: '#0f172a', roughness: 0.5, metalness: 0.5 }),
+  monitorBezel: new THREE.MeshStandardMaterial({ color: '#020617', roughness: 0.3, metalness: 0.4 }),
+  screenCode: new THREE.MeshBasicMaterial({ color: '#0284c7' }),
+  screenAdmin: new THREE.MeshBasicMaterial({ color: '#10b981' }),
+  screenSupport: new THREE.MeshBasicMaterial({ color: '#f59e0b' }),
+  
+  rackFrame: new THREE.MeshStandardMaterial({ color: '#020617', roughness: 0.4, metalness: 0.7 }),
+  rackGlass: new THREE.MeshStandardMaterial({ color: '#38bdf8', transparent: true, opacity: 0.3, metalness: 0.8 }),
+  rackBlade: new THREE.MeshStandardMaterial({ color: '#1e293b', roughness: 0.5, metalness: 0.6 }),
+  ledGreen: new THREE.MeshBasicMaterial({ color: '#34d399' }),
+  ledBlue: new THREE.MeshBasicMaterial({ color: '#38bdf8' }),
+  ledAmber: new THREE.MeshBasicMaterial({ color: '#fbbf24' }),
+  cableTray: new THREE.MeshStandardMaterial({ color: '#eab308', roughness: 0.4, metalness: 0.5 }),
+  ap: new THREE.MeshStandardMaterial({ color: '#f59e0b', roughness: 0.4 })
+};
+
+function box(parent, x, y, z, w, h, d, mat, shadow) {
+  var m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+  m.position.set(x, y, z);
+  if (shadow !== false) m.castShadow = true;
+  m.receiveShadow = true;
+  parent.add(m);
+  return m;
+}
+
+// REALISTIC SINGLE SEAMLESS GABLED ROOF (NO DUPLICATE ROOFS, NO FLOATING EAVES)
+function createGabledRoof(parent, x, baseY, z, width, length, height, roofMat, wallMat) {
+  var g = new THREE.Group();
+  g.position.set(x, baseY, z);
+  parent.add(g);
+
+  var overhang = 0.55;
+  var roofThick = 0.22;
+  var halfW = width / 2;
+  var totalHalfW = halfW + overhang;
+  var slopeLen = Math.sqrt(totalHalfW * totalHalfW + height * height);
+  var angle = Math.atan2(height, totalHalfW);
+
+  // Left roof slope
+  var leftSlope = new THREE.Mesh(
+    new THREE.BoxGeometry(slopeLen, roofThick, length + overhang * 2),
+    roofMat
+  );
+  leftSlope.position.set(-totalHalfW / 2, height / 2, 0);
+  leftSlope.rotation.z = angle;
+  leftSlope.castShadow = true;
+  leftSlope.receiveShadow = true;
+  g.add(leftSlope);
+
+  // Right roof slope
+  var rightSlope = new THREE.Mesh(
+    new THREE.BoxGeometry(slopeLen, roofThick, length + overhang * 2),
+    roofMat
+  );
+  rightSlope.position.set(totalHalfW / 2, height / 2, 0);
+  rightSlope.rotation.z = -angle;
+  rightSlope.castShadow = true;
+  rightSlope.receiveShadow = true;
+  g.add(rightSlope);
+
+  // Ridge cap along apex
+  var ridge = new THREE.Mesh(
+    new THREE.BoxGeometry(0.35, 0.18, length + overhang * 2 + 0.05),
+    roofMat
+  );
+  ridge.position.set(0, height + 0.06, 0);
+  g.add(ridge);
+
+  // Gable end walls (triangular walls closing the front and back attic)
+  var triShape = new THREE.Shape();
+  triShape.moveTo(-halfW, 0);
+  triShape.lineTo(0, height);
+  triShape.lineTo(halfW, 0);
+  triShape.closePath();
+
+  var triGeom = new THREE.ExtrudeGeometry(triShape, { depth: 0.25, bevelEnabled: false });
+  triGeom.center();
+
+  var gableMat = wallMat || mats.wallExterior;
+
+  var frontGable = new THREE.Mesh(triGeom, gableMat);
+  frontGable.position.set(0, height / 2, length / 2 - 0.12);
+  frontGable.castShadow = true;
+  g.add(frontGable);
+
+  var backGable = new THREE.Mesh(triGeom, gableMat);
+  backGable.position.set(0, height / 2, -length / 2 + 0.12);
+  backGable.castShadow = true;
+  g.add(backGable);
+
+  return g;
+}
+
+// LOW-POLY ARCHITECTURAL TREE
+function createTree(parent, x, z, scale) {
+  var s = scale || 1.0;
+  var g = new THREE.Group();
+  g.position.set(x, 0, z);
+  parent.add(g);
+
+  var trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.22 * s, 0.32 * s, 2.4 * s, 6), mats.treeTrunk);
+  trunk.position.y = 1.2 * s;
+  trunk.castShadow = true;
+  g.add(trunk);
+
+  var c1 = new THREE.Mesh(new THREE.ConeGeometry(1.6 * s, 2.6 * s, 7), mats.treeLeaves);
+  c1.position.y = 3.1 * s;
+  c1.castShadow = true;
+  g.add(c1);
+
+  var c2 = new THREE.Mesh(new THREE.ConeGeometry(1.25 * s, 2.2 * s, 7), mats.treeLeaves);
+  c2.position.y = 4.3 * s;
+  c2.castShadow = true;
+  g.add(c2);
+
+  return g;
+}
+
+// REALISTIC PARKED VEHICLE (MATCHING WHITE CAR IN REFERENCE)
+function createParkedCar(parent, x, z, rotY, colorHex) {
+  var g = new THREE.Group();
+  g.position.set(x, 0, z);
+  g.rotation.y = rotY || 0;
+  parent.add(g);
+
+  var carMat = new THREE.MeshStandardMaterial({ color: colorHex || '#ffffff', roughness: 0.25, metalness: 0.7 });
+  box(g, 0, 0.40, 0, 1.95, 0.48, 4.3, carMat);
+  box(g, 0, 0.90, -0.2, 1.75, 0.58, 2.3, carMat);
+
+  // Windows
+  box(g, 0, 0.88, 0.96, 1.55, 0.42, 0.08, mats.windowFrame);
+  box(g, 0, 0.88, -1.36, 1.55, 0.42, 0.08, mats.windowFrame);
+
+  // Wheels
+  var wheelMat = new THREE.MeshStandardMaterial({ color: '#0f172a', roughness: 0.8 });
+  var wGeom = new THREE.CylinderGeometry(0.34, 0.34, 0.22, 8);
+  var w1 = new THREE.Mesh(wGeom, wheelMat);
+  w1.rotation.z = Math.PI / 2;
+  w1.position.set(-0.95, 0.34, 1.3);
+  g.add(w1);
+  var w2 = w1.clone(); w2.position.set(0.95, 0.34, 1.3); g.add(w2);
+  var w3 = w1.clone(); w3.position.set(-0.95, 0.34, -1.3); g.add(w3);
+  var w4 = w1.clone(); w4.position.set(0.95, 0.34, -1.3); g.add(w4);
+
+  return g;
+}
+
+// -------------------------------------------------------------
+// REFINED 3D FLOATING LABELS (TRANSLUCENT MICRO-BADGES)
+// -------------------------------------------------------------
+var billboardTags = [];
+
+function makeTag(text, x, y, z, scale, tagType) {
+  scale = scale || 1;
+  tagType = tagType || 'device'; // 'building', 'room', 'device'
+  var c = document.createElement('canvas');
+  var ctx = c.getContext('2d');
+  
+  var fontSize = 24;
+  var fontStr = 'bold ' + fontSize + 'px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+  ctx.font = fontStr;
+
+  var lines = text.split('\n');
+  var maxWidth = 0;
+  for (var i = 0; i < lines.length; i++) {
+    var lw = ctx.measureText(lines[i]).width;
+    if (lw > maxWidth) maxWidth = lw;
+  }
+  
+  var padX = 24;
+  var padY = 12;
+  var lineHeight = fontSize * 1.35;
+  var cw = Math.max(180, Math.ceil(maxWidth + padX * 2));
+  var ch = Math.ceil(lineHeight * lines.length + padY * 2);
+  
+  c.width = cw;
+  c.height = ch;
+
+  ctx.font = fontStr;
+  ctx.fillStyle = 'rgba(8, 15, 30, 0.82)'; // Translucent sleek dark background
+  ctx.beginPath();
+  ctx.roundRect(4, 4, cw - 8, ch - 8, 10);
+  ctx.fill();
+  
+  ctx.strokeStyle = '#38bdf8';
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  
+  for (var i = 0; i < lines.length; i++) {
+    var lineY = padY + lineHeight * (i + 0.5);
+    ctx.fillStyle = (i === 0 && lines.length > 1) ? '#38bdf8' : '#f8fafc';
+    ctx.fillText(lines[i], cw / 2, lineY);
+  }
+
+  var tex = new THREE.CanvasTexture(c);
+  tex.minFilter = THREE.LinearFilter;
+  
+  var aspect = cw / ch;
+  var planeHeight = (0.65 + lines.length * 0.22) * scale;
+  var planeWidth = planeHeight * aspect;
+
+  var plane = new THREE.Mesh(
+    new THREE.PlaneGeometry(planeWidth, planeHeight),
+    new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.DoubleSide, depthWrite: false })
+  );
+  plane.position.set(x, y, z);
+  plane.userData = { tagType: tagType, text: text };
+  scene.add(plane);
+  billboardTags.push(plane);
+  return plane;
+}
+
+// INTERACTIVE REGISTRIES
+var interactiveObjects = [];
+var devicesMap = {};
+
+function registerInteractable(mesh, data) {
+  mesh.userData = data;
+  interactiveObjects.push(mesh);
+  devicesMap[data.id] = data;
+}
+
+// WORKSTATION (PC + DUAL MONITORS + DESK)
+function createWorkstation(parent, x, y, z, rotY, pcId, dept, vlan, ip, screenMat) {
+  var g = new THREE.Group();
+  g.position.set(x, y, z);
+  g.rotation.y = rotY || 0;
+  parent.add(g);
+
+  var top = box(g, 0, 0.72, 0, 1.3, 0.04, 0.75, mats.deskTop);
+  box(g, -0.6, 0.35, -0.32, 0.04, 0.70, 0.04, mats.deskLegs);
+  box(g, 0.6, 0.35, -0.32, 0.04, 0.70, 0.04, mats.deskLegs);
+  box(g, -0.6, 0.35, 0.32, 0.04, 0.70, 0.04, mats.deskLegs);
+  box(g, 0.6, 0.35, 0.32, 0.04, 0.70, 0.04, mats.deskLegs);
+
+  var tower = box(g, 0.44, 0.24, -0.12, 0.20, 0.44, 0.42, mats.pcCase);
+
+  box(g, -0.20, 0.74 + 0.12, -0.16, 0.06, 0.24, 0.06, mats.monitorBezel);
+  var mon1 = box(g, -0.20, 0.74 + 0.28, -0.16, 0.54, 0.32, 0.03, mats.monitorBezel);
+  box(g, -0.20, 0.74 + 0.28, -0.14, 0.50, 0.28, 0.01, screenMat || mats.screenCode, false);
+
+  var mon2 = box(g, 0.26, 0.74 + 0.28, -0.12, 0.50, 0.32, 0.03, mats.monitorBezel);
+  mon2.rotation.y = -0.22;
+  var mon2Scr = box(g, 0.26, 0.74 + 0.28, -0.10, 0.46, 0.28, 0.01, screenMat || mats.screenCode, false);
+  mon2Scr.rotation.y = -0.22;
+
+  box(g, -0.10, 0.745, 0.12, 0.42, 0.01, 0.13, mats.pcCase, false);
+  box(g, 0.24, 0.745, 0.12, 0.08, 0.01, 0.11, mats.monitorBezel, false);
+
+  box(g, 0, 0.46, 0.48, 0.44, 0.06, 0.44, mats.chair);
+  box(g, 0, 0.78, 0.66, 0.44, 0.56, 0.06, mats.chair);
+
+  var data = {
+    id: pcId,
+    type: 'Workstation Client PC',
+    dept: dept,
+    vlan: vlan,
+    ip: ip,
+    mac: '00:50:79:66:' + (Math.floor(Math.random()*89)+10) + ':' + (Math.floor(Math.random()*89)+10),
+    specs: 'Intel Core i7-13700 · 32GB DDR5 · 512GB NVMe SSD',
+    diskUsage: '94 GB Used / 418 GB Free (Local Storage)',
+    switchPort: 'C1000-24T Access Port Gi0/' + (Math.floor(Math.random()*20)+1),
+    desc: 'Developer/Staff client provisioned with dedicated 1 Gbps Cat6 access.'
+  };
+  registerInteractable(tower, data);
+  registerInteractable(mon1, data);
+  top.userData = data;
+}
+
+// DEDICATED SERVER PC WORKBENCH & HARDWARE
+function createServerPC(parent, x, y, z, rotY, pcId, labelTitle, labelSub, dept, vlan, ip, screenMat, specs, desc) {
+  var g = new THREE.Group();
+  g.position.set(x, y, z);
+  g.rotation.y = rotY || 0;
+  parent.add(g);
+
+  // Heavy-duty server worktable (1.5m W x 0.85m D x 0.74m H)
+  var desk = box(g, 0, 0.72, 0, 1.5, 0.05, 0.85, mats.deskTop);
+  box(g, -0.7, 0.35, -0.36, 0.05, 0.70, 0.05, mats.deskLegs);
+  box(g, 0.7, 0.35, -0.36, 0.05, 0.70, 0.05, mats.deskLegs);
+  box(g, -0.7, 0.35, 0.36, 0.05, 0.70, 0.05, mats.deskLegs);
+  box(g, 0.7, 0.35, 0.36, 0.05, 0.70, 0.05, mats.deskLegs);
+
+  // Enterprise Server PC Tower (Dual Tower Chassis with hot-swap bays)
+  var srvTower = box(g, 0.50, 0.28, -0.10, 0.28, 0.52, 0.55, mats.rackFrame);
+  // Front drive bay array
+  for (var d = 0; d < 4; d++) {
+    box(g, 0.50, 0.16 + d * 0.10, 0.18, 0.24, 0.08, 0.02, mats.rackBlade);
+    box(g, 0.42, 0.16 + d * 0.10, 0.195, 0.03, 0.02, 0.01, mats.ledGreen, false);
+    box(g, 0.46, 0.16 + d * 0.10, 0.195, 0.03, 0.02, 0.01, mats.ledBlue, false);
+  }
+
+  // Large Server Management Monitor
+  box(g, -0.15, 0.74 + 0.14, -0.15, 0.08, 0.28, 0.08, mats.monitorBezel);
+  var mon = box(g, -0.15, 0.74 + 0.34, -0.15, 0.68, 0.40, 0.04, mats.monitorBezel);
+  box(g, -0.15, 0.74 + 0.34, -0.13, 0.62, 0.34, 0.01, screenMat || mats.screenCode, false);
+
+  // Server Keyboard & Mouse
+  box(g, -0.15, 0.75, 0.15, 0.45, 0.01, 0.14, mats.pcCase, false);
+  box(g, 0.22, 0.75, 0.15, 0.08, 0.01, 0.12, mats.monitorBezel, false);
+
+  // Chair
+  box(g, -0.15, 0.46, 0.52, 0.44, 0.06, 0.44, mats.chair);
+  box(g, -0.15, 0.78, 0.70, 0.44, 0.56, 0.06, mats.chair);
+
+  var data = {
+    id: pcId,
+    type: 'Dedicated Enterprise Server PC',
+    dept: dept,
+    vlan: vlan,
+    ip: ip,
+    mac: '00:50:79:66:' + (Math.floor(Math.random()*89)+10) + ':' + (Math.floor(Math.random()*89)+10),
+    specs: specs,
+    diskUsage: 'Production Active Server Repository',
+    switchPort: 'Core Switch 10G SFP+ Port Gi1/1',
+    desc: desc
+  };
+  registerInteractable(srvTower, data);
+  registerInteractable(mon, data);
+  desk.userData = data;
+
+  // Prominent label directly above monitor
+  var wx = parent.position.x + x;
+  var wy = parent.position.y + y + 1.95;
+  var wz = parent.position.z + z;
+  makeTag(labelTitle + '\n' + labelSub, wx, wy, wz, 0.28, 'device');
+}
+
+// SERVER RACK
+function createServerCabinet(parent, x, y, z, rackId, labelText, specs) {
+  var g = new THREE.Group();
+  g.position.set(x, y, z);
+  parent.add(g);
+
+  box(g, 0, 1.1, 0, 0.85, 2.2, 1.05, mats.rackFrame);
+  box(g, 0, 1.1, 0.53, 0.78, 2.1, 0.02, mats.rackGlass);
+
+  for (var i = 0; i < 9; i++) {
+    var by = 0.35 + i * 0.20;
+    box(g, 0, by, 0.1, 0.76, 0.16, 0.80, mats.rackBlade);
+    box(g, -0.28, by, 0.51, 0.04, 0.03, 0.01, mats.ledGreen, false);
+    box(g, -0.22, by, 0.51, 0.04, 0.03, 0.01, mats.ledBlue, false);
+    box(g, -0.16, by, 0.51, 0.04, 0.03, 0.01, i === 4 ? mats.ledAmber : mats.ledGreen, false);
+  }
+  box(g, 0, 2.35, 0, 0.85, 0.08, 0.35, mats.cableTray);
+
+  var data = {
+    id: rackId,
+    type: '42U Datacenter Cabinet',
+    dept: 'Enterprise Core Infrastructure',
+    vlan: 'VLAN 30 (192.168.30.0/24)',
+    ip: specs.ip,
+    specs: specs.specs,
+    desc: specs.desc
+  };
+  registerInteractable(g.children[0], data);
+
+  var wx = parent.position.x + x;
+  var wy = parent.position.y + y + 2.50;
+  var wz = parent.position.z + z;
+  makeTag(labelText, wx, wy, wz, 0.30, 'device');
+}
+
+// -------------------------------------------------------------
+// REALISTIC CAMPUS GROUND & SITE PLAN (ZERO GRID LINES)
+// -------------------------------------------------------------
+var campusGroup = new THREE.Group();
+scene.add(campusGroup);
+
+// Large lush green lawn terrain
+box(campusGroup, 0, -0.3, 0, 240, 0.6, 190, mats.grass, false);
+
+// Concrete pedestrian walkways connecting all buildings
+box(campusGroup, -21.6, 0.02, 0, 3.2, 0.05, 24, mats.concrete);      // Employees Bldg to Studio Server Room
+box(campusGroup, -3.0, 0.02, 18, 22, 0.05, 3.2, mats.concrete);      // Employees Bldg to Admin Bldg
+box(campusGroup, 14.0, 0.02, -15, 46, 0.05, 3.2, mats.concrete);     // Courtyard to Second Branch Office
+box(campusGroup, -3.0, 0.02, -18, 16, 0.05, 3.2, mats.concrete);     // Server Room to Courtyard
+
+// Central campus courtyard plaza with garden planter
+box(campusGroup, -3.0, 0.02, 0, 14, 0.05, 14, mats.concrete);
+box(campusGroup, -3.0, 0.25, 0, 5.0, 0.45, 5.0, mats.concrete);
+box(campusGroup, -3.0, 0.50, 0, 4.4, 0.15, 4.4, mats.grass);
+createTree(campusGroup, -3.0, 0, 1.2);
+
+// Paved asphalt parking area & access road
+box(campusGroup, 16.0, 0.02, 2.0, 22, 0.04, 18, mats.asphalt);
+for (var p = -6; p <= 6; p += 4) {
+  box(campusGroup, 16.0, 0.045, p, 5.2, 0.02, 0.15, mats.striping);
+}
+
+// Realistic Parked Cars (matching white sedan in reference)
+createParkedCar(campusGroup, 14.0, 4.0, Math.PI / 2, '#ffffff');
+createParkedCar(campusGroup, 14.0, -4.0, Math.PI / 2, '#38bdf8');
+
+// Trees & landscaping along campus borders
+var campusTreesGroup = new THREE.Group();
+campusGroup.add(campusTreesGroup);
+var treeCoords = [
+  [-42, 28, 1.2], [-42, 14, 1.1], [-42, -4, 1.3], [-42, -22, 1.2],
+  [-10, -28, 1.2], [6, -28, 1.3], [24, -28, 1.1], [40, -28, 1.2],
+  [58, -6, 1.2], [58, -20, 1.3], [32, 24, 1.2], [44, 24, 1.1],
+  [6, 26, 1.2], [-8, 26, 1.3]
+];
+treeCoords.forEach(function(tc) {
+  createTree(campusTreesGroup, tc[0], tc[1], tc[2]);
+});
+
+// Hidden cadGrid for optional developer toggle
+var cadGrid = new THREE.GridHelper(130, 130, 0x38bdf8, 0x1e293b);
+cadGrid.position.y = 0.01;
+cadGrid.visible = false;
+scene.add(cadGrid);
+
+// -------------------------------------------------------------
+// 1. EMPLOYEES' BUILDING (5 Stories · 2 Rooms/Floor · 10 PCs/Room)
+// -------------------------------------------------------------
+var bEmployees = new THREE.Group();
+bEmployees.position.set(-22, 0, 18);
+scene.add(bEmployees);
+
+var employeeFloors = [];
+
+function buildEmployeeFloor(floorNum) {
+  var fg = new THREE.Group();
+  var floorHeight = 3.4;
+  var baseY = (floorNum - 1) * floorHeight;
+  fg.position.y = baseY;
+  bEmployees.add(fg);
+  employeeFloors.push(fg);
+
+  box(fg, 0, 0.1, 0, 24, 0.2, 16, mats.tileLight);
+  box(fg, 0, 1.7, -8, 24, 3.2, 0.25, mats.wallExterior);
+  box(fg, -12, 1.7, 0, 0.25, 3.2, 16, mats.wallExterior);
+  box(fg, 12, 1.7, 0, 0.25, 3.2, 16, mats.glassWall);
+  box(fg, 0, 1.7, 8, 24, 3.2, 0.25, mats.glassWall);
+
+  // Vertical timber accent panels & window mullions (matching CAD reference)
+  box(fg, -12.15, 1.7, -4.0, 0.08, 3.2, 4.5, mats.timber);
+  box(fg, -6.0, 1.7, 8.15, 4.5, 3.2, 0.08, mats.timber);
+  box(fg, 6.0, 1.7, 8.15, 4.5, 3.2, 0.08, mats.timber);
+
+  box(fg, 0, 1.7, -5, 0.25, 3.2, 6, mats.corridorWall);
+  box(fg, 0, 1.7, 5, 0.25, 3.2, 6, mats.corridorWall);
+
+  var swRack = box(fg, 0.4, 1.8, 0, 0.6, 1.1, 0.8, mats.rackFrame);
+  registerInteractable(swRack, {
+    id: 'SW-EMP-F' + floorNum,
+    type: 'Floor Access Switch (24-Port Gigabit)',
+    dept: "Employees' Building Floor " + floorNum,
+    vlan: 'VLAN 10 (10.10.10.0/24)',
+    ip: '10.10.10.' + (100 + floorNum),
+    specs: 'Cisco Catalyst 1000-24T-4G-L · Dual 1G Fiber LACP Uplink to Core',
+    desc: 'Supplies 20 desktop ports across Room A (10 PCs) and Room B (10 PCs).'
+  });
+  makeTag('SW-EMP-F' + floorNum, -22 + 0.4, baseY + 2.45, 18, 0.22, 'device');
+
+  // Room A (10 PCs)
+  makeTag('RM ' + floorNum + '01 (10 PCs)', -22 - 6, baseY + 2.3, 18 - 5.5, 0.25, 'room');
+  for (var i = 0; i < 5; i++) {
+    createWorkstation(fg, -10 + i * 1.8, 0, -3.2, 0, 'PC-EMP-F' + floorNum + '-R1-0' + (i + 1), 'Dev Team ' + floorNum + 'A', 'VLAN 10', '10.10.10.' + ((floorNum - 1) * 20 + i + 1), mats.screenCode);
+    createWorkstation(fg, -10 + i * 1.8, 0, -1.4, Math.PI, 'PC-EMP-F' + floorNum + '-R1-0' + (i + 6), 'Dev Team ' + floorNum + 'A', 'VLAN 10', '10.10.10.' + ((floorNum - 1) * 20 + i + 6), mats.screenCode);
+  }
+
+  var prnA = box(fg, -11, 0.45, -5.5, 0.6, 0.8, 0.6, mats.pcCase);
+  registerInteractable(prnA, {
+    id: 'PRN-EMP-F' + floorNum + '-A',
+    type: 'Floor Network Printer',
+    dept: 'Engineering Floor ' + floorNum,
+    vlan: 'VLAN 10 (10.10.10.0/24)',
+    ip: '10.10.10.' + (200 + floorNum * 2 - 1),
+    specs: 'Enterprise Workgroup Laser Printer · 1 Gbps NIC'
+  });
+
+  // Room B (10 PCs)
+  makeTag('RM ' + floorNum + '02 (10 PCs)', -22 + 6, baseY + 2.3, 18 - 5.5, 0.25, 'room');
+  for (var i = 0; i < 5; i++) {
+    createWorkstation(fg, 2.5 + i * 1.8, 0, -3.2, 0, 'PC-EMP-F' + floorNum + '-R2-0' + (i + 1), 'Dev Team ' + floorNum + 'B', 'VLAN 10', '10.10.10.' + ((floorNum - 1) * 20 + i + 11), mats.screenCode);
+    createWorkstation(fg, 2.5 + i * 1.8, 0, -1.4, Math.PI, 'PC-EMP-F' + floorNum + '-R2-0' + (i + 6), 'Dev Team ' + floorNum + 'B', 'VLAN 10', '10.10.10.' + ((floorNum - 1) * 20 + i + 16), mats.screenCode);
+  }
+
+  var prnB = box(fg, 10.5, 0.45, -5.5, 0.6, 0.8, 0.6, mats.pcCase);
+  registerInteractable(prnB, {
+    id: 'PRN-EMP-F' + floorNum + '-B',
+    type: 'Floor Network Printer',
+    dept: 'Engineering Floor ' + floorNum,
+    vlan: 'VLAN 10 (10.10.10.0/24)',
+    ip: '10.10.10.' + (200 + floorNum * 2),
+    specs: 'Enterprise Workgroup Laser Printer · 1 Gbps NIC'
+  });
+}
+
+for (var f = 1; f <= 5; f++) {
+  buildEmployeeFloor(f);
+}
+
+var empRoof = createGabledRoof(bEmployees, 0, 17.0, 0, 24, 16, 3.6, mats.roofSlate, mats.wallExterior);
+makeTag("EMPLOYEES' BUILDING\nMAIN BRANCH (100 PCs)", -22, 21.8, 18, 0.85, 'building');
+
+// -------------------------------------------------------------
+// 2. STUDIO SERVER ROOM & SERVER FARM (Building A)
+// -------------------------------------------------------------
+var bDatacenter = new THREE.Group();
+bDatacenter.position.set(-20, 0, -18);
+scene.add(bDatacenter);
+
+box(bDatacenter, 0, 0.15, 0, 22, 0.3, 16, mats.tileServer);
+box(bDatacenter, 0, 2.0, -8, 22, 3.7, 0.25, mats.wallExterior);
+box(bDatacenter, -11, 2.0, 0, 0.25, 3.7, 16, mats.wallExterior);
+box(bDatacenter, 11, 2.0, 0, 0.25, 3.7, 16, mats.glassWall);
+box(bDatacenter, 0, 2.0, 8, 22, 3.7, 0.25, mats.glassWall);
+
+// Vertical timber cladding & dark slate pitched roof
+box(bDatacenter, -11.15, 2.0, -3.0, 0.08, 3.7, 5.0, mats.timber);
+box(bDatacenter, 0, 2.0, 8.15, 5.5, 3.7, 0.08, mats.timber);
+var datacenterRoof = createGabledRoof(bDatacenter, 0, 3.8, 0, 22, 16, 2.8, mats.roofSlate, mats.wallExterior);
+
+// Overhead Cable Tray linking Networking Rack to Server PCs
+box(bDatacenter, -3.25, 2.30, -1.0, 4.5, 0.08, 0.35, mats.cableTray);
+
+// 1. NETWORKING DEVICES RACK (Switch, Routers, Firewall, NAS Storage)
+createServerCabinet(bDatacenter, -5.0, 0, -1.0, 'RACK-NET', 'NETWORKING RACK\nSWITCH · FIREWALL · ROUTERS', {
+  ip: '172.16.1.1 (Core), 172.16.0.4 (FW) & 192.168.30.20 (NAS)',
+  specs: 'Cisco Firepower 1010 NGFW + Catalyst 3650 Core + Dual 4331 ISRs + 16TB NAS',
+  desc: 'Consolidated network enclosure housing the core switch, perimeter firewall, PLDT/Globe routers, and NAS backup storage array.'
+});
+
+// 2. SERVER PC FOR THE EMPLOYEES (SRV-EMP)
+createServerPC(bDatacenter, -1.5, 0, -1.0, 0, 'SRV-EMP', 'SRV-EMP', 'SERVER PC (EMPLOYEES)',
+  'Main Branch Software Development', 'VLAN 30 (192.168.30.0/24)', '192.168.30.10', mats.screenCode,
+  'Dedicated Server PC · 4.0 TB NVMe Array · 64GB RAM · Xeon Processor',
+  'The dedicated server PC for the employees, hosting GitLab distributed version control, Docker registry, and local web staging environments.'
+);
+
+// 3. SERVER PC FOR THE ADMINISTRATION (SRV-ADM)
+createServerPC(bDatacenter, 1.5, 0, -1.0, 0, 'SRV-ADM', 'SRV-ADM', 'SERVER PC (ADMINISTRATION)',
+  'Main Branch Corporate Administration', 'VLAN 30 (192.168.30.0/24)', '192.168.30.11', mats.screenAdmin,
+  'Dedicated Server PC · 2.0 TB SAS Storage · 64GB RAM · Xeon Processor',
+  'The dedicated server PC for the administration, hosting Microsoft Active Directory Domain Controller, accounting suites, and enterprise ERP database.'
+);
+
+// 4. STUDIO WIRELESS ACCESS POINT (AP-STUDIO)
+var apStudio = box(bDatacenter, -2.5, 3.6, 1.0, 0.35, 0.08, 0.35, mats.ap);
+registerInteractable(apStudio, {
+  id: 'AP-STUDIO',
+  type: 'Studio Wireless Access Point',
+  dept: 'Studio Server Room Wireless',
+  vlan: 'VLAN 30 (Management Subnet 192.168.30.0/24)',
+  ip: '192.168.30.5',
+  specs: 'Wi-Fi 6 (802.11ax) Access Point for IT Administrator Mobility & Diagnostics'
+});
+makeTag('AP-STUDIO (WI-FI AP)', -20 - 2.5, 3.9, -18 + 1.0, 0.22, 'device');
+
+// Precision Dual HVAC
+var hvac1 = box(bDatacenter, -8.5, 1.2, -6.5, 1.4, 2.4, 1.0, mats.rackBlade);
+makeTag('HVAC UNIT 1\nPRECISION AC', -20 - 8.5, 2.40, -18 - 6.5, 0.22, 'device');
+var hvac2 = box(bDatacenter, -8.5, 1.2, 4.5, 1.4, 2.4, 1.0, mats.rackBlade);
+makeTag('HVAC UNIT 2\nHOT STANDBY', -20 - 8.5, 2.40, -18 + 4.5, 0.22, 'device');
+
+// Removed extra 3rd desk so the room contains strictly ONLY the TWO Server PCs (SRV-EMP & SRV-ADM)
+
+makeTag('STUDIO SERVER ROOM\nMAIN BRANCH', -20, 7.5, -18, 0.85, 'building');
+
+// -------------------------------------------------------------
+// 3. ADMINISTRATION BUILDING (2 Floors · 30 PCs Total)
+// -------------------------------------------------------------
+var bAdmin = new THREE.Group();
+bAdmin.position.set(16, 0, 18);
+scene.add(bAdmin);
+
+box(bAdmin, 0, 0.15, 0, 22, 0.3, 16, mats.woodFloor);
+box(bAdmin, 0, 1.8, -8, 22, 3.4, 0.25, mats.wallExterior);
+box(bAdmin, 11, 1.8, 0, 0.25, 3.4, 16, mats.wallExterior);
+box(bAdmin, -11, 1.8, 0, 0.25, 3.4, 16, mats.glassWall);
+box(bAdmin, 0, 1.8, 8, 22, 3.4, 0.25, mats.glassWall);
+
+// Floor 1 timber accent cladding
+box(bAdmin, 11.15, 1.8, -2.5, 0.08, 3.4, 4.5, mats.timber);
+box(bAdmin, 0, 1.8, 8.15, 5.0, 3.4, 0.08, mats.timber);
+
+box(bAdmin, 0, 1.8, -4.5, 0.25, 3.4, 7, mats.corridorWall);
+box(bAdmin, 0, 1.8, 4.5, 0.25, 3.4, 7, mats.corridorWall);
+
+makeTag('RM 101: FINANCE\n10 PCs', 16 - 5.5, 2.3, 18 - 5.5, 0.25, 'room');
+for (var i = 0; i < 5; i++) {
+  createWorkstation(bAdmin, -9 + i * 1.7, 0, -3.0, 0, 'PC-ADM-FIN-0' + (i+1), 'Finance & Accounting', 'VLAN 20', '192.168.20.' + (10+i), mats.screenAdmin);
+  createWorkstation(bAdmin, -9 + i * 1.7, 0, -1.2, Math.PI, 'PC-ADM-FIN-0' + (i+6), 'Finance & Accounting', 'VLAN 20', '192.168.20.' + (15+i), mats.screenAdmin);
+}
+
+makeTag('RM 102: HR & OPS\n10 PCs', 16 + 5.5, 2.3, 18 - 5.5, 0.25, 'room');
+for (var i = 0; i < 5; i++) {
+  createWorkstation(bAdmin, 2.5 + i * 1.7, 0, -3.0, 0, 'PC-ADM-HR-0' + (i+1), 'Human Resources & Ops', 'VLAN 20', '192.168.20.' + (20+i), mats.screenAdmin);
+  createWorkstation(bAdmin, 2.5 + i * 1.7, 0, -1.2, Math.PI, 'PC-ADM-HR-0' + (i+6), 'Human Resources & Ops', 'VLAN 20', '192.168.20.' + (25+i), mats.screenAdmin);
+}
+
+// Floor 2 (10 PCs Executive & Network Ops)
+box(bAdmin, 0, 3.5, 0, 22, 0.2, 16, mats.woodFloor);
+// Floor 2 Exterior Walls & Timber Accents
+box(bAdmin, 0, 5.2, -8, 22, 3.4, 0.25, mats.wallExterior);
+box(bAdmin, 11, 5.2, 0, 0.25, 3.4, 16, mats.wallExterior);
+box(bAdmin, -11, 5.2, 0, 0.25, 3.4, 16, mats.glassWall);
+box(bAdmin, 0, 5.2, 8, 22, 3.4, 0.25, mats.glassWall);
+box(bAdmin, 11.15, 5.2, -2.5, 0.08, 3.4, 4.5, mats.timber);
+box(bAdmin, 0, 5.2, 8.15, 5.0, 3.4, 0.08, mats.timber);
+
+var adminRoof = createGabledRoof(bAdmin, 0, 6.9, 0, 22, 16, 3.0, mats.roofSlate, mats.wallExterior);
+makeTag('RM 201: EXECUTIVE\n10 PCs', 16, 5.8, 18 - 5.5, 0.25, 'room');
+for (var i = 0; i < 5; i++) {
+  createWorkstation(bAdmin, -8 + i * 1.8, 3.5, 0, 0, 'PC-ADM-EXEC-0' + (i+1), 'Executive Suite', 'VLAN 20', '192.168.20.' + (30+i), mats.screenAdmin);
+  createWorkstation(bAdmin, 1.5 + i * 1.8, 3.5, 0, 0, 'PC-ADM-NET-0' + (i+1), 'Network Administration', 'VLAN 20', '192.168.20.' + (35+i), mats.screenAdmin);
+}
+
+var apAdmin = box(bAdmin, 0, 6.7, 0, 0.35, 0.08, 0.35, mats.ap);
+registerInteractable(apAdmin, {
+  id: 'AP-ADM-F2',
+  type: 'Dual-Band Enterprise Wi-Fi AP',
+  dept: 'Main Branch Wireless',
+  vlan: 'Staff SSID (VLAN 20) / Guest SSID (VLAN 40)',
+  ip: '192.168.20.5 (Mgmt)',
+  specs: 'Wi-Fi 6 (802.11ax) · Firepower ACL 110 Isolation for Guests'
+});
+
+makeTag('ADMINISTRATION BUILDING\nMAIN BRANCH (30 PCs)', 16, 10.6, 18, 0.85, 'building');
+
+// -------------------------------------------------------------
+// 4. SECOND BRANCH OFFICE (2 Floors · 35 PCs Total)
+// -------------------------------------------------------------
+var bBranch = new THREE.Group();
+bBranch.position.set(38, 0, -18);
+scene.add(bBranch);
+
+box(bBranch, 0, 0.15, 0, 22, 0.3, 16, mats.tileLight);
+box(bBranch, 0, 1.8, -8, 22, 3.4, 0.25, mats.wallExterior);
+box(bBranch, 11, 1.8, 0, 0.25, 3.4, 16, mats.wallExterior);
+box(bBranch, -11, 1.8, 0, 0.25, 3.4, 16, mats.glassWall);
+box(bBranch, 0, 1.8, 8, 22, 3.4, 0.25, mats.glassWall);
+
+// Floor 1 timber accent cladding
+box(bBranch, 11.15, 1.8, -2.0, 0.08, 3.4, 4.0, mats.timber);
+box(bBranch, 0, 1.8, 8.15, 4.5, 3.4, 0.08, mats.timber);
+
+makeTag('RM B101: SUPPORT 1\n10 PCs', 38 - 5.5, 2.3, -18 - 5.5, 0.25, 'room');
+for (var i = 0; i < 5; i++) {
+  createWorkstation(bBranch, -9 + i * 1.7, 0, -3.0, 0, 'PC-BR-SUP-0' + (i+1), 'Customer Support T1', 'VLAN 50', '192.168.50.' + (10+i), mats.screenSupport);
+  createWorkstation(bBranch, -9 + i * 1.7, 0, -1.2, Math.PI, 'PC-BR-SUP-0' + (i+6), 'Customer Support T1', 'VLAN 50', '192.168.50.' + (15+i), mats.screenSupport);
+}
+
+makeTag('RM B102: SUPPORT 2\n10 PCs', 38 + 5.5, 2.3, -18 - 5.5, 0.25, 'room');
+for (var i = 0; i < 5; i++) {
+  createWorkstation(bBranch, 2.5 + i * 1.7, 0, -3.0, 0, 'PC-BR-SUP-1' + (i+1), 'Technical Helpdesk T2', 'VLAN 50', '192.168.50.' + (20+i), mats.screenSupport);
+  createWorkstation(bBranch, 2.5 + i * 1.7, 0, -1.2, Math.PI, 'PC-BR-SUP-1' + (i+6), 'Technical Helpdesk T2', 'VLAN 50', '192.168.50.' + (25+i), mats.screenSupport);
+}
+
+box(bBranch, 0, 3.5, 0, 22, 0.2, 16, mats.tileLight);
+// Floor 2 Exterior Walls & Timber Accents
+box(bBranch, 0, 5.2, -8, 22, 3.4, 0.25, mats.wallExterior);
+box(bBranch, 11, 5.2, 0, 0.25, 3.4, 16, mats.wallExterior);
+box(bBranch, -11, 5.2, 0, 0.25, 3.4, 16, mats.glassWall);
+box(bBranch, 0, 5.2, 8, 22, 3.4, 0.25, mats.glassWall);
+box(bBranch, 11.15, 5.2, -2.0, 0.08, 3.4, 4.0, mats.timber);
+box(bBranch, 0, 5.2, 8.15, 4.5, 3.4, 0.08, mats.timber);
+
+var branchRoof = createGabledRoof(bBranch, 0, 6.9, 0, 22, 16, 3.0, mats.roofSlate, mats.wallExterior);
+makeTag('RM B201: BRANCH ADMIN\n5 PCs', 38 - 5.5, 5.8, -18 - 5.5, 0.25, 'room');
+for (var i = 0; i < 5; i++) {
+  createWorkstation(bBranch, -8 + i * 1.8, 3.5, 0, 0, 'PC-BR-ADM-0' + (i+1), 'Branch Administration', 'VLAN 60', '192.168.60.' + (10+i), mats.screenAdmin);
+}
+
+makeTag('RM B202: SUPPORT 3\n10 PCs', 38 + 5.5, 5.8, -18 - 5.5, 0.25, 'room');
+for (var i = 0; i < 5; i++) {
+  createWorkstation(bBranch, 2.5 + i * 1.7, 3.5, -3.0, 0, 'PC-BR-SUP-2' + (i+1), 'Escalation Support', 'VLAN 50', '192.168.50.' + (30+i), mats.screenSupport);
+  createWorkstation(bBranch, 2.5 + i * 1.7, 3.5, -1.2, Math.PI, 'PC-BR-SUP-2' + (i+6), 'Escalation Support', 'VLAN 50', '192.168.50.' + (35+i), mats.screenSupport);
+}
+
+createServerCabinet(bBranch, 8, 3.5, 4, 'RACK-BRANCH', 'BRANCH CABINET\nRTR-BR & SRV-BR', {
+  ip: '203.0.113.10 & 192.168.60.10',
+  specs: 'Cisco 4331 ISR (Converge 100M DIA) + SRV-BR (1.0 TB Ticket Cache)',
+  desc: 'Branch edge router terminating local internet and leased lines back to Main Branch.'
+});
+
+makeTag('SECOND BRANCH OFFICE\n35 PCs TOTAL', 38, 10.6, -18, 0.85, 'building');
+
+// -------------------------------------------------------------
+// WAN CARRIER LINKS
+// -------------------------------------------------------------
+function makeLine(p1, p2, colorHex, dashed) {
+  var geom = new THREE.BufferGeometry().setFromPoints([p1, p2]);
+  var matLine = new THREE.LineBasicMaterial({
+    color: colorHex,
+    linewidth: 2,
+    transparent: true,
+    opacity: 0.8
+  });
+  var line = new THREE.Line(geom, matLine);
+  scene.add(line);
+  return line;
+}
+
+var pDatacenterEdge = new THREE.Vector3(-20 - 5.0, 3.0, -18 - 1.0);
+var pBranchEdge = new THREE.Vector3(38 + 8, 3.5 + 2.5, -18 + 4);
+
+var linePrimaryWAN = makeLine(pDatacenterEdge, pBranchEdge, '#ef4444', false);
+var lineBackupWAN = makeLine(new THREE.Vector3(-20 - 5.5, 2.7, -18 - 1.0), new THREE.Vector3(38 + 8, 3.5 + 2.2, -18 + 4), '#fbbf24', true);
+
+// -------------------------------------------------------------
+// HIGH-VISIBILITY LIVE ARCHITECTURE & SIMULATION ENGINE
+// -------------------------------------------------------------
+var activeSimBadges = [];
+var activeShockwaves = [];
+var activeConduitMeshes = [];
+var activeBarrierMesh = null;
+var simLogTimeouts = [];
+
+// Ultra-bright high-visibility multi-layer energy orb with dynamic PointLight & corona
+var packetMesh = new THREE.Group();
+packetMesh.visible = false;
+
+// Inner core - solid bright white glowing nucleus
+var packetCoreMat = new THREE.MeshBasicMaterial({ 
+  color: '#ffffff',
+  depthTest: false,
+  depthWrite: false
+});
+var packetCore = new THREE.Mesh(new THREE.SphereGeometry(0.65, 16, 16), packetCoreMat);
+packetCore.renderOrder = 999999;
+packetMesh.add(packetCore);
+
+// Outer glowing aura sphere
+var packetAuraMat = new THREE.MeshBasicMaterial({
+  color: '#38bdf8',
+  transparent: true,
+  opacity: 0.88,
+  blending: THREE.AdditiveBlending,
+  depthTest: false,
+  depthWrite: false
+});
+var packetAura = new THREE.Mesh(new THREE.SphereGeometry(1.25, 16, 16), packetAuraMat);
+packetAura.renderOrder = 999999;
+packetMesh.add(packetAura);
+
+// High-tech rotating pulse ring
+var packetRingMat = new THREE.MeshBasicMaterial({
+  color: '#38bdf8',
+  transparent: true,
+  opacity: 0.92,
+  side: THREE.DoubleSide,
+  depthTest: false,
+  depthWrite: false
+});
+var packetRing = new THREE.Mesh(new THREE.RingGeometry(0.95, 1.65, 24), packetRingMat);
+packetRing.rotation.x = Math.PI / 2;
+packetRing.renderOrder = 999999;
+packetMesh.add(packetRing);
+
+// Forward compatibility alias for material property
+packetMesh.material = packetAuraMat;
+
+var packetLight = new THREE.PointLight('#38bdf8', 8.0, 24);
+packetMesh.add(packetLight);
+
+scene.add(packetMesh);
+
+var packetAnim = null;
+
+function streamSimLog(lines) {
+  var consoleEl = document.getElementById('simConsole');
+  if (!consoleEl) return;
+  consoleEl.innerHTML = '';
+  for (var i = 0; i < lines.length; i++) {
+    (function(line, idx) {
+      var tid = setTimeout(function() {
+        if (idx === 0) consoleEl.innerHTML = line;
+        else consoleEl.innerHTML += '<br>' + line;
+        consoleEl.scrollTop = consoleEl.scrollHeight;
+      }, idx * 400);
+      simLogTimeouts.push(tid);
+    })(lines[i], i);
+  }
+}
+
+function clearSimEffects() {
+  for (var i = 0; i < simLogTimeouts.length; i++) clearTimeout(simLogTimeouts[i]);
+  simLogTimeouts = [];
+
+  for (var i = 0; i < activeSimBadges.length; i++) {
+    scene.remove(activeSimBadges[i]);
+    var bIdx = billboardTags.indexOf(activeSimBadges[i]);
+    if (bIdx >= 0) billboardTags.splice(bIdx, 1);
+  }
+  activeSimBadges = [];
+
+  for (var i = 0; i < activeShockwaves.length; i++) {
+    scene.remove(activeShockwaves[i].mesh);
+  }
+  activeShockwaves = [];
+
+  for (var i = 0; i < activeConduitMeshes.length; i++) {
+    scene.remove(activeConduitMeshes[i]);
+  }
+  activeConduitMeshes = [];
+
+  if (activeBarrierMesh) {
+    scene.remove(activeBarrierMesh);
+    activeBarrierMesh = null;
+  }
+
+  packetMesh.visible = false;
+  packetAnim = null;
+
+  // Clear active button indicators
+  for (var b = 1; b <= 4; b++) {
+    var btn = document.getElementById('btnSim' + b);
+    if (btn) btn.classList.remove('sim-active');
+  }
+  hideTrackingPill();
+}
+
+// Builds continuous glowing 3D laser conduit pipes along the hops
+function buildConduitLine(p1, p2, colorHex) {
+  var dir = new THREE.Vector3().subVectors(p2, p1);
+  var len = dir.length();
+  if (len < 0.05) return;
+  var geom = new THREE.CylinderGeometry(0.12, 0.12, len, 8);
+  var mat = new THREE.MeshBasicMaterial({
+    color: colorHex,
+    transparent: true,
+    opacity: 0.88,
+    depthTest: false,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending
+  });
+  var cyl = new THREE.Mesh(geom, mat);
+  cyl.renderOrder = 999990;
+  var mid = new THREE.Vector3().addVectors(p1, p2).multiplyScalar(0.5);
+  cyl.position.copy(mid);
+  cyl.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.clone().normalize());
+  scene.add(cyl);
+  activeConduitMeshes.push(cyl);
+}
+
+function buildConduitPath(points, colorHex) {
+  for (var i = 0; i < points.length - 1; i++) {
+    buildConduitLine(points[i], points[i + 1], colorHex);
+  }
+}
+
+// Expanding floor shockwave ring
+function spawnShockwave(pos, colorHex) {
+  var geom = new THREE.RingGeometry(0.3, 0.6, 32);
+  var mat = new THREE.MeshBasicMaterial({
+    color: colorHex,
+    side: THREE.DoubleSide,
+    transparent: true,
+    opacity: 0.95,
+    blending: THREE.AdditiveBlending
+  });
+  var ring = new THREE.Mesh(geom, mat);
+  ring.rotation.x = -Math.PI / 2;
+  ring.position.copy(pos);
+  ring.position.y += 0.06;
+  scene.add(ring);
+  activeShockwaves.push({
+    mesh: ring,
+    scale: 1,
+    maxScale: 6.5,
+    opacity: 0.95,
+    speed: 0.14
+  });
+}
+
+// Holographic Cisco Firepower 1010 barrier shield
+function spawnFirewallBarrier(pos) {
+  var g = new THREE.Group();
+  g.position.copy(pos);
+
+  var planeGeom = new THREE.PlaneGeometry(1.65, 2.35);
+  var planeMat = new THREE.MeshBasicMaterial({
+    color: '#ef4444',
+    transparent: true,
+    opacity: 0.55,
+    side: THREE.DoubleSide,
+    blending: THREE.AdditiveBlending
+  });
+  var shieldPlane = new THREE.Mesh(planeGeom, planeMat);
+  shieldPlane.position.y = 1.15;
+  g.add(shieldPlane);
+
+  var wireGeom = new THREE.WireframeGeometry(planeGeom);
+  var wireMat = new THREE.LineBasicMaterial({
+    color: '#fca5a5',
+    transparent: true,
+    opacity: 0.95
+  });
+  var wireLines = new THREE.LineSegments(wireGeom, wireMat);
+  wireLines.position.y = 1.15;
+  g.add(wireLines);
+
+  var barrierLight = new THREE.PointLight('#ef4444', 5.5, 12);
+  barrierLight.position.set(0, 1.2, 0.4);
+  g.add(barrierLight);
+
+  scene.add(g);
+  activeBarrierMesh = g;
+}
+
+// High-contrast 3D billboard alert badge
+function createSimBadge(title, subtitle, detail, pos, theme) {
+  var c = document.createElement('canvas');
+  var ctx = c.getContext('2d');
+
+  var fTitle = 'bold 26px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+  var fSub = 'bold 19px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+  var fDet = '16px Consolas, monospace';
+
+  ctx.font = fTitle;
+  var w1 = ctx.measureText(title).width;
+  ctx.font = fSub;
+  var w2 = subtitle ? ctx.measureText(subtitle).width : 0;
+  ctx.font = fDet;
+  var w3 = detail ? ctx.measureText(detail).width : 0;
+
+  var maxW = Math.max(w1, w2, w3, 240);
+  var padX = 26;
+  var padY = 16;
+  var cw = Math.ceil(maxW + padX * 2);
+  var ch = Math.ceil(34 + (subtitle ? 26 : 0) + (detail ? 24 : 0) + padY * 2);
+
+  c.width = cw;
+  c.height = ch;
+
+  var colors = {
+    danger:  { bg: 'rgba(69, 10, 10, 0.94)', border: '#ef4444', text: '#fca5a5', hl: '#ffffff' },
+    success: { bg: 'rgba(6, 78, 59, 0.94)',  border: '#10b981', text: '#6ee7b7', hl: '#ffffff' },
+    sync:    { bg: 'rgba(12, 74, 110, 0.94)', border: '#38bdf8', text: '#7dd3fc', hl: '#ffffff' },
+    hsrp:    { bg: 'rgba(120, 53, 15, 0.94)', border: '#f59e0b', text: '#fde68a', hl: '#ffffff' }
+  };
+  var col = colors[theme] || colors.success;
+
+  ctx.fillStyle = col.bg;
+  ctx.beginPath();
+  ctx.roundRect(4, 4, cw - 8, ch - 8, 12);
+  ctx.fill();
+
+  ctx.strokeStyle = col.border;
+  ctx.lineWidth = 3.5;
+  ctx.stroke();
+
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  var curY = padY + 16;
+  ctx.font = fTitle;
+  ctx.fillStyle = col.hl;
+  ctx.fillText(title, cw / 2, curY);
+
+  if (subtitle) {
+    curY += 26;
+    ctx.font = fSub;
+    ctx.fillStyle = col.text;
+    ctx.fillText(subtitle, cw / 2, curY);
+  }
+
+  if (detail) {
+    curY += 24;
+    ctx.font = fDet;
+    ctx.fillStyle = '#f8fafc';
+    ctx.fillText(detail, cw / 2, curY);
+  }
+
+  var tex = new THREE.CanvasTexture(c);
+  tex.minFilter = THREE.LinearFilter;
+
+  var aspect = cw / ch;
+  var planeHeight = 1.45;
+  var planeWidth = planeHeight * aspect;
+
+  var plane = new THREE.Mesh(
+    new THREE.PlaneGeometry(planeWidth, planeHeight),
+    new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.DoubleSide, depthWrite: false })
+  );
+  plane.position.copy(pos);
+  plane.userData = { tagType: 'sim_badge' };
+  scene.add(plane);
+  activeSimBadges.push(plane);
+  billboardTags.push(plane);
+  return plane;
+}
+
+// -------------------------------------------------------------
+// CHASE CAMERA & DEFENSE DEBRIEF MODAL CONTROLLER
+// -------------------------------------------------------------
+var currentTestKey = null;
+var activeTestPlan = null;
+
+function closeBigScreen() {
+  var bs = document.getElementById('simBigScreen');
+  if (bs) bs.style.display = 'none';
+}
+
+function showTrackingPill(text) {
+  var pill = document.getElementById('simTrackingPill');
+  if (pill) {
+    document.getElementById('trackLabel').textContent = text;
+    pill.style.display = 'flex';
+  }
+}
+
+function hideTrackingPill() {
+  var pill = document.getElementById('simTrackingPill');
+  if (pill) pill.style.display = 'none';
+}
+
+function openBigScreen(plan) {
+  activeTestPlan = plan;
+  hideTrackingPill();
+
+  var bs = document.getElementById('simBigScreen');
+  if (!bs) return;
+
+  document.getElementById('bsIcon').textContent = plan.badge || 'VERIFIED';
+  document.getElementById('bsTitle').textContent = plan.title;
+  document.getElementById('bsSubtitle').textContent = plan.subtitle;
+
+  var bBadge = document.getElementById('bsVerdictBadge');
+  bBadge.className = 'big-screen-badge ' + (plan.badgeClass || 'badge-success');
+  bBadge.textContent = plan.verdict || 'COMPLETED';
+
+  document.getElementById('bsExplanation').innerHTML = plan.explanation;
+
+  // Build Hops Flow (Completed Timeline with Checkmarks, zero scrollbar)
+  var hCont = document.getElementById('bsHopsContainer');
+  hCont.innerHTML = '';
+  if (plan.hops && plan.hops.length > 0) {
+    plan.hops.forEach(function(hop, idx) {
+      if (idx > 0) {
+        var arr = document.createElement('span');
+        arr.className = 'hop-arrow';
+        arr.textContent = '→';
+        hCont.appendChild(arr);
+      }
+      var hDiv = document.createElement('div');
+      var isDenyFinal = (plan.isDeny && idx === plan.hops.length - 1);
+      hDiv.className = isDenyFinal ? 'hop-step completed-red' : 'hop-step completed';
+      var checkIcon = isDenyFinal ? 'BLOCKED' : 'PASS';
+      hDiv.innerHTML = '<span style="font-size:10px;margin-right:2px;">' + checkIcon + '</span> ' + hop;
+      hCont.appendChild(hDiv);
+    });
+  }
+
+  // Build Meta Items
+  var mGrid = document.getElementById('bsMetaGrid');
+  mGrid.innerHTML = '';
+  if (plan.meta && plan.meta.length > 0) {
+    plan.meta.forEach(function(m) {
+      var it = document.createElement('div');
+      it.className = 'bs-meta-item';
+      it.innerHTML = '<div class="bs-meta-label">' + m.label + '</div><div class="bs-meta-val" title="' + m.value + '">' + m.value + '</div>';
+      mGrid.appendChild(it);
+    });
+  }
+
+  bs.style.display = 'block';
+}
+
+function replayActiveTest() {
+  closeBigScreen();
+  if (currentTestKey) {
+    setTimeout(function() {
+      if (currentTestKey === 'hsrp') toggleHSRP();
+      else runSim(currentTestKey);
+    }, 200);
+  }
+}
+
+function runPacketTrace(points, colorHex, speed, onDone) {
+  closeBigScreen();
+  hideTrackingPill();
+
+  packetAuraMat.color.set(colorHex);
+  packetRingMat.color.set(colorHex);
+  packetLight.color.set(colorHex);
+  packetMesh.position.copy(points[0]);
+  packetMesh.visible = true;
+
+  // Set starting camera POV inside the building/room
+  if (activeNav === 'orbit') {
+    if (currentTestKey === 'inter_vlan') {
+      // Intimate indoor POV inside Room 101 right next to the starting workstation
+      camera.position.set(-25.8, 2.2, 17.2);
+      orbit.target.copy(points[0]);
+    } else if (currentTestKey === 'acl_block') {
+      // Indoor POV inside Admin Building 2F next to Wi-Fi AP
+      camera.position.set(13.5, 7.5, 20.2);
+      orbit.target.copy(points[0]);
+    } else if (currentTestKey === 'wan_sync') {
+      // Indoor POV inside Second Branch Office
+      camera.position.set(43.5, 4.2, -11.5);
+      orbit.target.copy(points[0]);
+    } else if (currentTestKey === 'branch_dia') {
+      // Indoor POV inside Second Branch Office next to branch PC
+      camera.position.set(30.0, 2.4, -18.5);
+      orbit.target.copy(points[0]);
+    } else {
+      // Inside Studio Server Room
+      camera.position.set(points[0].x - 3.8, points[0].y + 2.0, points[0].z + 4.2);
+      orbit.target.copy(points[0]);
+    }
+    orbit.update();
+  }
+
+  var title = 'SENDING DATA ACROSS NETWORK...';
+  if (currentTestKey === 'inter_vlan') title = 'TEST 1: Employee PC ➔ Office Switch ➔ Employee Server';
+  else if (currentTestKey === 'acl_block') title = 'TEST 2: Guest Phone ➔ Cisco Firewall ➔ Access Blocked';
+  else if (currentTestKey === 'wan_sync') title = 'TEST 3: Admin Server ➔ 500 Mbps Private Line ➔ Second Branch';
+  else if (currentTestKey === 'branch_dia') title = 'TEST 4: Branch Computer ➔ 100 Mbps Direct Internet ➔ Cloud / Web';
+  else if (currentTestKey === 'hsrp') title = 'TEST 5: Main Line Down ➔ Switching to Backup Internet (Globe)';
+  showTrackingPill(title);
+
+  packetAnim = {
+    points: points,
+    currentSegment: 0,
+    progress: 0,
+    speed: speed || 0.024,
+    chaseCamera: true,
+    onDone: onDone
+  };
+}
+
+
+// -------------------------------------------------------------
+// CLEAN TOP NAVIGATION LOGIC
+// -------------------------------------------------------------
+function focusFacility(name) {
+  clearSimEffects();
+  closeBigScreen();
+  if (activeNav === 'walk') setNavMode('orbit');
+  
+  // Highlight active nav button
+  var btns = {
+    overview: 'btnNavOverview',
+    datacenter: 'btnNavServer',
+    emp: 'btnNavEmp',
+    admin: 'btnNavAdmin',
+    branch: 'btnNavBranch'
+  };
+  for (var k in btns) {
+    var el = document.getElementById(btns[k]);
+    if (el) el.className = (k === name) ? 'nav-btn active' : 'nav-btn';
+  }
+
+  // Floor sub-bar visibility
+  var floorSub = document.getElementById('floorSubNav');
+  floorSub.style.display = (name === 'emp') ? 'flex' : 'none';
+
+  selectFloor('all');
+
+  if (typeof datacenterRoof !== 'undefined') datacenterRoof.visible = (name !== 'datacenter');
+  if (typeof adminRoof !== 'undefined') adminRoof.visible = (name !== 'admin');
+  if (typeof branchRoof !== 'undefined') branchRoof.visible = (name !== 'branch');
+
+  var views = {
+    overview: { cam: [-30, 48, 65], tgt: [6, 2, 0] },
+    datacenter: { cam: [-18, 6.5, -9], tgt: [-20, 1.8, -18] },
+    emp: { cam: [-22, 16, 38], tgt: [-22, 3.0, 18] },
+    admin: { cam: [16, 9.5, 30], tgt: [16, 2.2, 18] },
+    branch: { cam: [38, 7.5, -9], tgt: [38, 2.2, -18] }
+  };
+  var v = views[name] || views.overview;
+  tweenCam(v.cam, v.tgt);
+  document.getElementById('dockCoords').textContent = 'Viewing: ' + name.toUpperCase();
+}
+
+function selectFloor(floor, skipCam) {
+  for (var i = 1; i <= 5; i++) {
+    var p = document.getElementById('fp' + i);
+    if (p) p.className = floor === i ? 'floor-pill active' : 'floor-pill';
+  }
+  var fpAll = document.getElementById('fpAll');
+  if (fpAll) fpAll.className = floor === 'all' ? 'floor-pill active' : 'floor-pill';
+
+  if (floor === 'all') {
+    employeeFloors.forEach(function(fg) { fg.visible = true; });
+    if (typeof empRoof !== 'undefined') empRoof.visible = true;
+    if (!skipCam) tweenCam([-28, 24, 45], [-22, 7, 18]);
+  } else {
+    var fIndex = parseInt(floor) - 1;
+    employeeFloors.forEach(function(fg, idx) {
+      fg.visible = (idx === fIndex);
+    });
+    if (typeof empRoof !== 'undefined') empRoof.visible = false;
+    var targetY = fIndex * 3.4;
+    if (!skipCam) tweenCam([-22, targetY + 8, 30], [-22, targetY + 1.2, 18]);
+  }
+}
+
+function tweenCam(pos, tgt) {
+  var startCam = camera.position.clone();
+  var startTgt = orbit.target.clone();
+  var endCam = new THREE.Vector3(pos[0], pos[1], pos[2]);
+  var endTgt = new THREE.Vector3(tgt[0], tgt[1], tgt[2]);
+  var t = 0;
+
+  function step() {
+    t += 0.05;
+    camera.position.lerpVectors(startCam, endCam, t);
+    orbit.target.lerpVectors(startTgt, endTgt, t);
+    orbit.update();
+    if (t < 1) requestAnimationFrame(step);
+  }
+  step();
+}
+
+// -------------------------------------------------------------
+// DOCK ACTIONS & TOGGLES
+// -------------------------------------------------------------
+function cycleLabels() {
+  if (labelMode === 'smart') labelMode = 'minimal';
+  else if (labelMode === 'minimal') labelMode = 'off';
+  else labelMode = 'smart';
+
+  document.getElementById('lblModeText').textContent =
+    labelMode === 'smart' ? 'Smart' : (labelMode === 'minimal' ? 'Bldg Only' : 'Off');
+  document.getElementById('btnDockTags').className =
+    labelMode === 'off' ? 'dock-btn' : 'dock-btn active';
+}
+
+function toggleStyleMode() {
+  currentStyle = (currentStyle === 'realistic' ? 'studio' : 'realistic');
+  document.getElementById('lblStyleText').textContent = currentStyle === 'realistic' ? 'Campus' : 'Studio';
+
+  if (currentStyle === 'studio') {
+    // Option B: Pristine White Studio Architectural Model
+    scene.background = new THREE.Color('#f8fafc');
+    scene.fog = new THREE.Fog('#f8fafc', 90, 270);
+    mats.grass.color.set('#f1f5f9');
+    mats.concrete.color.set('#e2e8f0');
+    mats.asphalt.color.set('#cbd5e1');
+    hemiLight.color.set('#ffffff');
+    hemiLight.groundColor.set('#cbd5e1');
+    sunLight.intensity = 1.6;
+    sunLight.color.set('#ffffff');
+    if (typeof campusTreesGroup !== 'undefined') campusTreesGroup.visible = false;
+  } else {
+    // Option A: Realistic Outdoor Campus with Lawn & Sky (Matching Reference CAD)
+    scene.background = new THREE.Color('#90caf9');
+    scene.fog = new THREE.Fog('#dbeafe', 90, 290);
+    mats.grass.color.set('#4d7c0f');
+    mats.concrete.color.set('#e2e8f0');
+    mats.asphalt.color.set('#334155');
+    hemiLight.color.set('#bae6fd');
+    hemiLight.groundColor.set('#4d7c0f');
+    sunLight.intensity = 2.2;
+    sunLight.color.set('#fff7ed');
+    if (typeof campusTreesGroup !== 'undefined') campusTreesGroup.visible = true;
+  }
+}
+
+function toggleTestDrawer() {
+  var d = document.getElementById('testDrawer');
+  d.style.display = (d.style.display === 'block') ? 'none' : 'block';
+}
+
+// -------------------------------------------------------------
+// SLIDE-OUT DEVICE INSPECTOR
+// -------------------------------------------------------------
+function inspectDevice(d) {
+  document.getElementById('inspName').textContent = d.id;
+  document.getElementById('inspSub').textContent = d.dept || d.type;
+  document.getElementById('inspVlan').textContent = d.vlan ? d.vlan.split(' ')[0] : 'NODE';
+
+  var box = document.getElementById('inspSpecs');
+  box.innerHTML = `
+    <div class="spec-line"><span class="sk">Type:</span><span class="sv">${d.type}</span></div>
+    <div class="spec-line"><span class="sk">Subnet:</span><span class="sv">${d.vlan || 'LAN'}</span></div>
+    <div class="spec-line"><span class="sk">IP Address:</span><span class="sv">${d.ip || 'DHCP'}</span></div>
+    ${d.mac ? `<div class="spec-line"><span class="sk">MAC:</span><span class="sv">${d.mac}</span></div>` : ''}
+    ${d.switchPort ? `<div class="spec-line"><span class="sk">Switchport:</span><span class="sv">${d.switchPort}</span></div>` : ''}
+    <div class="spec-line"><span class="sk">Hardware:</span><span class="sv">${d.specs}</span></div>
+    ${d.diskUsage ? `<div class="spec-line"><span class="sk">Storage:</span><span class="sv">${d.diskUsage}</span></div>` : ''}
+  `;
+  document.getElementById('inspDesc').textContent = d.desc;
+
+  var drawer = document.getElementById('inspectorDrawer');
+  drawer.style.display = 'block';
+  document.getElementById('dockCoords').textContent = 'Inspecting: ' + d.id;
+}
+
+function closeInspector() {
+  document.getElementById('inspectorDrawer').style.display = 'none';
+}
+
+// -------------------------------------------------------------
+// NETWORK POLICIES & SIMULATIONS
+// -------------------------------------------------------------
+var isPLDTCut = false;
+
+function toggleHSRP() {
+  clearSimEffects();
+  closeBigScreen();
+  currentTestKey = 'hsrp';
+  if (activeNav === 'walk') setNavMode('orbit');
+
+  isPLDTCut = !isPLDTCut;
+  var btn = document.getElementById('btnFailover');
+
+  // Smooth camera to frame Studio Server Room WAN demarcation
+  
+  if (isPLDTCut) {
+    btn.className = 't-btn t-btn-red sim-active';
+    btn.innerHTML = '<span style="color:#ef4444;font-size:12px;">●</span> PLDT Link DOWN (Globe Active)';
+    linePrimaryWAN.material.color.set('#334155');
+    lineBackupWAN.material.color.set('#f59e0b');
+
+    spawnShockwave(new THREE.Vector3(-25.0, 0.05, -18.0), '#ef4444');
+
+    streamSimLog([
+      '<span style="color:#ef4444;font-weight:700;">[1. OUTAGE DETECTED]</span> Primary internet line (PLDT) lost connection',
+      '<span style="color:#f59e0b;">[2. FAST DETECTION]</span> Office router senses outage in under 3 seconds',
+      '<span style="color:#f59e0b;font-weight:700;">[3. BACKUP ACTIVATES]</span> Backup router turns on Globe Business internet line',
+      '<span style="color:#38bdf8;">[4. SEAMLESS TRANSFER]</span> All office traffic automatically moves to Globe line',
+      '<span style="color:#ffffff;background:#78350f;padding:2px 6px;border-radius:4px;font-weight:700;">RESULT: Backup Active (Zero Downtime for Employees)</span>'
+    ]);
+
+    var pts = [
+      new THREE.Vector3(-25.0, 2.2, -19.0), // Core Switch
+      new THREE.Vector3(-25.0, 2.6, -16.0), // Cable ladder
+      new THREE.Vector3(-18.5, 2.5, -20.0), // RTR-MAIN-2 (Standby -> Active!)
+      new THREE.Vector3(-18.5, 5.0, -22.0)  // Globe Business 200M DIA Optical Demarc
+    ];
+    buildConduitPath(pts, '#f59e0b');
+
+    runPacketTrace(pts, '#f59e0b', 0.020, function() {
+      spawnShockwave(new THREE.Vector3(-18.5, 5.0, -22.0), '#f59e0b');
+      tweenCam([-14, 7, -12], [-18.5, 3.5, -20.0]);
+
+      setTimeout(function() {
+        openBigScreen({
+          badge: 'TEST 1',
+          title: 'TEST 5: INTERNET BACKUP TEST (PLDT TO GLOBE FAILOVER)',
+          subtitle: 'Automatic switch to backup internet line when primary line fails',
+          verdict: 'BACKUP ACTIVE (Internet Still Online)',
+          badgeClass: 'badge-amber',
+          isDeny: false,
+          hops: [
+            'Primary Internet (PLDT) Goes Down',
+            'Router Detects Issue in <3 Seconds',
+            'Backup Router Automatically Takes Over',
+            'Backup Internet (Globe) Turns On',
+            'All Computers Stay Connected'
+          ],
+          explanation: 'When the main internet line (PLDT) experiences an outage, the office routers automatically detect the loss and switch all office traffic to the secondary internet line (Globe Business) in under 3 seconds. Employees can continue working with zero disruption.',
+          meta: [
+            { label: 'PRIMARY LINE', value: 'PLDT (Simulated Outage)' },
+            { label: 'BACKUP LINE', value: 'Globe Business (Now Active)' },
+            { label: 'SWITCH TIME', value: 'Under 3 Seconds' },
+            { label: 'OFFICE IMPACT', value: 'Zero Downtime' },
+            { label: 'STATUS', value: 'All Computers Stay Online' }
+          ]
+        });
+      }, 400);
+    });
+
+  } else {
+    btn.className = 't-btn';
+    btn.innerHTML = '<span style="color:#f59e0b;font-size:12px;">⚡</span> 5. Simulate PLDT Link Cut (HSRP Failover)';
+    linePrimaryWAN.material.color.set('#ef4444');
+    lineBackupWAN.material.color.set('#fbbf24');
+
+    spawnShockwave(new THREE.Vector3(-22.5, 0.05, -18.0), '#10b981');
+
+    streamSimLog([
+      '<span style="color:#34d399;font-weight:700;">[1. LINE RESTORED]</span> Primary internet line (PLDT) is back online',
+      '<span style="color:#38bdf8;">[2. RECONNECTING]</span> Main router detects restored fiber link',
+      '<span style="color:#38bdf8;">[3. RESUMING NORMAL]</span> Primary router resumes main duties smoothly',
+      '<span style="color:#34d399;">[4. STANDBY READY]</span> Secondary router returns to standby mode',
+      '<span style="color:#ffffff;background:#065f46;padding:2px 6px;border-radius:4px;font-weight:700;">✅ RESULT: Normal Operation Restored (Both Lines Online)</span>'
+    ]);
+
+    var pts = [
+      new THREE.Vector3(-25.0, 2.2, -19.0), // Core Switch
+      new THREE.Vector3(-25.0, 2.6, -16.0), // Cable ladder
+      new THREE.Vector3(-18.5, 2.5, -18.0), // RTR-MAIN-1 (Active resumed)
+      new THREE.Vector3(-18.5, 5.0, -16.0)  // PLDT 200M DIA Optical Demarc
+    ];
+    buildConduitPath(pts, '#10b981');
+
+    runPacketTrace(pts, '#34d399', 0.020, function() {
+      spawnShockwave(new THREE.Vector3(-18.5, 5.0, -16.0), '#10b981');
+      tweenCam([-14, 7, -12], [-18.5, 3.5, -18.0]);
+
+      setTimeout(function() {
+        openBigScreen({
+          badge: 'FAILOVER',
+          title: 'TEST 5: PRIMARY INTERNET RESTORED',
+          subtitle: 'Main PLDT line back online • Normal dual-line operation resumed',
+          verdict: 'NORMALIZED (Both Lines Active)',
+          badgeClass: 'badge-success',
+          isDeny: false,
+          hops: [
+            'Primary Internet (PLDT) Restored',
+            'Router Automatically Reconnects',
+            'Primary Router Resumes Normal Work',
+            'Backup Router Returns to Standby',
+            'Traffic Shared Across Both Lines'
+          ],
+          explanation: 'The primary PLDT fiber line is back online. The main router resumed normal operation, and internet traffic is once again shared smoothly across both internet lines.',
+          meta: [
+            { label: 'PRIMARY LINE', value: 'PLDT 200M (Online)' },
+            { label: 'BACKUP LINE', value: 'Globe 200M (Standby)' },
+            { label: 'STATUS', value: 'Normal Operation' },
+            { label: 'TRAFFIC', value: 'Shared Across Both Lines' },
+            { label: 'RESULT', value: 'Full Backup Ready' }
+          ]
+        });
+      }, 400);
+    });
+  }
+}
+
+function runSim(type) {
+  clearSimEffects();
+  closeBigScreen();
+  currentTestKey = type;
+  if (activeNav === 'walk') setNavMode('orbit');
+
+  if (type === 'inter_vlan') {
+    var btn = document.getElementById('btnSim1');
+    if (btn) btn.classList.add('sim-active');
+
+    // Automatically isolate Floor 1 so camera enters directly inside Room 101 without upper floors blocking
+    selectFloor(1, true);
+
+    var pts = [
+      new THREE.Vector3(-28.0, 1.4, 14.8),  // PC-DEV-F1-01 (Room 101 Desk)
+      new THREE.Vector3(-21.6, 1.4, 14.8),  // Exit room into hallway
+      new THREE.Vector3(-21.6, 2.0, 18.0),  // SW-EMP-F1 Access Switch
+      new THREE.Vector3(-21.6, 2.2, 0.0),   // Campus fiber conduit
+      new THREE.Vector3(-25.0, 2.4, -16.0), // Enter Studio Server Room cable ladder
+      new THREE.Vector3(-25.0, 2.0, -19.0), // RACK-NET Catalyst 3650 Core SVI
+      new THREE.Vector3(-21.5, 1.4, -19.0)  // SRV-EMP Dedicated Server PC (Employees)
+    ];
+
+    buildConduitPath(pts, '#10b981');
+
+    streamSimLog([
+      '<span style="color:#34d399;">[1. SENDING]</span> Employee computer in Room 101 sends file request',
+      '<span style="color:#94a3b8;">[2. OFFICE SWITCH]</span> Floor 1 Switch forwards data through main fiber cable',
+      '<span style="color:#38bdf8;">[3. STUDIO ROOM]</span> Core Switch connects directly to the Employee Server',
+      '<span style="color:#34d399;">[4. SERVER CONNECTED]</span> Employee Server (SRV-EMP) responds with requested files',
+      '<span style="color:#ffffff;background:#065f46;padding:2px 6px;border-radius:4px;font-weight:700;">✓ RESULT: Connected Successfully (Fast Gigabit Speed)</span>'
+    ]);
+
+    runPacketTrace(pts, '#34d399', 0.024, function() {
+      spawnShockwave(new THREE.Vector3(-21.5, 0.05, -19.0), '#10b981');
+      tweenCam([-19, 4.5, -14], [-21.5, 1.2, -19.0]);
+
+      setTimeout(function() {
+        openBigScreen({
+          badge: 'TEST 1',
+          title: 'TEST 1: EMPLOYEE PC TO SERVER CONNECTION',
+          subtitle: 'Office computer communicating with the employee server',
+          verdict: 'CONNECTED (Success)',
+          badgeClass: 'badge-success',
+          isDeny: false,
+          hops: [
+            'Employee Computer (Room 101)',
+            'Floor 1 Office Switch',
+            'Main Fiber Network Cable',
+            'Core Switch (Studio Server Room)',
+            'Employee Server (SRV-EMP)'
+          ],
+          explanation: 'An employee computer on the 1st floor connects directly to the Employee Server (SRV-EMP) located in the Studio Server Room. The Core Switch connects them at full gigabit speed so file sharing and daily office work are fast and responsive.',
+          meta: [
+            { label: 'FROM', value: 'Employee PC (Room 101)' },
+            { label: 'TO', value: 'Employee Server (SRV-EMP)' },
+            { label: 'DEPARTMENT', value: 'Employees (VLAN 10)' },
+            { label: 'LOCATION', value: 'Studio Server Room' },
+            { label: 'SPEED', value: 'Fast Gigabit (1.0 Gbps)' }
+          ]
+        });
+      }, 400);
+    });
+
+  } else if (type === 'acl_block') {
+    var btn = document.getElementById('btnSim2');
+    if (btn) btn.classList.add('sim-active');
+
+    var pts = [
+      new THREE.Vector3(16.0, 6.5, 18.0),   // Guest Mobile under Admin 2F AP
+      new THREE.Vector3(11.0, 2.0, 18.0),   // SW-ADM-F1
+      new THREE.Vector3(-10.0, 2.2, 0.0),   // Across courtyard
+      new THREE.Vector3(-25.0, 2.4, -16.0), // Cable ladder
+      new THREE.Vector3(-25.0, 1.8, -18.6)  // Cisco Firepower 1010 NGFW at RACK-NET
+    ];
+
+    buildConduitPath(pts, '#ef4444');
+
+    streamSimLog([
+      '<span style="color:#f59e0b;">[1. WI-FI USER]</span> Visitor on Guest Wi-Fi tries to access private Admin Server',
+      '<span style="color:#94a3b8;">[2. OFFICE SWITCH]</span> Admin Building switch forwards data to the server room',
+      '<span style="color:#ef4444;font-weight:700;">[3. SECURITY CHECK]</span> Cisco Firewall checks the visitor\'s permissions',
+      '<span style="color:#f87171;">[4. RULE MATCH]</span> Security Rule: Guests are only allowed on the public internet',
+      '<span style="color:#ffffff;background:#7f1d1d;padding:2px 6px;border-radius:4px;font-weight:700;">⛔ RESULT: Access Blocked (Company Records Protected)</span>'
+    ]);
+
+    runPacketTrace(pts, '#ef4444', 0.024, function() {
+      spawnFirewallBarrier(new THREE.Vector3(-25.0, 0.0, -18.3));
+      spawnShockwave(new THREE.Vector3(-25.0, 0.05, -18.6), '#ef4444');
+      tweenCam([-21.5, 4.0, -13], [-25.0, 1.8, -18.6]);
+
+      setTimeout(function() {
+        openBigScreen({
+          badge: 'SECURITY',
+          title: 'TEST 2: GUEST WI-FI BLOCKED FROM ADMIN SERVER',
+          subtitle: 'Cisco Firewall stops unauthorized visitors from accessing private files',
+          verdict: 'BLOCKED (Access Denied)',
+          badgeClass: 'badge-danger',
+          isDeny: true,
+          hops: [
+            'Guest Mobile Phone (Wi-Fi)',
+            'Admin Office Wi-Fi Point',
+            'Admin Building Switch',
+            'Cisco Firewall (Security Rule)',
+            'Admin Server (SRV-ADM) [Blocked]'
+          ],
+          explanation: 'A visitor connected to Guest Wi-Fi tried to connect to the private Administration Server. The Cisco Firewall checked the security rules, recognized that visitors are only allowed to browse the public internet, and immediately blocked access to protect confidential company records.',
+          meta: [
+            { label: 'WHO', value: 'Guest Phone (VLAN 40)' },
+            { label: 'TARGET', value: 'Admin Server (SRV-ADM)' },
+            { label: 'SECURITY', value: 'Cisco Firewall Rule' },
+            { label: 'ACTION', value: 'Connection Blocked & Logged' },
+            { label: 'RESULT', value: 'Company Records Safe' }
+          ]
+        });
+      }, 400);
+    });
+
+  } else if (type === 'wan_sync') {
+    var btn = document.getElementById('btnSim3');
+    if (btn) btn.classList.add('sim-active');
+
+    var pts = [
+      new THREE.Vector3(46.0, 3.5, -14.0),  // SRV-BR in Second Branch
+      new THREE.Vector3(46.0, 6.0, -14.0),  // RTR-BR serial WAN edge
+      new THREE.Vector3(10.0, 5.0, -16.0),  // Mid-span aerial WAN link
+      new THREE.Vector3(-25.0, 4.0, -18.0), // Main Branch roof entry
+      new THREE.Vector3(-25.0, 2.0, -19.0), // RACK-NET
+      new THREE.Vector3(-18.5, 1.4, -19.0)  // SRV-ADM (Server PC Administration)
+    ];
+
+    buildConduitPath(pts, '#0284c7');
+
+    streamSimLog([
+      '<span style="color:#38bdf8;">[1. DATABASE SYNC]</span> Admin Server in Studio Room sends data to Second Branch',
+      '<span style="color:#94a3b8;">[2. OFFICE ROUTER]</span> Main Branch Router prepares files for private transmission',
+      '<span style="color:#f59e0b;">[3. PRIVATE LINE]</span> Data travels across the dedicated 500 Mbps fiber line',
+      '<span style="color:#34d399;">[4. BRANCH REACHED]</span> Second Branch Router forwards data to branch computers',
+      '<span style="color:#ffffff;background:#065f46;padding:2px 6px;border-radius:4px;font-weight:700;">✓ RESULT: Offices Connected (Secure Private Line)</span>'
+    ]);
+
+    runPacketTrace(pts, '#38bdf8', 0.024, function() {
+      spawnShockwave(new THREE.Vector3(-18.5, 0.05, -19.0), '#38bdf8');
+      tweenCam([-15, 4.0, -14], [-18.5, 1.2, -19.0]);
+
+      setTimeout(function() {
+        openBigScreen({
+          badge: 'WAN LINK',
+          title: 'TEST 3: MAIN OFFICE TO SECOND BRANCH CONNECTION',
+          subtitle: 'Private leased line sending database updates between offices',
+          verdict: 'CONNECTED (Offices Linked)',
+          badgeClass: 'badge-cyan',
+          isDeny: false,
+          hops: [
+            'Admin Server (Studio Room)',
+            'Main Office Router',
+            '500 Mbps Dedicated Private Line',
+            'Second Branch Router',
+            'Second Branch Computers'
+          ],
+          explanation: 'The Administration Server in the main office sends database and file updates across the dedicated 500 Mbps private fiber line to the Second Branch Office. Because this uses a private line, company data does not travel over the public internet, keeping it safe and fast.',
+          meta: [
+            { label: 'FROM', value: 'Admin Server (Main Office)' },
+            { label: 'TO', value: 'Second Branch Office' },
+            { label: 'CONNECTION', value: '500 Mbps Private Line' },
+            { label: 'SECURITY', value: 'Private & Encrypted' },
+            { label: 'SPEED', value: 'Instant Delivery (<2ms)' }
+          ]
+        });
+      }, 400);
+    });
+
+  } else if (type === 'branch_dia') {
+    var btn = document.getElementById('btnSim4');
+    if (btn) btn.classList.add('sim-active');
+
+    var pts = [
+      new THREE.Vector3(32.5, 1.4, -21.0),  // Branch Support Workstation
+      new THREE.Vector3(46.0, 2.5, -14.0),  // RTR-BR Branch Router
+      new THREE.Vector3(46.0, 6.0, -14.0),  // Direct DIA riser
+      new THREE.Vector3(54.0, 10.0, -14.0)  // Cloud Breakout
+    ];
+
+    buildConduitPath(pts, '#10b981');
+
+    streamSimLog([
+      '<span style="color:#34d399;">[1. WEB REQUEST]</span> Branch computer opens cloud apps and websites',
+      '<span style="color:#94a3b8;">[2. BRANCH ROUTER]</span> Branch router directs web traffic to the local internet',
+      '<span style="color:#f59e0b;">[3. DIRECT INTERNET]</span> Traffic exits through Converge 100 Mbps direct line',
+      '<span style="color:#34d399;">[4. CLOUD ONLINE]</span> Connects directly to web apps without slowing main office line',
+      '<span style="color:#ffffff;background:#065f46;padding:2px 6px;border-radius:4px;font-weight:700;">✓ RESULT: Direct Internet Working (Private line kept free for files)</span>'
+    ]);
+
+    runPacketTrace(pts, '#34d399', 0.024, function() {
+      spawnShockwave(new THREE.Vector3(54.0, 10.0, -14.0), '#10b981');
+      tweenCam([42, 9.0, -6], [50, 7.0, -14.0]);
+
+      setTimeout(function() {
+        openBigScreen({
+          badge: 'DIRECT DIA',
+          title: 'TEST 4: SECOND BRANCH DIRECT INTERNET ACCESS',
+          subtitle: 'Branch computers using their own dedicated internet for web & cloud',
+          verdict: 'ONLINE (Direct Internet)',
+          badgeClass: 'badge-success',
+          isDeny: false,
+          hops: [
+            'Second Branch Computer',
+            'Branch Office Switch',
+            'Branch Office Router',
+            '100 Mbps Direct Internet Line',
+            'Cloud Websites (Office 365, CRM)'
+          ],
+          explanation: 'Computers at the Second Branch connect directly to the internet using the branch\'s own 100 Mbps fiber line. This allows branch staff to browse websites and use cloud tools without congesting the private connection to the main office.',
+          meta: [
+            { label: 'FROM', value: 'Second Branch Computer' },
+            { label: 'TARGET', value: 'Internet Websites & Cloud' },
+            { label: 'LINE', value: 'Converge 100 Mbps Fiber' },
+            { label: 'PRIVATE LINE', value: '0% Traffic (Saved for files)' },
+            { label: 'STATUS', value: 'Online & Working' }
+          ]
+        });
+      }, 400);
+    });
+  }
+}
+
+// -------------------------------------------------------------
+// RAYCASTING FOR MOUSE CLICK ON DESKS / SERVERS
+// -------------------------------------------------------------
+var raycaster = new THREE.Raycaster();
+var mouse = new THREE.Vector2();
+
+window.addEventListener('click', function(e) {
+  if (e.target.closest('#topNav') || e.target.closest('#bottomDock') || e.target.closest('#testDrawer') || e.target.closest('#inspectorDrawer') || e.target.closest('#simBigScreen')) {
+    return;
+  }
+  mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+
+  var hits = raycaster.intersectObjects(interactiveObjects, true);
+  if (hits.length > 0) {
+    var hitObj = hits[0].object;
+    while (hitObj && !hitObj.userData.id && hitObj.parent) {
+      hitObj = hitObj.parent;
+    }
+    if (hitObj && hitObj.userData && hitObj.userData.id) {
+      inspectDevice(hitObj.userData);
+    }
+  }
+});
+
+// WASD WALKTHROUGH CONTROLS
+var keys = {};
+window.addEventListener('keydown', function(e) { keys[e.code] = true; });
+window.addEventListener('keyup', function(e) { keys[e.code] = false; });
+
+// -------------------------------------------------------------
+// ANIMATION LOOP (LOD TAGS & CAMERA)
+// -------------------------------------------------------------
+function animate() {
+  requestAnimationFrame(animate);
+
+  if (activeNav === 'orbit' && (!packetAnim || !packetAnim.chaseCamera)) {
+    orbit.update();
+  } else if (activeNav === 'walk') {
+    if (walk.isLocked) {
+      var speed = keys.ShiftLeft ? 0.32 : 0.16;
+      if (keys.KeyW || keys.ArrowUp) walk.moveForward(speed);
+      if (keys.KeyS || keys.ArrowDown) walk.moveForward(-speed);
+      if (keys.KeyA || keys.ArrowLeft) walk.moveRight(-speed);
+      if (keys.KeyD || keys.ArrowRight) walk.moveRight(speed);
+    }
+    // Mobile Virtual Joystick Input
+    if (joystickInput.x !== 0 || joystickInput.y !== 0) {
+      var jSpeed = 0.16;
+      walk.moveForward(-joystickInput.y * jSpeed);
+      walk.moveRight(joystickInput.x * jSpeed);
+    }
+    walk.getObject().position.y = 1.65;
+  }
+
+  // Refined Smart Distance LOD (Zero Sky Clutter)
+  var cPos = camera.position;
+  for (var bIdx = 0; bIdx < billboardTags.length; bIdx++) {
+    var bTag = billboardTags[bIdx];
+    bTag.quaternion.copy(camera.quaternion);
+
+    if (labelMode === 'off') {
+      bTag.visible = false;
+      continue;
+    }
+    if (labelMode === 'minimal') {
+      bTag.visible = (bTag.userData.tagType === 'building');
+      continue;
+    }
+
+    // Smart LOD
+    var dDist = cPos.distanceTo(bTag.position);
+    if (bTag.userData.tagType === 'sim_badge') {
+      // Simulation reaction badges are ALWAYS 100% visible
+      bTag.visible = true;
+    } else if (bTag.userData.tagType === 'building') {
+      bTag.visible = dDist > 14;
+    } else if (bTag.userData.tagType === 'room') {
+      bTag.visible = dDist < 32;
+    } else { // 'device'
+      bTag.visible = dDist < 38;
+    }
+  }
+
+  // Pulse WAN lines
+  var time = performance.now() * 0.002;
+  if (!isPLDTCut) {
+    linePrimaryWAN.material.opacity = 0.5 + 0.45 * Math.sin(time * 3);
+    lineBackupWAN.material.opacity = 0.35 + 0.2 * Math.sin(time * 2);
+  } else {
+    linePrimaryWAN.material.opacity = 0.25;
+    lineBackupWAN.material.opacity = 0.7 + 0.3 * Math.sin(time * 5);
+  }
+
+  // Animate expanding floor shockwave rings
+  for (var swI = activeShockwaves.length - 1; swI >= 0; swI--) {
+    var sw = activeShockwaves[swI];
+    sw.scale += sw.speed;
+    sw.mesh.scale.set(sw.scale, sw.scale, sw.scale);
+    sw.opacity -= 0.022;
+    sw.mesh.material.opacity = Math.max(0, sw.opacity);
+    if (sw.opacity <= 0 || sw.scale >= sw.maxScale) {
+      scene.remove(sw.mesh);
+      activeShockwaves.splice(swI, 1);
+    }
+  }
+
+  // Animate firewall barrier pulse
+  if (activeBarrierMesh) {
+    var bTime = performance.now() * 0.008;
+    activeBarrierMesh.children[0].material.opacity = 0.45 + 0.35 * Math.sin(bTime);
+    activeBarrierMesh.children[2].intensity = 4.0 + 2.5 * Math.sin(bTime * 2);
+  }
+
+  // Animate packet flight with dynamic drone chase camera
+  if (packetAnim) {
+    packetAnim.progress += packetAnim.speed;
+    var pts = packetAnim.points;
+    var seg = packetAnim.currentSegment;
+
+    if (seg < pts.length - 1) {
+      packetMesh.position.lerpVectors(pts[seg], pts[seg + 1], packetAnim.progress);
+
+      var pTime = performance.now() * 0.015;
+      packetLight.intensity = 5.5 + 2.5 * Math.sin(pTime);
+      var ringScale = 1.0 + 0.22 * Math.sin(pTime * 2);
+      packetRing.scale.set(ringScale, ringScale, ringScale);
+      packetRing.rotation.z += 0.05;
+
+      // Smart adaptive camera chase (Intimate indoor room view vs outdoor campus view)
+      if (packetAnim.chaseCamera && activeNav === 'orbit') {
+        orbit.target.lerp(packetMesh.position, 0.18);
+
+        var isOutdoor = false;
+        if (currentTestKey === 'inter_vlan') {
+          // Packet enters outdoor courtyard conduit between Floor 1 and Studio Server Room
+          if (packetAnim.currentSegment >= 3 && packetMesh.position.z > -14) {
+            isOutdoor = true;
+            // Restore full building once packet leaves Floor 1
+            selectFloor('all', true);
+          }
+        } else if (currentTestKey === 'wan_sync') {
+          // Aerial leased line across campus
+          if (packetMesh.position.y > 4.0 || (packetMesh.position.x > -15 && packetMesh.position.x < 35)) {
+            isOutdoor = true;
+          }
+        } else if (currentTestKey === 'branch_dia') {
+          // Breakout high into cloud
+          if (packetMesh.position.y > 5.5) {
+            isOutdoor = true;
+          }
+        }
+
+        var desiredX, desiredY, desiredZ;
+        if (isOutdoor) {
+          // Smooth elevated outdoor campus view
+          desiredX = packetMesh.position.x - 10.0;
+          desiredY = packetMesh.position.y + 8.5;
+          desiredZ = packetMesh.position.z + 12.0;
+        } else {
+          // Intimate indoor room POV (close to desks and server racks, under ceiling)
+          desiredX = packetMesh.position.x - 3.2;
+          desiredY = packetMesh.position.y + 1.8;
+          desiredZ = packetMesh.position.z + 3.8;
+        }
+
+        camera.position.x += (desiredX - camera.position.x) * 0.12;
+        camera.position.y += (desiredY - camera.position.y) * 0.12;
+        camera.position.z += (desiredZ - camera.position.z) * 0.12;
+        orbit.update();
+      }
+
+      if (packetAnim.progress >= 1.0) {
+        packetAnim.progress = 0;
+        packetAnim.currentSegment++;
+      }
+    } else {
+      packetMesh.visible = false;
+      hideTrackingPill();
+      var doneCb = packetAnim.onDone;
+      packetAnim = null;
+      if (doneCb) doneCb();
+    }
+  }
+
+  renderer.render(scene, camera);
+}
+animate();
+
+// URL Query Param Support for direct testing / automated demonstration
+window.addEventListener('load', function() {
+  try {
+    var params = new URLSearchParams(window.location.search);
+    var test = params.get('test');
+    if (test) {
+      toggleTestDrawer();
+      setTimeout(function() {
+        if (test === 'hsrp') toggleHSRP();
+        else runSim(test);
+      }, 500);
+    }
+  } catch(e) {}
+});
+
+window.addEventListener('resize', function() {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+</script>
+</body>
+</html>
