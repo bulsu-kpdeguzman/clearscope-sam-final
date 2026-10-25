@@ -67,7 +67,7 @@ body {
   font-weight: 700;
   letter-spacing: 0.04em;
   color: #f8fafc;
-  padding: 0 10px 0 6px;
+  padding: 0 12px 0 10px;
   border-right: 1px solid rgba(255, 255, 255, 0.12);
   display: flex;
   align-items: center;
@@ -75,13 +75,7 @@ body {
   white-space: nowrap;
   flex-shrink: 0;
 }
-.nav-brand-dot {
-  width: 6px;
-  height: 6px;
-  background: var(--green-accent);
-  border-radius: 50%;
-  box-shadow: none;
-}
+.nav-brand-dot { display: none !important; }
 .nav-btn {
   background: transparent;
   border: 1px solid transparent;
@@ -237,13 +231,44 @@ body {
   gap: 6px;
 }
 .drawer-close {
-  background: transparent;
-  border: none;
-  color: var(--text-muted);
-  font-size: 14px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #f8fafc;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
 }
-.drawer-close:hover { color: #fff; }
+.drawer-close:hover, .drawer-close:active {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+.t-btn-close-full {
+  width: 100%;
+  margin-top: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #f8fafc;
+  padding: 7px 12px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  box-sizing: border-box;
+}
+.t-btn-close-full:hover, .t-btn-close-full:active {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
 .test-btn-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -934,19 +959,18 @@ body {
   /* Fixed Bounded Test Drawer (Pinned header, never cut off) */
   #testDrawer {
     position: fixed !important;
-    top: max(6px, env(safe-area-inset-top, 6px)) !important;
-    bottom: max(6px, env(safe-area-inset-bottom, 6px)) !important;
-    right: max(8px, env(safe-area-inset-right, 8px)) !important;
+    top: max(10px, env(safe-area-inset-top, 10px)) !important;
+    bottom: max(10px, env(safe-area-inset-bottom, 10px)) !important;
+    right: max(10px, env(safe-area-inset-right, 10px)) !important;
     left: auto !important;
-    width: min(330px, 45vw) !important;
+    width: min(330px, 46vw) !important;
     height: auto !important;
-    max-height: calc(100dvh - 12px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)) !important;
-    border-radius: 12px !important;
+    max-height: calc(100dvh - 20px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)) !important;
+    border-radius: 14px !important;
     padding: 8px 10px !important;
-    /* display handled by JS */
     flex-direction: column !important;
     overflow: hidden !important;
-    z-index: 1000 !important;
+    z-index: 1050 !important;
   }
   .drawer-header {
     margin-bottom: 6px !important;
@@ -1154,16 +1178,14 @@ if (typeof THREE === 'undefined') {
 <div id="topNav">
   <!-- Mobile Compact Trigger (Visible on Mobile Only) -->
   <button class="glass mobile-nav-trigger" id="btnMobileNavToggle" onclick="toggleMobileNav()">
-    <span class="nav-brand-dot"></span>
-    <span id="lblMobileFacility">All Facilities</span>
+        <span id="lblMobileFacility">All Facilities</span>
     <span class="mobile-chevron" id="mobileNavChevron">▼</span>
   </button>
 
   <!-- Full Facility Capsule (Desktop Default, Expandable Dropdown on Mobile) -->
   <div class="glass nav-capsule" id="navCapsule">
     <div class="nav-brand">
-      <span class="nav-brand-dot"></span>
-      <span>ClearScope BIM</span>
+            <span>ClearScope BIM</span>
     </div>
     <button class="nav-btn active" id="btnNavOverview" onclick="handleFacilitySelect('overview')">All Facilities</button>
     <button class="nav-btn" id="btnNavServer" onclick="handleFacilitySelect('datacenter')">Studio Server Room</button>
@@ -1273,30 +1295,36 @@ if (typeof THREE === 'undefined') {
 <div class="glass" id="testDrawer">
   <div class="drawer-header">
     <div class="drawer-title">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="color:var(--cyan-accent);vertical-align:middle;margin-right:6px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-      Interactive Network Tests
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="color:var(--brand-accent);vertical-align:middle;margin-right:6px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      Interactive Tests
     </div>
-    <button class="drawer-close" onclick="toggleTestDrawer()" title="Close">✕</button>
+    <button class="drawer-close" onclick="toggleTestDrawer()" title="Close Tests" aria-label="Close Tests">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </button>
   </div>
   <div class="test-drawer-scrollable">
     <div class="test-btn-grid">
       <button class="t-btn" id="btnSim1" onclick="runSim('inter_vlan')">
-        <span style="color:#34d399;font-size:11px;">●</span> 1. Employee PC to Server
+        <span style="color:#10b981;font-size:11px;">●</span> 1. Employee PC to Server
       </button>
       <button class="t-btn t-btn-red" id="btnSim2" onclick="runSim('acl_block')">
         <span style="color:#ef4444;font-size:11px;">●</span> 2. Block Guest Access
       </button>
       <button class="t-btn" id="btnSim3" onclick="runSim('wan_sync')">
-        <span style="color:#38bdf8;font-size:11px;">●</span> 3. Main to Branch Link
+        <span style="color:#3b82f6;font-size:11px;">●</span> 3. Main to Branch Link
       </button>
       <button class="t-btn" id="btnSim4" onclick="runSim('branch_dia')">
-        <span style="color:#34d399;font-size:11px;">●</span> 4. Branch Direct Internet
+        <span style="color:#10b981;font-size:11px;">●</span> 4. Branch Direct Internet
       </button>
     </div>
     <button class="t-btn" id="btnFailover" style="width:100%;margin-bottom:8px;" onclick="toggleHSRP()">
       <span style="color:#f59e0b;font-size:11px;">●</span> 5. Test Internet Backup (Failover)
     </button>
     <div class="sim-console" id="simConsole"><span style="color:#64748b;">[READY]</span> Select any test above to watch data travel through the facility in 3D.</div>
+    <button class="t-btn-close-full" onclick="toggleTestDrawer()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="margin-right:4px;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      Close Tests
+    </button>
   </div>
 </div>
 
@@ -1395,6 +1423,9 @@ scene.add(sunLight);
 var orbit = new THREE.OrbitControls(camera, renderer.domElement);
 orbit.enableDamping = true;
 orbit.dampingFactor = 0.05;
+orbit.rotateSpeed = isTouchDevice ? 0.65 : 0.85;
+orbit.panSpeed = isTouchDevice ? 0.65 : 0.85;
+orbit.zoomSpeed = 0.8;
 orbit.maxPolarAngle = Math.PI / 2.05;
 orbit.target.set(6, 2, 0);
 
@@ -1622,8 +1653,8 @@ function updateJoystickVisibility() {
         camera.rotation.order = 'YXZ';
         var euler = new THREE.Euler(0, 0, 0, 'YXZ');
         euler.setFromQuaternion(camera.quaternion);
-        euler.y -= deltaX * 0.0032;
-        euler.x -= deltaY * 0.0028;
+        euler.y -= deltaX * 0.0016;
+        euler.x -= deltaY * 0.0013;
         euler.x = Math.max(-Math.PI / 2.25, Math.min(Math.PI / 2.25, euler.x));
         euler.z = 0; // ZERO ROLL - PREVENTS HORIZON TILT PERMANENTLY
         camera.quaternion.setFromEuler(euler);
@@ -3192,7 +3223,8 @@ function toggleStyleMode() {
 function toggleTestDrawer() {
   var id = document.getElementById('inspectorDrawer');
   if (id) id.style.display = 'none';
-  closeBigScreen();
+  var bs = document.getElementById('simBigScreen');
+  if (bs) bs.style.display = 'none';
   var bp = document.getElementById('blueprintModal');
   if (bp) bp.style.display = 'none';
 
@@ -3758,13 +3790,12 @@ function animate() {
       if (keys.KeyA || keys.ArrowLeft) walk.moveRight(-speed);
       if (keys.KeyD || keys.ArrowRight) walk.moveRight(speed);
     }
-    // Mobile Virtual Joystick Input (Progressive Speed + Fast Outdoor Acceleration)
+    // Mobile Virtual Joystick Input (Smooth & Controllable Walk Speed)
     var jMag = Math.hypot(joystickInput.x, joystickInput.y);
-    if (jMag > 0.05) {
-      // Gentle push (0.16-0.22) for room precision, full stick tilt sprints (up to 0.58) outdoors
-      var outdoorMult = isOutdoors ? 1.85 : 1.0;
-      var sprintMult = (jMag > 0.70) ? 1.45 : 1.0;
-      var jSpeed = (0.16 + (jMag * 0.16)) * outdoorMult * sprintMult;
+    if (jMag > 0.04) {
+      // Smooth natural walking: 0.08 indoors, 0.14 outdoors
+      var baseSpeed = isOutdoors ? 0.14 : 0.08;
+      var jSpeed = baseSpeed * Math.min(1.0, jMag);
       walk.moveForward(-joystickInput.y * jSpeed);
       walk.moveRight(joystickInput.x * jSpeed);
     }
