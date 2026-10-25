@@ -1214,6 +1214,7 @@ var currentStyle = 'realistic'; // 'realistic' (Option A) or 'studio' (Option B)
 var labelMode = 'smart';        // 'smart', 'minimal', 'off'
 
 var camera = new THREE.PerspectiveCamera(52, window.innerWidth / window.innerHeight, 0.1, 800);
+camera.rotation.order = 'YXZ'; // Strict YXZ Euler to permanently eliminate gimbal lock & horizon tilt
 camera.position.set(-28, 38, 54);
 
 var renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
@@ -1258,6 +1259,8 @@ orbit.maxPolarAngle = Math.PI / 2.05;
 orbit.target.set(6, 2, 0);
 
 var walk = new THREE.PointerLockControls(camera, renderer.domElement);
+walk.minPolarAngle = 0.08; // Clamp pitch to prevent gimbal singularity at zenith
+walk.maxPolarAngle = Math.PI - 0.08; // Clamp pitch to prevent gimbal singularity at nadir
 scene.add(walk.getObject());
 
 var activeNav = 'orbit';
@@ -1279,6 +1282,16 @@ function setNavMode(mode) {
   } else {
     orbit.enabled = false;
     if (crosshair) crosshair.style.display = 'block';
+
+    // Level horizon and eye-height when transitioning into walk mode
+    camera.rotation.order = 'YXZ';
+    var euler = new THREE.Euler(0, 0, 0, 'YXZ');
+    euler.setFromQuaternion(camera.quaternion);
+    euler.x = Math.max(-0.35, Math.min(0.35, euler.x));
+    euler.z = 0;
+    camera.quaternion.setFromEuler(euler);
+    camera.position.y = 1.65;
+
     if (!isTouchDevice && window.innerWidth > 860) {
       walk.lock();
     }
@@ -3490,13 +3503,12 @@ window.addEventListener('keyup', function(e) { keys[e.code] = false; });
 function animate() {
   requestAnimationFrame(animate);
 
-  // STRICT LEVEL HORIZON: Never allow camera to roll / tilt diagonally
-  if (camera.rotation.z !== 0) camera.rotation.z = 0;
-  camera.up.set(0, 1, 0);
-
   if (activeNav === 'orbit' && (!packetAnim || !packetAnim.chaseCamera)) {
     orbit.update();
   } else if (activeNav === 'walk') {
+    // Strict YXZ zero-roll enforcement in first-person walk mode
+    if (camera.rotation.order !== 'YXZ') camera.rotation.order = 'YXZ';
+    if (camera.rotation.z !== 0) camera.rotation.z = 0;
     if (walk.isLocked) {
       var speed = keys.ShiftLeft ? 0.32 : 0.16;
       if (keys.KeyW || keys.ArrowUp) walk.moveForward(speed);
