@@ -315,9 +315,9 @@ body {
   margin-bottom: 8px;
 }
 .t-btn {
-  background: #0b1324;
-  border: 1px solid rgba(148, 163, 184, 0.25);
-  color: #e2e8f0;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  color: #cbd5e1;
   padding: 7px 9px;
   border-radius: 7px;
   font-size: 11px;
@@ -329,29 +329,41 @@ body {
   align-items: center;
   gap: 5px;
 }
-.t-btn:hover { background: #1e293b; border-color: var(--cyan-accent); color: #fff; }
+.t-btn:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.22);
+  color: #fff;
+}
 .t-btn.sim-active {
   background: rgba(37, 99, 235, 0.28);
   border-color: rgba(96, 165, 250, 0.5);
   box-shadow: none;
   color: #fff;
 }
-.t-btn-red { background: #450a0a; border-color: #ef4444; color: #fca5a5; }
-.t-btn-red:hover { background: #7f1d1d; color: #fff; }
+.t-btn-red {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.28);
+  color: #fca5a5;
+}
+.t-btn-red:hover {
+  background: rgba(239, 68, 68, 0.22);
+  border-color: rgba(239, 68, 68, 0.45);
+  color: #fff;
+}
 .t-btn-red.sim-active {
-  background: #7f1d1d;
-  border-color: #f87171;
-  box-shadow: 0 0 14px rgba(239, 68, 68, 0.55);
+  background: rgba(239, 68, 68, 0.32);
+  border-color: #ef4444;
+  box-shadow: none;
   color: #fff;
 }
 .sim-console {
-  background: #020617;
-  border: 1px solid rgba(56, 189, 248, 0.25);
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 7px;
   padding: 8px 10px;
   font-family: Consolas, 'SF Mono', monospace;
   font-size: 10.5px;
-  color: var(--cyan-accent);
+  color: #94a3b8;
   min-height: 72px;
   max-height: 120px;
   overflow-y: auto;
@@ -368,9 +380,10 @@ body {
   z-index: 45;
   padding: 6px 16px;
   display: none;
-  background: rgba(8, 15, 30, 0.88);
-  backdrop-filter: blur(14px);
-  border: 1px solid rgba(56, 189, 248, 0.45);
+  background: rgba(15, 23, 42, 0.94);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 20px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
   font-size: 11.5px;
@@ -385,8 +398,8 @@ body {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #38bdf8;
-  box-shadow: 0 0 10px #38bdf8;
+  background: #3b82f6;
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.6);
   animation: blink 0.8s infinite alternate;
 }
 @keyframes blink {
@@ -394,23 +407,26 @@ body {
   to { opacity: 1; transform: scale(1.2); }
 }
 
-/* EXECUTIVE DEFENSE DEBRIEF MODAL (NO SCROLLBAR, GORGEOUS GLASS) */
+/* EXECUTIVE DEFENSE DEBRIEF MODAL (CLEAN ARCHITECTURAL SLATE) */
 #simBigScreen {
   position: fixed;
   top: 76px;
   left: 50%;
   transform: translateX(-50%);
   width: min(680px, calc(100vw - 32px));
+  max-height: calc(100dvh - 96px);
   z-index: 55;
-  padding: 20px 24px;
+  padding: 18px 22px;
   display: none;
-  background: rgba(10, 16, 32, 0.88);
-  backdrop-filter: blur(24px) saturate(190%);
-  border: 1px solid rgba(56, 189, 248, 0.35);
+  background: rgba(15, 23, 42, 0.96);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 16px;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8), 0 0 35px rgba(56, 189, 248, 0.12);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.08);
   animation: debriefPop 0.28s cubic-bezier(0.16, 1, 0.3, 1);
   pointer-events: auto;
+  box-sizing: border-box;
 }
 
 @keyframes debriefPop {
@@ -424,7 +440,7 @@ body {
   align-items: center;
   margin-bottom: 12px;
   padding-bottom: 10px;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 .big-screen-icon {
   font-size: 22px;
@@ -434,7 +450,7 @@ body {
 .big-screen-title {
   font-size: 14.5px;
   font-weight: 700;
-  color: #fff;
+  color: #f8fafc;
   letter-spacing: 0.3px;
 }
 .big-screen-subtitle {
@@ -443,19 +459,19 @@ body {
   margin-top: 1px;
 }
 .big-screen-badge {
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 700;
-  padding: 4px 12px;
-  border-radius: 7px;
+  padding: 3px 10px;
+  border-radius: 6px;
   letter-spacing: 0.4px;
   text-transform: uppercase;
   white-space: nowrap;
 }
 
-.badge-success { background: rgba(6, 78, 59, 0.9); color: #6ee7b7; border: 1px solid #10b981; }
-.badge-danger  { background: rgba(127, 29, 29, 0.9); color: #fca5a5; border: 1px solid #ef4444; }
-.badge-sync    { background: rgba(12, 74, 110, 0.9); color: #7dd3fc; border: 1px solid #38bdf8; }
-.badge-amber   { background: rgba(120, 53, 15, 0.9); color: #fde68a; border: 1px solid #f59e0b; }
+.badge-success { background: rgba(16, 185, 129, 0.16); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.32); }
+.badge-danger  { background: rgba(239, 68, 68, 0.16); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.32); }
+.badge-sync    { background: rgba(59, 130, 246, 0.16); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.32); }
+.badge-amber   { background: rgba(245, 158, 11, 0.16); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.32); }
 
 /* Clean Flex-Wrap Breadcrumbs (Zero Ugly Scrollbar) */
 .big-screen-hops {
@@ -469,8 +485,8 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  background: rgba(15, 23, 42, 0.8);
-  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.09);
   padding: 4px 8px;
   border-radius: 6px;
   font-size: 10.5px;
@@ -478,14 +494,14 @@ body {
   color: #94a3b8;
 }
 .hop-step.completed {
-  border-color: rgba(52, 211, 153, 0.4);
-  color: #6ee7b7;
-  background: rgba(6, 78, 59, 0.3);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: #34d399;
+  background: rgba(16, 185, 129, 0.12);
 }
 .hop-step.completed-red {
-  border-color: rgba(239, 68, 68, 0.5);
-  color: #fca5a5;
-  background: rgba(127, 29, 29, 0.35);
+  border-color: rgba(239, 68, 68, 0.35);
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.12);
 }
 .hop-arrow {
   color: rgba(148, 163, 184, 0.35);
@@ -497,10 +513,11 @@ body {
   line-height: 1.6;
   color: #e2e8f0;
   margin-bottom: 12px;
-  background: rgba(2, 6, 23, 0.6);
+  background: rgba(255, 255, 255, 0.03);
   padding: 11px 14px;
   border-radius: 8px;
-  border-left: 3px solid var(--cyan-accent);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-left: 3px solid #3b82f6;
 }
 .big-screen-meta {
   display: grid;
@@ -509,8 +526,8 @@ body {
   margin-bottom: 14px;
 }
 .bs-meta-item {
-  background: rgba(15, 23, 42, 0.75);
-  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
   padding: 7px 10px;
   border-radius: 6px;
   display: flex;
@@ -518,8 +535,8 @@ body {
   justify-content: center;
 }
 .bs-meta-label {
-  font-size: 10px;
-  color: var(--text-muted);
+  font-size: 9.5px;
+  color: #64748b;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 3px;
@@ -541,11 +558,11 @@ body {
   align-items: center;
   gap: 8px;
   padding-top: 10px;
-  border-top: 1px solid rgba(148, 163, 184, 0.15);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 .bs-act-btn {
-  background: #1e293b;
-  border: 1px solid rgba(148, 163, 184, 0.3);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   color: #f8fafc;
   padding: 6px 14px;
   border-radius: 7px;
@@ -558,16 +575,17 @@ body {
   gap: 6px;
 }
 .bs-act-btn:hover {
-  background: #334155;
-  border-color: var(--cyan-accent);
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.25);
 }
 .bs-act-primary {
-  background: #0284c7;
-  border-color: #38bdf8;
+  background: #2563eb;
+  border-color: #3b82f6;
   color: #fff;
 }
 .bs-act-primary:hover {
-  background: #0369a1;
+  background: #1d4ed8;
+  border-color: #60a5fa;
 }
 
 
@@ -584,6 +602,7 @@ body {
   flex: 1 1 auto !important;
   min-height: 0 !important;
   padding-right: 4px;
+  touch-action: pan-y !important;
 }
 
 /* SLIDE-OVER DEVICE INSPECTOR (RIGHT) */
@@ -601,15 +620,7 @@ body {
   box-sizing: border-box;
   animation: slideLeft 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.insp-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 10px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid rgba(56, 189, 248, 0.2);
-  flex-shrink: 0;
-}
+
 .insp-scrollable-body {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
@@ -725,7 +736,7 @@ body {
   height: 110px;
   border-radius: 50%;
   background: rgba(15, 23, 42, 0.6);
-  border: 2px solid rgba(56, 189, 248, 0.4);
+  border: 2px solid rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(8px);
   position: relative;
   display: flex;
@@ -776,7 +787,7 @@ body {
   font-weight: 700;
   color: #fff;
   background: rgba(15, 23, 42, 0.85);
-  border: 1px solid rgba(56, 189, 248, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   display: flex;
   align-items: center;
   gap: 6px;
@@ -808,7 +819,7 @@ body {
     border-radius: 999px;
     font-size: 11.5px;
     font-weight: 700;
-    color: var(--cyan-accent);
+    color: #f8fafc;
     cursor: pointer;
     box-shadow: 0 4px 16px rgba(0,0,0,0.4);
     pointer-events: auto;
@@ -948,10 +959,14 @@ body {
   #simBigScreen {
     width: 95vw;
     max-width: 95vw;
-    padding: 14px;
-    max-height: 85vh;
-    overflow-y: auto;
+    padding: 12px 14px;
+    max-height: calc(100dvh - 32px);
+    overflow: hidden !important;
+    display: none;
+    flex-direction: column !important;
     z-index: 1000;
+    background: rgba(15, 23, 42, 0.96) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
   }
   .big-screen-hops {
     grid-template-columns: 1fr;
@@ -1042,35 +1057,100 @@ body {
     font-size: 9.5px !important;
   }
 
-  /* Fixed Bounded Simulation Debrief Report (Centered, never cut off, zero overlap) */
+  /* Fixed Bounded Simulation Debrief Report (Fluid Scrollable, Pinned Header & Actions) */
   #simBigScreen {
     position: fixed !important;
-    top: max(6px, env(safe-area-inset-top, 6px)) !important;
-    bottom: max(6px, env(safe-area-inset-bottom, 6px)) !important;
+    top: max(8px, env(safe-area-inset-top, 8px)) !important;
+    bottom: max(8px, env(safe-area-inset-bottom, 8px)) !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
-    width: min(600px, 92vw) !important;
-    height: auto !important;
-    max-height: calc(100dvh - 12px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)) !important;
+    width: min(620px, 94vw) !important;
+    height: calc(100dvh - 16px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)) !important;
+    max-height: calc(100dvh - 16px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)) !important;
     padding: 8px 12px !important;
-    border-radius: 12px !important;
-    /* display handled by JS */
+    border-radius: 14px !important;
     flex-direction: column !important;
     overflow: hidden !important;
-    z-index: 1001 !important;
+    z-index: 1050 !important;
+    box-sizing: border-box !important;
   }
   .big-screen-header {
-    margin-bottom: 5px !important;
+    margin-bottom: 4px !important;
     padding-bottom: 4px !important;
+    flex-shrink: 0 !important;
   }
-  .big-screen-title { font-size: 12px !important; }
-  .big-screen-subtitle { font-size: 9.5px !important; }
-  .big-screen-hops { gap: 4px !important; margin-bottom: 4px !important; }
-  .hop-pill { padding: 2px 5px !important; font-size: 9px !important; }
-  .big-screen-desc { padding: 6px 8px !important; font-size: 10px !important; margin-bottom: 4px !important; }
+  .big-screen-title { font-size: 11px !important; }
+  .big-screen-subtitle { font-size: 9px !important; }
+  .big-screen-scrollable {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    padding-right: 4px !important;
+  }
+  .hop-step { padding: 3px 6px !important; font-size: 9.5px !important; }
+  .big-screen-desc { padding: 6px 8px !important; font-size: 10px !important; margin-bottom: 6px !important; }
   .bs-meta-grid { gap: 4px !important; font-size: 9.5px !important; }
-  .big-screen-actions { margin-top: 4px !important; }
-  .bs-act-btn { padding: 4px 8px !important; font-size: 9.5px !important; }
+  .big-screen-actions {
+    margin-top: 6px !important;
+    padding-top: 4px !important;
+    border-top: 1px solid rgba(255,255,255,0.08) !important;
+    flex-shrink: 0 !important;
+  }
+  .bs-act-btn { padding: 5px 10px !important; font-size: 10px !important; }
+
+  /* Bounded Blueprint Modal for Landscape Mobile */
+  #blueprintModal {
+    position: fixed !important;
+    top: max(8px, env(safe-area-inset-top, 8px)) !important;
+    bottom: max(8px, env(safe-area-inset-bottom, 8px)) !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: min(860px, 95vw) !important;
+    height: calc(100dvh - 16px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)) !important;
+    max-height: calc(100dvh - 16px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)) !important;
+    border-radius: 14px !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    z-index: 2000 !important;
+  }
+  .bp-header {
+    padding: 6px 12px !important;
+    flex-shrink: 0 !important;
+  }
+  .bp-title { font-size: 12px !important; }
+  .bp-sub { font-size: 9.5px !important; }
+  .bp-tabs {
+    padding: 4px 10px !important;
+    gap: 4px !important;
+    flex-shrink: 0 !important;
+  }
+  .bp-tab {
+    padding: 3px 9px !important;
+    font-size: 10px !important;
+  }
+  .bp-body {
+    padding: 6px 10px !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+  }
+  .bp-image-box {
+    padding: 6px !important;
+    width: auto !important;
+    max-width: 100% !important;
+  }
+  .bp-image-box img {
+    max-height: calc(100dvh - 130px) !important;
+    max-width: 100% !important;
+    object-fit: contain !important;
+  }
+  .bp-legend-card {
+    margin-top: 6px !important;
+    padding: 6px 8px !important;
+    font-size: 10px !important;
+  }
 }
 
 /* -------------------------------------------------------------
@@ -1141,13 +1221,14 @@ body {
 }
 .bp-tab:hover {
   color: #fff;
-  border-color: rgba(56, 189, 248, 0.5);
+  background: var(--glass-hover);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 .bp-tab.active {
-  background: rgba(14, 165, 233, 0.25);
-  border-color: var(--cyan-accent);
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.28);
   color: #fff;
-  box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
+  box-shadow: none;
 }
 
 .bp-body {
@@ -1187,7 +1268,7 @@ body {
 }
 .bp-legend-title {
   font-weight: 700;
-  color: var(--cyan-accent);
+  color: #f8fafc;
   margin-bottom: 4px;
 }
 
@@ -1316,32 +1397,37 @@ if (typeof THREE === 'undefined') {
   <span id="trackLabel">Tracing Network Packet...</span>
 </div>
 
-<!-- EXECUTIVE DEFENSE DEBRIEF MODAL (CLEANED - NO EMOJIS) -->
+<!-- EXECUTIVE DEFENSE DEBRIEF MODAL (SCROLLABLE & PINNED ACTIONS) -->
 <div class="glass" id="simBigScreen">
   <div class="big-screen-header">
-    <div style="display:flex;align-items:center;gap:10px;">
-      <span class="big-screen-icon" id="bsIcon" style="font-size:11px;font-weight:800;letter-spacing:0.05em;padding:4px 8px;border-radius:6px;background:rgba(56,189,248,0.15);color:var(--cyan-accent);border:1px solid rgba(56,189,248,0.3);">TEST</span>
-      <div>
+    <div style="display:flex;align-items:center;gap:10px;min-width:0;">
+      <span class="big-screen-icon" id="bsIcon" style="font-size:10px;font-weight:800;letter-spacing:0.05em;padding:3px 7px;border-radius:6px;background:rgba(255,255,255,0.08);color:#f8fafc;border:1px solid rgba(255,255,255,0.15);flex-shrink:0;">TEST</span>
+      <div style="min-width:0;">
         <div class="big-screen-title" id="bsTitle">TEST TITLE</div>
         <div class="big-screen-subtitle" id="bsSubtitle">Test Subtitle</div>
       </div>
     </div>
-    <div style="display:flex;align-items:center;gap:8px;">
+    <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
       <span class="big-screen-badge badge-success" id="bsVerdictBadge">COMPLETED</span>
-      <button class="drawer-close" onclick="closeBigScreen()" title="Close">×</button>
+      <button class="drawer-close" onclick="closeBigScreen()" title="Close Report" aria-label="Close Report">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
     </div>
   </div>
 
-  <!-- Completed Route Hop Timeline (No Scrollbars) -->
-  <div class="big-screen-hops" id="bsHopsContainer"></div>
+  <!-- Smooth Scrollable Body -->
+  <div class="big-screen-scrollable">
+    <div class="big-screen-hops" id="bsHopsContainer"></div>
+    <div class="big-screen-desc" id="bsExplanation"></div>
+    <div class="big-screen-meta" id="bsMetaGrid"></div>
+  </div>
 
-  <!-- Architectural Explanation & Telemetry -->
-  <div class="big-screen-desc" id="bsExplanation"></div>
-  <div class="big-screen-meta" id="bsMetaGrid"></div>
-
-  <!-- Actions -->
+  <!-- Pinned Actions Always Visible at Bottom -->
   <div class="big-screen-actions">
-    <button class="bs-act-btn" id="bsReplayBtn" onclick="replayActiveTest()">▶ Replay Trace</button>
+    <button class="bs-act-btn" id="bsReplayBtn" onclick="replayActiveTest()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;vertical-align:middle;"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+      Replay Trace
+    </button>
     <button class="bs-act-btn bs-act-primary" onclick="closeBigScreen()">Close Report</button>
   </div>
 </div>
@@ -1387,13 +1473,15 @@ if (typeof THREE === 'undefined') {
 <div id="blueprintModal">
   <div class="bp-header">
     <div class="bp-title-group">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--cyan-accent);"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--brand-accent);"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
       <div>
         <div class="bp-title">OFFICIAL 2D ARCHITECTURAL FLOOR PLANS</div>
-        <div class="bp-sub">ClearScope Technologies Campus Blueprints & Equipment Placement</div>
+        <div class="bp-sub">Campus Blueprints & Equipment Placement</div>
       </div>
     </div>
-    <button class="drawer-close" onclick="closeBlueprintModal()" title="Close">×</button>
+    <button class="drawer-close" onclick="closeBlueprintModal()" title="Close Blueprints" aria-label="Close Blueprints">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </button>
   </div>
   <div class="bp-tabs">
     <button class="bp-tab active" id="bpTab1" onclick="switchBlueprint('server')">Main Branch | Server Room</button>
