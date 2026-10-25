@@ -40,63 +40,267 @@ body {
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
-/* TOP FLOATING NAV BAR */
+/* TOP-LEFT FLOATING FACILITY & TOUR SELECTOR */
 #topNav {
   position: fixed;
   top: 14px;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 14px;
   z-index: 50;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
   pointer-events: none;
 }
-.nav-capsule {
+.nav-dropdown-wrapper {
+  position: relative;
   pointer-events: auto;
+}
+.nav-dropdown-trigger {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 5px 8px;
+  gap: 8px;
+  padding: 6px 14px 6px 12px;
   border-radius: 999px;
-  white-space: nowrap;
-}
-.nav-brand {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  background: rgba(15, 23, 42, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   color: #f8fafc;
-  padding: 0 12px 0 10px;
-  border-right: 1px solid rgba(255, 255, 255, 0.12);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+.nav-dropdown-trigger:hover {
+  background: rgba(30, 41, 59, 0.95);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+.nav-brand-tag {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #38bdf8;
+}
+.nav-divider {
+  width: 1px;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.16);
+}
+.nav-facility-current {
+  font-size: 12px;
+  font-weight: 600;
+  color: #f1f5f9;
+}
+.nav-chevron {
+  font-size: 9px;
+  color: #94a3b8;
+  transition: transform 0.2s ease;
+  margin-left: 2px;
+}
+.nav-chevron.open {
+  transform: rotate(180deg);
+}
+
+.nav-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  width: 320px;
+  max-width: 90vw;
+  background: rgba(15, 23, 42, 0.96);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 14px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7);
+  padding: 6px;
+  display: none;
+  flex-direction: column;
+  gap: 3px;
+  animation: fadeIn 0.18s ease;
+  z-index: 60;
+  pointer-events: auto;
+}
+.dropdown-header {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #64748b;
+  padding: 6px 10px 4px;
+}
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: 1px solid transparent;
+}
+.dropdown-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+.dropdown-item.active {
+  background: rgba(56, 189, 248, 0.12);
+  border-color: rgba(56, 189, 248, 0.28);
+}
+.item-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  overflow: hidden;
+}
+.item-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.item-text {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.item-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #f8fafc;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.item-desc {
+  font-size: 10px;
+  color: #94a3b8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tour-btn {
+  background: rgba(56, 189, 248, 0.14);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  color: #38bdf8;
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 4px 9px;
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+  margin-left: 6px;
+  flex-shrink: 0;
+}
+.tour-btn:hover {
+  background: #0284c7;
+  color: #ffffff;
+  border-color: #38bdf8;
+}
+
+/* AUTO-WALKTHROUGH TOUR HUD */
+#tourHUD {
+  position: fixed;
+  bottom: 64px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 70;
+  background: rgba(15, 23, 42, 0.94);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 16px;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65);
+  max-width: 94vw;
+  width: 640px;
+  animation: fadeIn 0.25s ease;
+}
+.tour-hud-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  overflow: hidden;
+}
+.tour-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.tour-badge {
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.tour-step-counter {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #94a3b8;
+}
+.tour-facility-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #ffffff;
+}
+.tour-status-text {
+  font-size: 11px;
+  color: #cbd5e1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 380px;
+}
+.tour-hud-controls {
   display: flex;
   align-items: center;
   gap: 6px;
-  white-space: nowrap;
   flex-shrink: 0;
 }
-.nav-brand-dot { display: none !important; }
-.nav-btn {
-  background: transparent;
-  border: 1px solid transparent;
-  color: var(--text-muted);
-  font-size: 11.5px;
+.tour-ctrl-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #f1f5f9;
+  font-size: 11px;
   font-weight: 600;
-  padding: 5px 12px;
-  border-radius: 999px;
+  padding: 6px 10px;
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.15s ease;
   white-space: nowrap;
 }
-.nav-btn:hover {
+.tour-ctrl-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
   color: #fff;
-  background: var(--glass-hover);
 }
-.nav-btn.active {
-  background: rgba(255, 255, 255, 0.14);
-  border-color: rgba(255, 255, 255, 0.22);
+.tour-exit-btn {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #fca5a5;
+}
+.tour-exit-btn:hover {
+  background: #dc2626;
   color: #ffffff;
-  box-shadow: none;
+}
+@media (max-width: 640px), (max-height: 520px) {
+  #tourHUD {
+    bottom: 48px;
+    padding: 8px 12px;
+    gap: 10px;
+    width: 95vw;
+  }
+  .tour-status-text {
+    max-width: 190px;
+  }
+  .tour-ctrl-btn {
+    padding: 5px 8px;
+    font-size: 10px;
+  }
 }
 
 /* FLOOR SELECTOR SUB-BAR */
@@ -799,63 +1003,21 @@ body {
    MOBILE RESPONSIVE STYLES (PORTRAIT & LANDSCAPE PHONES)
    ========================================================================== */
 @media (max-width: 860px), (max-height: 520px) {
-  /* 1. TOP BAR: Compact Click-to-Expand Trigger */
+  /* 1. TOP BAR: Compact Dropdown Menu Pinned to Top-Left */
   #topNav {
     top: 8px;
-    width: 94vw;
-    max-width: 440px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    left: 8px;
+    width: auto;
+    max-width: none;
+    transform: none;
+    align-items: flex-start;
   }
-
-  .mobile-nav-trigger {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 7px 14px;
-    border-radius: 999px;
-    font-size: 11.5px;
-    font-weight: 700;
-    color: #f8fafc;
-    cursor: pointer;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
-    pointer-events: auto;
+  .nav-dropdown-trigger {
+    padding: 5px 12px 5px 10px;
+    font-size: 11px;
   }
-  .mobile-chevron {
-    font-size: 9px;
-    transition: transform 0.2s ease;
-    opacity: 0.75;
-  }
-  .mobile-chevron.open {
-    transform: rotate(180deg);
-  }
-
-  /* Facility Menu is Hidden by default on mobile, expands on click */
-  .nav-capsule {
-    display: none;
-    flex-direction: column;
-    width: 100%;
-    margin-top: 6px;
-    padding: 8px;
-    border-radius: 14px;
-    background: rgba(11, 20, 38, 0.94);
-    box-shadow: 0 8px 30px rgba(0,0,0,0.6);
-  }
-  .nav-capsule.mobile-open {
-    display: flex;
-  }
-  .nav-brand {
-    display: none;
-  }
-  .nav-btn {
-    width: 100%;
-    text-align: left;
-    padding: 8px 12px;
-    font-size: 12px;
-    border-radius: 8px;
+  .nav-dropdown-menu {
+    width: 290px;
   }
 
   /* Floor selector sub-bar */
@@ -980,7 +1142,8 @@ body {
 /* Landscape Mode Specifically (max-height <= 480px) */
 @media (max-height: 560px) and (orientation: landscape) {
   #topNav {
-    top: 4px;
+    top: 6px;
+    left: 8px;
   }
   #bottomDock {
     bottom: 4px;
@@ -1298,35 +1461,95 @@ if (typeof THREE === 'undefined') {
 </div>
 
 
-<!-- TOP FLOATING NAVIGATION (COLLAPSIBLE ON MOBILE) -->
+<!-- TOP-LEFT FLOATING FACILITY & TOUR SELECTOR -->
 <div id="topNav">
-  <!-- Mobile Compact Trigger (Visible on Mobile Only) -->
-  <button class="glass mobile-nav-trigger" id="btnMobileNavToggle" onclick="toggleMobileNav()">
-        <span id="lblMobileFacility">All Facilities</span>
-    <span class="mobile-chevron" id="mobileNavChevron">▼</span>
-  </button>
-
-  <!-- Full Facility Capsule (Desktop Default, Expandable Dropdown on Mobile) -->
-  <div class="glass nav-capsule" id="navCapsule">
-    <div class="nav-brand">
-            <span>ClearScope</span>
+  <div class="nav-dropdown-wrapper">
+    <button class="glass nav-dropdown-trigger" id="btnNavDropdown" onclick="toggleFacilityDropdown(event)">
+      <span class="nav-brand-tag">ClearScope</span>
+      <span class="nav-divider"></span>
+      <span class="nav-facility-current" id="lblFacilityCurrent">🏢 All Facilities</span>
+      <span class="nav-chevron" id="navChevron">▼</span>
+    </button>
+    <div class="glass nav-dropdown-menu" id="navDropdownMenu">
+      <div class="dropdown-header">Campus Facilities &amp; Tours</div>
+      <div class="dropdown-item active" id="itemFacOverview" onclick="selectFacilityItem('overview')">
+        <div class="item-info">
+          <span class="item-icon">🌐</span>
+          <div class="item-text">
+            <span class="item-title">All Facilities</span>
+            <span class="item-desc">Full campus aerial overview</span>
+          </div>
+        </div>
+      </div>
+      <div class="dropdown-item" id="itemFacServer" onclick="selectFacilityItem('datacenter')">
+        <div class="item-info">
+          <span class="item-icon">🖥️</span>
+          <div class="item-text">
+            <span class="item-title">Studio Server Room</span>
+            <span class="item-desc">Core switch, firewall, servers</span>
+          </div>
+        </div>
+        <button class="tour-btn" title="Start Automated Walkthrough" onclick="startBuildingTour(event, 'datacenter')">▶ Tour</button>
+      </div>
+      <div class="dropdown-item" id="itemFacEmp" onclick="selectFacilityItem('emp')">
+        <div class="item-info">
+          <span class="item-icon">🏢</span>
+          <div class="item-text">
+            <span class="item-title">Employee Building</span>
+            <span class="item-desc">5-floor workspace pods &amp; service core</span>
+          </div>
+        </div>
+        <button class="tour-btn" title="Start Automated Walkthrough" onclick="startBuildingTour(event, 'emp')">▶ Tour</button>
+      </div>
+      <div class="dropdown-item" id="itemFacAdmin" onclick="selectFacilityItem('admin')">
+        <div class="item-info">
+          <span class="item-icon">🏛️</span>
+          <div class="item-text">
+            <span class="item-title">Admin Building</span>
+            <span class="item-desc">2-floor executive suites &amp; staircase</span>
+          </div>
+        </div>
+        <button class="tour-btn" title="Start Automated Walkthrough" onclick="startBuildingTour(event, 'admin')">▶ Tour</button>
+      </div>
+      <div class="dropdown-item" id="itemFacBranch" onclick="selectFacilityItem('branch')">
+        <div class="item-info">
+          <span class="item-icon">🏬</span>
+          <div class="item-text">
+            <span class="item-title">Second Branch</span>
+            <span class="item-desc">Customer support &amp; accounting branch</span>
+          </div>
+        </div>
+        <button class="tour-btn" title="Start Automated Walkthrough" onclick="startBuildingTour(event, 'branch')">▶ Tour</button>
+      </div>
     </div>
-    <button class="nav-btn active" id="btnNavOverview" onclick="handleFacilitySelect('overview')">All Facilities</button>
-    <button class="nav-btn" id="btnNavServer" onclick="handleFacilitySelect('datacenter')">Studio Server Room</button>
-    <button class="nav-btn" id="btnNavEmp" onclick="handleFacilitySelect('emp')">Employees' Bldg (5F)</button>
-    <button class="nav-btn" id="btnNavAdmin" onclick="handleFacilitySelect('admin')">Admin Bldg (2F)</button>
-    <button class="nav-btn" id="btnNavBranch" onclick="handleFacilitySelect('branch')">Second Branch (35 PCs)</button>
   </div>
 
-  <!-- Floor Selector Sub-Bar (Appears for Employees Building) -->
+  <!-- Floor Selector Sub-Bar (Appears for Employee Building) -->
   <div class="glass" id="floorSubNav">
     <span class="floor-lbl">Level:</span>
-    <button class="floor-pill active" id="fpAll" onclick="selectFloor('all')">All (5F)</button>
+    <button class="floor-pill active" id="fpAll" onclick="selectFloor('all')">All Floors</button>
     <button class="floor-pill" id="fp1" onclick="selectFloor(1)">Floor 1</button>
     <button class="floor-pill" id="fp2" onclick="selectFloor(2)">Floor 2</button>
     <button class="floor-pill" id="fp3" onclick="selectFloor(3)">Floor 3</button>
     <button class="floor-pill" id="fp4" onclick="selectFloor(4)">Floor 4</button>
     <button class="floor-pill" id="fp5" onclick="selectFloor(5)">Floor 5</button>
+  </div>
+</div>
+
+<!-- AUTO-WALKTHROUGH TOUR HUD -->
+<div class="glass" id="tourHUD" style="display:none;">
+  <div class="tour-hud-info">
+    <div class="tour-badge-row">
+      <span class="tour-badge">🎬 AUTO WALKTHROUGH</span>
+      <span class="tour-step-counter" id="tourStepCounter">Step 1 of 7</span>
+    </div>
+    <div class="tour-facility-title" id="tourFacilityTitle">Admin Building</div>
+    <div class="tour-status-text" id="tourStatusText">Entering Ground Floor Main Entrance...</div>
+  </div>
+  <div class="tour-hud-controls">
+    <button class="tour-ctrl-btn" id="btnTourPause" onclick="toggleTourPause()">⏸ Pause</button>
+    <button class="tour-ctrl-btn" id="btnTourNext" onclick="nextTourStep()">⏭ Next Room</button>
+    <button class="tour-ctrl-btn tour-exit-btn" id="btnTourExit" onclick="exitTour()">✕ Exit Tour</button>
   </div>
 </div>
 
@@ -1663,31 +1886,315 @@ function setNavMode(mode) {
 
 // SETUP MOBILE VIRTUAL JOYSTICK & TOUCH LOOK CONTROLS
 
-// MOBILE NAVIGATION COLLAPSIBLE CONTROLS
-function toggleMobileNav() {
-  var cap = document.getElementById('navCapsule');
-  var chev = document.getElementById('mobileNavChevron');
-  if (!cap) return;
-  var isOpen = cap.classList.toggle('mobile-open');
-  if (chev) chev.className = isOpen ? 'mobile-chevron open' : 'mobile-chevron';
+// -------------------------------------------------------------
+// FACILITY DROPDOWN CONTROLS
+// -------------------------------------------------------------
+function toggleFacilityDropdown(e) {
+  if (e && e.stopPropagation) e.stopPropagation();
+  var menu = document.getElementById('navDropdownMenu');
+  var chev = document.getElementById('navChevron');
+  if (!menu) return;
+  var isOpen = (menu.style.display === 'flex');
+  menu.style.display = isOpen ? 'none' : 'flex';
+  if (chev) chev.classList.toggle('open', !isOpen);
 }
 
-function handleFacilitySelect(facName) {
-  focusFacility(facName);
-  var cap = document.getElementById('navCapsule');
-  var chev = document.getElementById('mobileNavChevron');
-  if (cap) cap.classList.remove('mobile-open');
-  if (chev) chev.className = 'mobile-chevron';
+function closeFacilityDropdown() {
+  var menu = document.getElementById('navDropdownMenu');
+  var chev = document.getElementById('navChevron');
+  if (menu) menu.style.display = 'none';
+  if (chev) chev.classList.remove('open');
+}
 
-  var labels = {
-    overview: 'All Facilities',
-    datacenter: 'Studio Server Room',
-    emp: "Employees' Bldg (5F)",
-    admin: 'Admin Bldg (2F)',
-    branch: 'Second Branch (35 PCs)'
-  };
-  var lbl = document.getElementById('lblMobileFacility');
-  if (lbl) lbl.textContent = labels[facName] || 'Facilities';
+function selectFacilityItem(facName) {
+  focusFacility(facName);
+  closeFacilityDropdown();
+}
+
+// -------------------------------------------------------------
+// CINEMATIC AUTO-WALKTHROUGH TOUR ENGINE
+// -------------------------------------------------------------
+var tourState = {
+  running: false,
+  facility: null,
+  facilityName: '',
+  stepIndex: 0,
+  paused: false,
+  timer: null,
+  steps: []
+};
+
+var tourRoutes = {
+  admin: {
+    name: 'Admin Building',
+    steps: [
+      {
+        cam: [16, 9.5, 30], tgt: [16, 2.2, 18],
+        title: 'Main Branch Administration Building',
+        desc: 'Two-story executive headquarters housing administrative suites, conference core, and network infrastructure.',
+        duration: 3500, floor: 'all'
+      },
+      {
+        cam: [16, 1.8, 25.5], tgt: [16, 1.7, 18],
+        title: 'Floor 1: Main Entrance & Central Foyer',
+        desc: 'Entering through south double doors into the central reception hall connecting East and West wings.',
+        duration: 3200, floor: 1
+      },
+      {
+        cam: [7.5, 1.8, 18.0], tgt: [5.0, 1.2, 18.0],
+        title: 'Floor 1: West Operations Bay',
+        desc: 'Inspecting workstation clusters with departmental high-speed laser printers and network drops.',
+        duration: 3400, floor: 1
+      },
+      {
+        cam: [20.0, 1.8, 16.0], tgt: [22.5, 2.2, 18.0],
+        title: 'Floor 1: East Service Core & Architectural Stairwell',
+        desc: 'Arriving at the structural elevator core and architectural staircase leading to the executive suites.',
+        duration: 3200, floor: 1
+      },
+      {
+        cam: [16.0, 5.2, 23.0], tgt: [16.0, 5.0, 18.0],
+        title: 'Floor 2: Central Hallway & Enterprise Wi-Fi',
+        desc: 'Floor 2 corridor with ceiling-mounted Cisco Catalyst 9115 Wi-Fi 6 Access Point providing campus wireless coverage.',
+        duration: 3400, floor: 2
+      },
+      {
+        cam: [8.5, 5.2, 16.5], tgt: [6.0, 4.8, 14.0],
+        title: 'Floor 2: Executive Management Suite',
+        desc: 'Private executive workstations, administration printer, and secured network ports.',
+        duration: 3400, floor: 2
+      },
+      {
+        cam: [21.0, 10.5, 32.0], tgt: [16.0, 3.5, 18.0],
+        title: 'Admin Building Tour Completed',
+        desc: 'Full walkthrough completed. Returning camera to comfortable architectural orbit perspective.',
+        duration: 3200, floor: 'all'
+      }
+    ]
+  },
+  emp: {
+    name: 'Employee Building',
+    steps: [
+      {
+        cam: [-22, 18, 42], tgt: [-22, 5, 18],
+        title: '5-Story Employee Operations Building',
+        desc: 'Primary workforce facility hosting 100+ developer and staff workstations across 5 synchronized floors.',
+        duration: 3500, floor: 'all'
+      },
+      {
+        cam: [-22, 1.8, 23.5], tgt: [-22, 1.6, 18],
+        title: 'Floor 1: East Access Core & Elevator Lobby',
+        desc: 'Entering through the east service core featuring elevator shaft and architectural staircase.',
+        duration: 3200, floor: 1
+      },
+      {
+        cam: [-22, 1.8, 14.5], tgt: [-27, 1.3, 14.5],
+        title: 'Floor 1: North Developer Pod (VLAN 10)',
+        desc: 'Collaborative pod of 6 workstations facing each other with dedicated network drops and dual monitors.',
+        duration: 3500, floor: 1
+      },
+      {
+        cam: [-22, 1.8, 21.5], tgt: [-27, 1.3, 21.5],
+        title: 'Floor 1: South Developer Pod & Printers',
+        desc: 'South collaborative pod and networked laser printers connected to Cisco Catalyst 1000 switch.',
+        duration: 3500, floor: 1
+      },
+      {
+        cam: [-14.5, 1.8, 18.0], tgt: [-18.5, 2.2, 18.0],
+        title: 'Floor 1: Cisco Floor Switch SW-EMP-F1',
+        desc: '24-port Gigabit access switch with dual 1G fiber uplink to the Studio Server Room Core.',
+        duration: 3200, floor: 1
+      },
+      {
+        cam: [-22, 5.2, 23.0], tgt: [-26, 4.8, 18.0],
+        title: 'Floor 2: Development Wing',
+        desc: 'Identical standardized collaborative layout ensuring redundant workstation capacity.',
+        duration: 3400, floor: 2
+      },
+      {
+        cam: [-28, 22, 45], tgt: [-22, 7, 18],
+        title: 'Employee Building Tour Completed',
+        desc: '5-floor employee operations overview completed.',
+        duration: 3200, floor: 'all'
+      }
+    ]
+  },
+  datacenter: {
+    name: 'Studio Server Room',
+    steps: [
+      {
+        cam: [-18, 6.5, -9], tgt: [-20, 1.8, -18],
+        title: 'Campus Studio Server Room & Datacenter',
+        desc: 'Climate-controlled mission-critical core facility connecting all campus facilities and WAN links.',
+        duration: 3500, floor: 'all'
+      },
+      {
+        cam: [-15, 1.8, -18], tgt: [-20, 1.8, -18],
+        title: 'Entrance & Overhead Fiber Cable Ladders',
+        desc: 'Entering through security access doors beneath structured overhead fiber distribution trays.',
+        duration: 3200, floor: 'all'
+      },
+      {
+        cam: [-24, 1.8, -16.5], tgt: [-25.5, 1.8, -18.6],
+        title: 'Main Network Rack: Core Switch & Cisco Firepower NGFW',
+        desc: 'Cisco Catalyst 3650 Core L3 Switch and Firepower 1010 Firewall managing VLAN routing and ACL security.',
+        duration: 3500, floor: 'all'
+      },
+      {
+        cam: [-19.5, 1.8, -17.5], tgt: [-21.5, 1.4, -19.0],
+        title: 'Dedicated Enterprise Server Farm',
+        desc: 'SRV-EMP (Employee Operations Server) and SRV-ADM (Administration & Database Server).',
+        duration: 3400, floor: 'all'
+      },
+      {
+        cam: [-18, 6.5, -9], tgt: [-20, 1.8, -18],
+        title: 'Studio Server Room Tour Completed',
+        desc: 'Server farm inspection completed.',
+        duration: 3200, floor: 'all'
+      }
+    ]
+  },
+  branch: {
+    name: 'Second Branch Office',
+    steps: [
+      {
+        cam: [38, 7.5, -9], tgt: [38, 2.2, -18],
+        title: 'Remote Second Branch Facility (35 Workstations)',
+        desc: 'Two-story remote branch connected via 500 Mbps private fiber line to Main Branch headquarters.',
+        duration: 3500, floor: 'all'
+      },
+      {
+        cam: [34, 1.8, -12], tgt: [38, 1.8, -18],
+        title: 'Floor 1: Main Corridor Entrance',
+        desc: 'Central entrance corridor providing direct access to customer support and stairwell.',
+        duration: 3200, floor: 'all'
+      },
+      {
+        cam: [31, 1.8, -18], tgt: [28, 1.3, -18],
+        title: 'Floor 1: Customer Support Operation (VLAN 50)',
+        desc: '30 technical and customer support workstations arranged in high-density collaborative teams.',
+        duration: 3500, floor: 'all'
+      },
+      {
+        cam: [38, 1.8, -14], tgt: [38, 2.8, -14],
+        title: 'Floor 1: Architectural Staircase',
+        desc: 'Architectural staircase leading up to Floor 2 Accounting Suite and Branch Server Room.',
+        duration: 3200, floor: 'all'
+      },
+      {
+        cam: [38, 5.2, -18], tgt: [44, 4.8, -18],
+        title: 'Floor 2: Accounting Suite & Branch Server (SRV-BR)',
+        desc: '5 Accounting workstations and dedicated Branch Server linked to Cisco 4331 Branch Router.',
+        duration: 3500, floor: 'all'
+      },
+      {
+        cam: [38, 8.0, -9], tgt: [38, 2.5, -18],
+        title: 'Second Branch Tour Completed',
+        desc: 'Remote facility walkthrough completed.',
+        duration: 3200, floor: 'all'
+      }
+    ]
+  }
+};
+
+function startBuildingTour(e, facKey) {
+  if (e && e.stopPropagation) e.stopPropagation();
+  closeFacilityDropdown();
+  clearSimEffects();
+  closeBigScreen();
+  if (activeNav === 'walk') setNavMode('orbit');
+
+  var route = tourRoutes[facKey];
+  if (!route) return;
+
+  tourState.running = true;
+  tourState.facility = facKey;
+  tourState.facilityName = route.name;
+  tourState.stepIndex = 0;
+  tourState.paused = false;
+  tourState.steps = route.steps;
+  if (tourState.timer) clearTimeout(tourState.timer);
+
+  focusFacility(facKey);
+
+  var hud = document.getElementById('tourHUD');
+  if (hud) hud.style.display = 'flex';
+
+  var pBtn = document.getElementById('btnTourPause');
+  if (pBtn) pBtn.textContent = '⏸ Pause';
+
+  executeTourStep(0);
+}
+
+function executeTourStep(index) {
+  if (!tourState.running || index >= tourState.steps.length) {
+    exitTour();
+    return;
+  }
+  tourState.stepIndex = index;
+  var step = tourState.steps[index];
+
+  var cnt = document.getElementById('tourStepCounter');
+  if (cnt) cnt.textContent = 'Step ' + (index + 1) + ' of ' + tourState.steps.length;
+
+  var ttl = document.getElementById('tourFacilityTitle');
+  if (ttl) ttl.textContent = tourState.facilityName;
+
+  var stx = document.getElementById('tourStatusText');
+  if (stx) stx.textContent = step.title + ' — ' + step.desc;
+
+  if (step.floor && tourState.facility === 'emp') {
+    selectFloor(step.floor, true);
+  }
+
+  var moveDuration = Math.round(step.duration * 0.7);
+  var pauseDuration = Math.round(step.duration * 0.3);
+
+  tweenCam(step.cam, step.tgt, moveDuration, function() {
+    if (!tourState.running) return;
+    if (tourState.timer) clearTimeout(tourState.timer);
+    tourState.timer = setTimeout(function() {
+      if (!tourState.running || tourState.paused) return;
+      if (tourState.stepIndex + 1 < tourState.steps.length) {
+        executeTourStep(tourState.stepIndex + 1);
+      } else {
+        exitTour();
+      }
+    }, pauseDuration);
+  });
+}
+
+function nextTourStep() {
+  if (!tourState.running) return;
+  if (tourState.timer) clearTimeout(tourState.timer);
+  if (tourState.stepIndex + 1 < tourState.steps.length) {
+    executeTourStep(tourState.stepIndex + 1);
+  } else {
+    exitTour();
+  }
+}
+
+function toggleTourPause() {
+  if (!tourState.running) return;
+  tourState.paused = !tourState.paused;
+  var pBtn = document.getElementById('btnTourPause');
+  if (pBtn) pBtn.textContent = tourState.paused ? '▶ Resume' : '⏸ Pause';
+
+  if (!tourState.paused) {
+    nextTourStep();
+  }
+}
+
+function exitTour() {
+  if (tourState.timer) clearTimeout(tourState.timer);
+  tourState.running = false;
+  tourState.paused = false;
+  var hud = document.getElementById('tourHUD');
+  if (hud) hud.style.display = 'none';
+
+  if (tourState.facility) {
+    focusFacility(tourState.facility);
+  }
 }
 
 function toggleMobileMore(e) {
@@ -1700,15 +2207,22 @@ function toggleMobileMore(e) {
   if (btn) btn.classList.toggle('active', isHidden);
 }
 
-// Click outside popover to close
+// Click outside popover or facility dropdown to close
 window.addEventListener('click', function(e) {
   var pop = document.getElementById('mobileMorePopover');
   var btn = document.getElementById('btnMobileMore');
-  if (pop && pop.style.display === 'flex') {
-    if (!pop.contains(e.target) && (!btn || !btn.contains(e.target))) {
-      pop.style.display = 'none';
-      if (btn) btn.classList.remove('active');
-    }
+  if (pop && pop.style.display !== 'none' && !pop.contains(e.target) && e.target !== btn && !btn.contains(e.target)) {
+    pop.style.display = 'none';
+    if (btn) btn.classList.remove('active');
+  }
+  if (!e.target.closest('#topNav')) {
+    closeFacilityDropdown();
+  }
+});
+
+window.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape' && tourState && tourState.running) {
+    exitTour();
   }
 });
 
@@ -2406,6 +2920,61 @@ function createPrinter(parent, x, y, z, rotY, data) {
   return g;
 }
 
+// ARCHITECTURAL STEPPED STAIRCASE BUILDER (CAD BLUEPRINT STANDARD)
+function createArchitecturalStairs(parent, opt) {
+  var g = new THREE.Group();
+  g.position.set(opt.x || 0, opt.y || 0, opt.z || 0);
+  if (opt.rotY) g.rotation.y = opt.rotY;
+  parent.add(g);
+
+  var steps = opt.steps || 10;
+  var stepW = opt.width || 2.4;
+  var totalH = opt.totalHeight || 3.4;
+  var totalD = opt.totalDepth || 3.6;
+  var stepH = totalH / steps;
+  var stepD = totalD / steps;
+
+  for (var i = 0; i < steps; i++) {
+    var curY = i * stepH;
+    var curZ = i * stepD;
+    // Solid concrete riser mass
+    box(g, 0, curY + stepH * 0.5, curZ + stepD * 0.5, stepW, stepH, stepD, mats.concrete);
+    // Dark nosing finish plate
+    box(g, 0, (i + 1) * stepH + 0.015, curZ + stepD * 0.5 + 0.02, stepW + 0.02, 0.03, stepD + 0.04, mats.rackBlade);
+  }
+
+  // Top landing platform
+  if (opt.hasLanding) {
+    var landD = opt.landingDepth || 1.2;
+    box(g, 0, totalH - 0.08, steps * stepD + landD * 0.5, stepW, 0.16, landD, mats.concrete);
+  }
+
+  // Railings & balusters along the sides
+  if (opt.hasRailings !== false) {
+    var railH = 0.9;
+    var railMat = mats.frameDark;
+    var sideOffsets = [-stepW * 0.5 + 0.06, stepW * 0.5 - 0.06];
+    for (var s = 0; s < sideOffsets.length; s++) {
+      var sX = sideOffsets[s];
+      // Vertical balusters
+      var pStep = Math.max(2, Math.floor(steps / 4));
+      for (var p = 0; p <= steps; p += pStep) {
+        var postY = p * stepH + railH * 0.5;
+        var postZ = p * stepD;
+        box(g, sX, postY, postZ, 0.04, railH, 0.04, railMat);
+      }
+      // Top slanted handrail
+      var railLen = Math.hypot(totalH, totalD);
+      var ang = Math.atan2(totalH, totalD);
+      var handrail = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, railLen, 8), railMat);
+      handrail.position.set(sX, totalH * 0.5 + railH, totalD * 0.5);
+      handrail.rotation.x = Math.PI / 2 - ang;
+      g.add(handrail);
+    }
+  }
+  return g;
+}
+
 function buildEmployeeFloor(floorNum) {
   var fg = new THREE.Group();
   var floorHeight = 3.4;
@@ -2414,21 +2983,77 @@ function buildEmployeeFloor(floorNum) {
   bEmployees.add(fg);
   employeeFloors.push(fg);
 
+  // 1. Floor Slab (24m x 16m)
   box(fg, 0, 0.1, 0, 24, 0.2, 16, mats.tileLight);
+
+  // 2. Exterior Envelope
+  // North Wall (Exterior Stucco)
   box(fg, 0, 1.7, -8, 24, 3.2, 0.25, mats.wallExterior);
-  box(fg, -12, 1.7, 0, 0.25, 3.2, 16, mats.wallExterior);
-  box(fg, 12, 1.7, 0, 0.25, 3.2, 16, mats.glassWall);
+  // West Wall (Framed Glass Curtain Wall)
+  box(fg, -12, 1.7, 0, 0.25, 3.2, 16, mats.glassWall);
+  // East Wall: Office core exterior with central corridor windows
+  box(fg, 12, 1.7, -4.75, 0.25, 3.2, 6.5, mats.wallExterior);
+  box(fg, 12, 1.7, 4.75, 0.25, 3.2, 6.5, mats.wallExterior);
+  box(fg, 12, 1.7, 0, 0.25, 3.2, 3.0, mats.glassWall); // Corridor glass
+  // South Wall (Full Panoramic Glass Wall - matching CAD blueprint view)
   box(fg, 0, 1.7, 8, 24, 3.2, 0.25, mats.glassWall);
 
-  // Vertical timber accent panels & window mullions (matching CAD reference)
-  box(fg, -12.15, 1.7, -4.0, 0.08, 3.2, 4.5, mats.timber);
-  box(fg, -6.0, 1.7, 8.15, 4.5, 3.2, 0.08, mats.timber);
-  box(fg, 6.0, 1.7, 8.15, 4.5, 3.2, 0.08, mats.timber);
+  // Architectural mullions on South glass facade
+  for (var mx = -10; mx <= 10; mx += 4) {
+    box(fg, mx, 1.7, 8.05, 0.08, 3.2, 0.08, mats.frameDark);
+  }
 
-  box(fg, 0, 1.7, -5, 0.25, 3.2, 6, mats.corridorWall);
-  box(fg, 0, 1.7, 5, 0.25, 3.2, 6, mats.corridorWall);
+  // 3. Central Horizontal Acoustic Divider Wall (Z = 0, X: -12.0 to 3.5, length 15.5m)
+  box(fg, -4.25, 0.75, 0, 15.5, 1.3, 0.18, mats.corridorWall);
+  box(fg, -4.25, 1.45, 0, 15.6, 0.1, 0.22, mats.timber); // Acoustic wood cap rail
 
-  var swRack = box(fg, 0.4, 1.8, 0, 0.6, 1.1, 0.8, mats.rackFrame);
+  // 4. East Core Demising Wall at X = 3.5 (from Z = -8 to +8)
+  // Segment A: North section (Z: -8 to -4.4, length 3.6m, center -6.2m)
+  box(fg, 3.5, 1.7, -6.2, 0.22, 3.2, 3.6, mats.corridorWall);
+  // Doorway A (North Wing Entrance at Z = -3.5, width 1.8m)
+  box(fg, 3.5, 1.15, -3.5, 0.08, 2.3, 1.6, mats.doorWood); // Double doors
+  box(fg, 3.5, 2.75, -3.5, 0.22, 0.9, 1.8, mats.corridorWall); // Lintel above door
+  // Segment B: Middle section (Z: -2.6 to +2.6, length 5.2m, center 0)
+  box(fg, 3.5, 1.7, 0, 0.22, 3.2, 5.2, mats.corridorWall);
+  // Doorway B (South Wing Entrance at Z = +3.5, width 1.8m)
+  box(fg, 3.5, 1.15, 3.5, 0.08, 2.3, 1.6, mats.doorWood); // Double doors
+  box(fg, 3.5, 2.75, 3.5, 0.22, 0.9, 1.8, mats.corridorWall); // Lintel above door
+  // Segment C: South section (Z: +4.4 to +8, length 3.6m, center +6.2m)
+  box(fg, 3.5, 1.7, 6.2, 0.22, 3.2, 3.6, mats.corridorWall);
+
+  // 5. East Service Core Rooms & Partitions
+  // Northeast Utility / Storage Room (Z = -8 to -2.6, X = 3.5 to 7.8)
+  box(fg, 5.65, 1.7, -2.6, 4.3, 3.2, 0.2, mats.corridorWall); // South partition
+  box(fg, 7.8, 1.7, -5.3, 0.2, 3.2, 5.4, mats.corridorWall); // East partition separating from elevator
+  box(fg, 5.5, 1.15, -2.6, 1.0, 2.3, 0.08, mats.doorWood); // Door to hallway
+
+  // Northeast Elevator Shaft (Z = -8 to -2.6, X = 7.8 to 12.0)
+  box(fg, 9.9, 1.15, -2.6, 1.4, 2.3, 0.08, mats.rackBlade); // Elevator Doors
+  box(fg, 9.9, 2.75, -2.6, 1.4, 0.9, 0.2, mats.corridorWall); // Lintel
+  box(fg, 9.9, 1.7, -5.3, 0.12, 3.2, 0.12, mats.rackFrame); // Elevator guide rail
+
+  // Southeast Utility Room (Z = 2.6 to 8.0, X = 3.5 to 7.5)
+  box(fg, 5.5, 1.7, 2.6, 4.0, 3.2, 0.2, mats.corridorWall); // North partition
+  box(fg, 7.5, 1.7, 5.3, 0.2, 3.2, 5.4, mats.corridorWall); // East partition separating from stairs
+  box(fg, 5.5, 1.15, 2.6, 1.0, 2.3, 0.08, mats.doorWood); // Door to hallway
+
+  // Southeast Architectural Staircase (Z = 2.6 to 8.0, X = 7.5 to 11.5)
+  createArchitecturalStairs(fg, {
+    x: 9.5, y: 0.1, z: 2.8,
+    rotY: 0,
+    width: 2.4,
+    totalHeight: 3.4,
+    totalDepth: 4.6,
+    steps: 12,
+    hasLanding: true,
+    landingDepth: 1.0
+  });
+
+  // Ceiling plate / structural lintels
+  box(fg, 0, 3.35, 0, 24, 0.1, 16, mats.tileLight);
+
+  // 6. Floor Access Switch SW-EMP-F{floorNum} mounted in utility room
+  var swRack = box(fg, 4.2, 1.8, -5.0, 0.5, 1.1, 0.7, mats.rackFrame);
   registerInteractable(swRack, {
     id: 'SW-EMP-F' + floorNum,
     type: 'Floor Access Switch (24-Port Gigabit)',
@@ -2436,66 +3061,75 @@ function buildEmployeeFloor(floorNum) {
     vlan: 'VLAN 10 (192.168.10.0/24)',
     ip: '192.168.10.' + (1 + floorNum),
     specs: 'Cisco Catalyst 1000-24T-4G-L · Dual 1G Fiber LACP Uplink to Core',
-    desc: 'Supplies 20 desktop ports across Room A (10 PCs) and Room B (10 PCs).'
+    desc: 'Supplies 24 desktop ports across North and South collaborative pods.'
   });
-  makeTag('SW-EMP-F' + floorNum, -22 + 0.4, baseY + 2.45, 18, 0.22, 'device');
+  makeTag('SW-EMP-F' + floorNum, -22 + 4.2, baseY + 2.45, 18 - 5.0, 0.22, 'device');
 
-  // Room A (10 PCs: IDs 01-10, IPs 192.168.10.x starting at .10)
-  makeTag('RM ' + floorNum + '01 (10 PCs)', -22 - 6, baseY + 2.3, 18 - 5.5, 0.25, 'room');
-  for (var i = 0; i < 5; i++) {
+  // 7. Workstations Pods (Matching CAD Blueprint 1:1)
+  // North Wing: 2 Pods of 6 Workstations (facing North/South)
+  makeTag('RM ' + floorNum + '01: DEV NORTH (12 PCs)', -22 - 5.0, baseY + 2.3, 18 - 3.8, 0.25, 'room');
+  var nOffsets = [-8.8, -7.0, -5.2, -2.4, -0.6, 1.2];
+  for (var i = 0; i < 6; i++) {
+    var pX = nOffsets[i];
     var idA1 = (i + 1) < 10 ? '0' + (i + 1) : '' + (i + 1);
-    var idA2 = (i + 6) < 10 ? '0' + (i + 6) : '' + (i + 6);
-    var ipA1 = '192.168.10.' + ((floorNum - 1) * 20 + 10 + i);
-    var ipA2 = '192.168.10.' + ((floorNum - 1) * 20 + 15 + i);
-    createWorkstation(fg, -10 + i * 1.8, 0, -3.2, 0, 'PC-EMP-F' + floorNum + '-R1-' + idA1, 'Dev Team ' + floorNum + 'A', 'VLAN 10', ipA1, mats.screenCode);
-    createWorkstation(fg, -10 + i * 1.8, 0, -1.4, Math.PI, 'PC-EMP-F' + floorNum + '-R1-' + idA2, 'Dev Team ' + floorNum + 'A', 'VLAN 10', ipA2, mats.screenCode);
+    var idA2 = (i + 7) < 10 ? '0' + (i + 7) : '' + (i + 7);
+    var ipA1 = '192.168.10.' + ((floorNum - 1) * 20 + 10 + (i % 5));
+    var ipA2 = '192.168.10.' + ((floorNum - 1) * 20 + 15 + (i % 5));
+    // Desk 1 facing South (towards central divider)
+    createWorkstation(fg, pX, 0, -4.5, 0, 'PC-EMP-F' + floorNum + '-R1-' + idA1, 'Dev Team ' + floorNum + 'A', 'VLAN 10', ipA1, mats.screenCode);
+    // Desk 2 facing North
+    createWorkstation(fg, pX, 0, -2.2, Math.PI, 'PC-EMP-F' + floorNum + '-R1-' + idA2, 'Dev Team ' + floorNum + 'A', 'VLAN 10', ipA2, mats.screenCode);
   }
 
-  // Room A (RM {floorNum}01): 2 Departmental Network Laser Printers
-  createPrinter(fg, -11.0, 0, -5.8, 0, {
+  // North Wing Departmental Laser Printers
+  createPrinter(fg, -11.0, 0, -6.2, 0, {
     id: 'PRN-DEV-F' + floorNum + '-01',
     dept: 'Engineering Bay ' + floorNum + '01',
     vlan: 'VLAN 10 (192.168.10.0/24)',
     ip: '192.168.10.' + (200 + (floorNum - 1) * 4 + 1),
     switchPort: 'SW-EMP-F' + floorNum + ' Port Gi0/21',
-    worldX: -22 - 11.0, worldY: baseY, worldZ: 18 - 5.8
+    worldX: -22 - 11.0, worldY: baseY, worldZ: 18 - 6.2
   });
-  createPrinter(fg, -1.8, 0, -5.8, 0, {
+  createPrinter(fg, 2.0, 0, -6.2, 0, {
     id: 'PRN-DEV-F' + floorNum + '-02',
     dept: 'Engineering Bay ' + floorNum + '01',
     vlan: 'VLAN 10 (192.168.10.0/24)',
     ip: '192.168.10.' + (200 + (floorNum - 1) * 4 + 2),
     switchPort: 'SW-EMP-F' + floorNum + ' Port Gi0/22',
-    worldX: -22 - 1.8, worldY: baseY, worldZ: 18 - 5.8
+    worldX: -22 + 2.0, worldY: baseY, worldZ: 18 - 6.2
   });
 
-  // Room B (10 PCs: IDs 01-10, IPs 192.168.10.x starting at .20)
-  makeTag('RM ' + floorNum + '02 (10 PCs)', -22 + 6, baseY + 2.3, 18 - 5.5, 0.25, 'room');
-  for (var i = 0; i < 5; i++) {
-    var idB1 = (i + 1) < 10 ? '0' + (i + 1) : '' + (i + 1);
-    var idB2 = (i + 6) < 10 ? '0' + (i + 6) : '' + (i + 6);
-    var ipB1 = '192.168.10.' + ((floorNum - 1) * 20 + 20 + i);
-    var ipB2 = '192.168.10.' + ((floorNum - 1) * 20 + 25 + i);
-    createWorkstation(fg, 2.5 + i * 1.8, 0, -3.2, 0, 'PC-EMP-F' + floorNum + '-R2-' + idB1, 'Dev Team ' + floorNum + 'B', 'VLAN 10', ipB1, mats.screenCode);
-    createWorkstation(fg, 2.5 + i * 1.8, 0, -1.4, Math.PI, 'PC-EMP-F' + floorNum + '-R2-' + idB2, 'Dev Team ' + floorNum + 'B', 'VLAN 10', ipB2, mats.screenCode);
+  // South Wing: 2 Pods of 6 Workstations (facing North/South)
+  makeTag('RM ' + floorNum + '02: DEV SOUTH (12 PCs)', -22 - 5.0, baseY + 2.3, 18 + 3.8, 0.25, 'room');
+  var sOffsets = [-8.8, -7.0, -5.2, -2.4, -0.6, 1.2];
+  for (var j = 0; j < 6; j++) {
+    var pXs = sOffsets[j];
+    var idB1 = (j + 1) < 10 ? '0' + (j + 1) : '' + (j + 1);
+    var idB2 = (j + 7) < 10 ? '0' + (j + 7) : '' + (j + 7);
+    var ipB1 = '192.168.10.' + ((floorNum - 1) * 20 + 20 + (j % 5));
+    var ipB2 = '192.168.10.' + ((floorNum - 1) * 20 + 25 + (j % 5));
+    // Desk 1 facing North (towards central divider)
+    createWorkstation(fg, pXs, 0, 2.2, 0, 'PC-EMP-F' + floorNum + '-R2-' + idB1, 'Dev Team ' + floorNum + 'B', 'VLAN 10', ipB1, mats.screenCode);
+    // Desk 2 facing South
+    createWorkstation(fg, pXs, 0, 4.5, Math.PI, 'PC-EMP-F' + floorNum + '-R2-' + idB2, 'Dev Team ' + floorNum + 'B', 'VLAN 10', ipB2, mats.screenCode);
   }
 
-  // Room B (RM {floorNum}02): 2 Departmental Network Laser Printers
-  createPrinter(fg, 1.8, 0, -5.8, 0, {
+  // South Wing Departmental Laser Printers
+  createPrinter(fg, -11.0, 0, 6.2, 0, {
     id: 'PRN-DEV-F' + floorNum + '-03',
     dept: 'Engineering Bay ' + floorNum + '02',
     vlan: 'VLAN 10 (192.168.10.0/24)',
     ip: '192.168.10.' + (200 + (floorNum - 1) * 4 + 3),
     switchPort: 'SW-EMP-F' + floorNum + ' Port Gi0/23',
-    worldX: -22 + 1.8, worldY: baseY, worldZ: 18 - 5.8
+    worldX: -22 - 11.0, worldY: baseY, worldZ: 18 + 6.2
   });
-  createPrinter(fg, 11.0, 0, -5.8, 0, {
+  createPrinter(fg, 2.0, 0, 6.2, 0, {
     id: 'PRN-DEV-F' + floorNum + '-04',
     dept: 'Engineering Bay ' + floorNum + '02',
     vlan: 'VLAN 10 (192.168.10.0/24)',
     ip: '192.168.10.' + (200 + (floorNum - 1) * 4 + 4),
     switchPort: 'SW-EMP-F' + floorNum + ' Port Gi0/24',
-    worldX: -22 + 11.0, worldY: baseY, worldZ: 18 - 5.8
+    worldX: -22 + 2.0, worldY: baseY, worldZ: 18 + 6.2
   });
 }
 
@@ -2658,10 +3292,17 @@ box(bAdmin, 2.5, 1.75, 6.25, 0.2, 3.5, 7.5, mats.corridorWall);
 // =========================================================================
 // EAST CORE: STAIRCASE, ELEVATOR SHAFT & FACILITIES ROOM
 // =========================================================================
-// 1. Staircase: 6 solid concrete steps leading up from Floor 1 toward Floor 2
-for (var st = 0; st < 6; st++) {
-  box(bAdmin, 6.5, 0.25 + st * 0.28, 0.8 + st * 0.55, 4.2, 0.28, 0.55, mats.concrete);
-}
+// 1. Architectural Stepped Staircase leading to Floor 2
+createArchitecturalStairs(bAdmin, {
+  x: 6.5, y: 0.1, z: 0.8,
+  rotY: 0,
+  width: 2.8,
+  totalHeight: 3.4,
+  totalDepth: 3.8,
+  steps: 12,
+  hasLanding: true,
+  landingDepth: 1.2
+});
 // 2. Structural Elevator Shaft (X = 4.8 to 9.8, Z = 4.8 to 7.8)
 // Front wall at Z = 4.8:
 box(bAdmin, 5.2, 1.75, 4.8, 0.8, 3.5, 0.2, mats.corridorWall);
@@ -2916,9 +3557,16 @@ box(bBranch, -2.2, 1.8, 0, 0.25, 3.4, 16, mats.corridorWall);
 box(bBranch, 2.2, 1.8, 0, 0.25, 3.4, 16, mats.corridorWall);
 
 // Staircase landing in rear corridor leading upstairs (matching blueprint)
-for (var st = 0; st < 6; st++) {
-  box(bBranch, 0, 0.25 + st * 0.25, 4.5 + st * 0.45, 3.8, 0.25, 0.45, mats.concrete);
-}
+createArchitecturalStairs(bBranch, {
+  x: 0, y: 0.1, z: 3.2,
+  rotY: 0,
+  width: 2.6,
+  totalHeight: 3.4,
+  totalDepth: 3.6,
+  steps: 12,
+  hasLanding: true,
+  landingDepth: 1.2
+});
 
 // =========================================================================
 // 1ST FLOOR: 30 SUPPORT WORKSTATIONS (15 in Room 1 + 15 in Room 2, VLAN 50)
@@ -3498,17 +4146,27 @@ function focusFacility(name) {
   closeBigScreen();
   if (activeNav === 'walk') setNavMode('orbit');
   
-  // Highlight active nav button
-  var btns = {
-    overview: 'btnNavOverview',
-    datacenter: 'btnNavServer',
-    emp: 'btnNavEmp',
-    admin: 'btnNavAdmin',
-    branch: 'btnNavBranch'
+  // Update current facility display label and active state
+  var facilityDisplay = {
+    overview: 'All Facilities',
+    datacenter: 'Studio Server Room',
+    emp: 'Employee Building',
+    admin: 'Admin Building',
+    branch: 'Second Branch'
   };
-  for (var k in btns) {
-    var el = document.getElementById(btns[k]);
-    if (el) el.className = (k === name) ? 'nav-btn active' : 'nav-btn';
+  var lblCurrent = document.getElementById('lblFacilityCurrent');
+  if (lblCurrent) lblCurrent.textContent = (name === 'overview' ? '🏢 ' : '') + (facilityDisplay[name] || 'All Facilities');
+
+  var itemIds = {
+    overview: 'itemFacOverview',
+    datacenter: 'itemFacServer',
+    emp: 'itemFacEmp',
+    admin: 'itemFacAdmin',
+    branch: 'itemFacBranch'
+  };
+  for (var k in itemIds) {
+    var itemEl = document.getElementById(itemIds[k]);
+    if (itemEl) itemEl.classList.toggle('active', k === name);
   }
 
   // Floor sub-bar visibility
@@ -4183,7 +4841,27 @@ window.addEventListener('keyup', function(e) { keys[e.code] = false; });
 function animate() {
   requestAnimationFrame(animate);
 
-  if (activeNav === 'orbit' && (!packetAnim || !packetAnim.chaseCamera)) {
+  if (activeNav === 'orbit' && (!packetAnim || !packetAnim.chaseCamera) && (!tourState || !tourState.running)) {
+    // Desktop WASD + Arrow Keys Smooth Glide in Orbit Mode
+    var isInputActive = document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA');
+    if (!isInputActive) {
+      var hasWASD = keys.KeyW || keys.ArrowUp || keys.KeyS || keys.ArrowDown || keys.KeyA || keys.ArrowLeft || keys.KeyD || keys.ArrowRight;
+      if (hasWASD) {
+        var fwd = new THREE.Vector3();
+        camera.getWorldDirection(fwd);
+        fwd.y = 0;
+        fwd.normalize();
+        var right = new THREE.Vector3().crossVectors(fwd, camera.up).normalize();
+        var moveSpd = (keys.ShiftLeft || keys.ShiftRight) ? 0.75 : 0.35;
+        var delta = new THREE.Vector3();
+        if (keys.KeyW || keys.ArrowUp) delta.addScaledVector(fwd, moveSpd);
+        if (keys.KeyS || keys.ArrowDown) delta.addScaledVector(fwd, -moveSpd);
+        if (keys.KeyD || keys.ArrowRight) delta.addScaledVector(right, moveSpd);
+        if (keys.KeyA || keys.ArrowLeft) delta.addScaledVector(right, -moveSpd);
+        camera.position.add(delta);
+        orbit.target.add(delta);
+      }
+    }
     orbit.update();
   } else if (activeNav === 'walk') {
     // Strict YXZ zero-roll enforcement in first-person walk mode
