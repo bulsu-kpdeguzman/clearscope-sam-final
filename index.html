@@ -196,55 +196,55 @@ body {
   border-color: #38bdf8;
 }
 
-/* AUTO-WALKTHROUGH TOUR HUD */
+/* AUTO-WALKTHROUGH TOUR HUD (SLIM TOP-CENTER CAPSULE) */
 #tourHUD {
   position: fixed;
-  bottom: 64px;
+  top: 14px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 70;
   background: rgba(15, 23, 42, 0.94);
-  backdrop-filter: blur(18px);
+  backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 16px;
-  padding: 10px 16px;
+  border-radius: 999px;
+  padding: 5px 12px 5px 10px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65);
-  max-width: 94vw;
-  width: 640px;
-  animation: fadeIn 0.25s ease;
+  gap: 12px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.65);
+  max-width: 90vw;
+  white-space: nowrap;
+  animation: fadeIn 0.2s ease;
 }
 .tour-hud-info {
   display: flex;
-  flex-direction: column;
-  gap: 3px;
+  align-items: center;
+  gap: 8px;
   overflow: hidden;
 }
 .tour-badge-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 .tour-badge {
-  font-size: 9.5px;
+  font-size: 9px;
   font-weight: 800;
   letter-spacing: 0.05em;
   color: #38bdf8;
-  background: rgba(56, 189, 248, 0.12);
-  border: 1px solid rgba(56, 189, 248, 0.25);
+  background: rgba(56, 189, 248, 0.14);
+  border: 1px solid rgba(56, 189, 248, 0.28);
   padding: 2px 6px;
   border-radius: 4px;
 }
 .tour-step-counter {
-  font-size: 10.5px;
+  font-size: 10px;
   font-weight: 600;
   color: #94a3b8;
 }
 .tour-facility-title {
-  font-size: 13.5px;
+  font-size: 11.5px;
   font-weight: 700;
   color: #ffffff;
 }
@@ -254,28 +254,28 @@ body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 380px;
+  max-width: 280px;
 }
 .tour-hud-controls {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   flex-shrink: 0;
 }
 .tour-ctrl-btn {
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.14);
   color: #f1f5f9;
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 600;
-  padding: 6px 10px;
-  border-radius: 8px;
+  padding: 4px 9px;
+  border-radius: 999px;
   cursor: pointer;
   transition: all 0.15s ease;
   white-space: nowrap;
 }
 .tour-ctrl-btn:hover {
-  background: rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.18);
   color: #fff;
 }
 .tour-exit-btn {
@@ -287,19 +287,20 @@ body {
   background: #dc2626;
   color: #ffffff;
 }
-@media (max-width: 640px), (max-height: 520px) {
+@media (max-width: 860px), (max-height: 520px) {
   #tourHUD {
-    bottom: 48px;
-    padding: 8px 12px;
-    gap: 10px;
-    width: 95vw;
+    top: 8px;
+    padding: 4px 8px;
+    gap: 8px;
+    max-width: 95vw;
   }
   .tour-status-text {
-    max-width: 190px;
+    max-width: 130px;
+    font-size: 10px;
   }
   .tour-ctrl-btn {
-    padding: 5px 8px;
-    font-size: 10px;
+    padding: 3px 6px;
+    font-size: 9.5px;
   }
 }
 
@@ -1540,16 +1541,17 @@ if (typeof THREE === 'undefined') {
 <div class="glass" id="tourHUD" style="display:none;">
   <div class="tour-hud-info">
     <div class="tour-badge-row">
-      <span class="tour-badge">🎬 AUTO WALKTHROUGH</span>
-      <span class="tour-step-counter" id="tourStepCounter">Step 1 of 7</span>
+      <span class="tour-badge">🎬 TOUR</span>
+      <span class="tour-facility-title" id="tourFacilityTitle">Admin Building</span>
+      <span class="tour-step-counter" id="tourStepCounter">1/6</span>
     </div>
-    <div class="tour-facility-title" id="tourFacilityTitle">Admin Building</div>
-    <div class="tour-status-text" id="tourStatusText">Entering Ground Floor Main Entrance...</div>
+    <span class="nav-divider" style="height:12px;opacity:0.4;"></span>
+    <div class="tour-status-text" id="tourStatusText">Entering Room...</div>
   </div>
   <div class="tour-hud-controls">
     <button class="tour-ctrl-btn" id="btnTourPause" onclick="toggleTourPause()">⏸ Pause</button>
-    <button class="tour-ctrl-btn" id="btnTourNext" onclick="nextTourStep()">⏭ Next Room</button>
-    <button class="tour-ctrl-btn tour-exit-btn" id="btnTourExit" onclick="exitTour()">✕ Exit Tour</button>
+    <button class="tour-ctrl-btn" id="btnTourNext" onclick="nextTourStep()">⏭ Next</button>
+    <button class="tour-ctrl-btn tour-exit-btn" id="btnTourExit" onclick="exitTour()">✕ Exit</button>
   </div>
 </div>
 
@@ -1929,46 +1931,40 @@ var tourRoutes = {
     name: 'Admin Building',
     steps: [
       {
-        cam: [16, 9.0, 32], tgt: [16, 2.5, 18],
-        title: 'Main Branch Administration Building',
-        desc: 'Two-story executive headquarters with transparent glass facade, administrative suites, and network core.',
-        duration: 3400
+        cam: [8.5, 1.65, 26.5], tgt: [13.5, 1.1, 20.0],
+        title: 'Floor 1: Suite 1 (Operations Bay · 10 PCs)',
+        desc: 'Corner perspective showing all perimeter workstations, dual displays, and departmental laser printer.',
+        duration: 3800, roof: false
       },
       {
-        cam: [16, 2.6, 25.0], tgt: [16, 1.8, 16.0],
-        title: 'Floor 1: Central Reception & Corridor',
-        desc: 'Entering through the southern entrance into the polished hardwood central corridor.',
-        duration: 3200
+        cam: [8.5, 1.65, 10.5], tgt: [13.5, 1.1, 16.0],
+        title: 'Floor 1: Suite 2 (Administration · 5 PCs)',
+        desc: 'Corner view across private administrative workstations and dedicated network drops.',
+        duration: 3800, roof: false
       },
       {
-        cam: [18.0, 3.2, 23.5], tgt: [11.0, 1.4, 16.5],
-        title: 'Floor 1: Administration Suites (15 PCs & Printers)',
-        desc: 'High-angle perspective inspecting perimeter executive desks, dual displays, and network printers (VLAN 20).',
-        duration: 3800
+        cam: [19.0, 1.65, 18.0], tgt: [23.0, 2.4, 20.5],
+        title: 'Floor 1: East Service Core & Architectural Staircase',
+        desc: 'Architectural stepped treads, safety balusters, and structural elevator shaft connecting to Floor 2.',
+        duration: 3600, roof: false
       },
       {
-        cam: [17.5, 2.5, 15.5], tgt: [22.5, 2.2, 18.5],
-        title: 'Floor 1: Architectural Staircase & Elevator Core',
-        desc: 'Architectural stepped treads, safety balusters, and structural elevator shaft leading to Floor 2.',
-        duration: 3400
+        cam: [16.0, 5.0, 24.0], tgt: [16.0, 5.8, 17.0],
+        title: 'Floor 2: Central Hallway & Enterprise Wi-Fi 6',
+        desc: 'Corridor view framing ceiling-mounted Cisco Catalyst 9115 Wi-Fi 6 Access Point.',
+        duration: 3600, roof: false
       },
       {
-        cam: [16.0, 5.6, 23.5], tgt: [16.0, 5.2, 16.5],
-        title: 'Floor 2: Central Corridor & Wi-Fi 6 Access Point',
-        desc: 'Ceiling-mounted Cisco Catalyst 9115 Wi-Fi 6 Access Point delivering enterprise wireless coverage.',
-        duration: 3400
-      },
-      {
-        cam: [18.0, 6.2, 22.5], tgt: [11.0, 4.8, 16.5],
-        title: 'Floor 2: Executive Management & Conference Bay',
-        desc: 'Upper floor executive workstations, dedicated administration printer, and secured network drops.',
-        duration: 3800
+        cam: [8.5, 5.15, 26.0], tgt: [13.5, 4.6, 18.0],
+        title: 'Floor 2: Executive Management Suite (15 PCs)',
+        desc: 'Corner-to-corner panoramic view of Floor 2 executive desks, manager stations, and laser printer.',
+        duration: 4000, roof: false
       },
       {
         cam: [22.0, 10.5, 32.0], tgt: [16.0, 3.5, 18.0],
-        title: 'Admin Building Tour Completed',
-        desc: 'Walkthrough completed. Returning to architectural perspective.',
-        duration: 3200
+        title: 'Admin Building Overview',
+        desc: 'Walkthrough completed. Restoring exterior view.',
+        duration: 3200, roof: true
       }
     ]
   },
@@ -1976,81 +1972,34 @@ var tourRoutes = {
     name: 'Employee Building',
     steps: [
       {
-        cam: [-22, 18, 42], tgt: [-22, 5, 18],
-        title: '5-Story Employee Operations Building',
-        desc: 'Primary workforce facility hosting 100 developer workstations (10 PCs/room, 20/floor, VLAN 10).',
-        duration: 3400, floor: 'all'
+        cam: [-32.5, 1.65, 11.8], tgt: [-24.0, 1.1, 15.5],
+        title: 'Floor 1: North Developer Wing (10 PCs · VLAN 10)',
+        desc: 'Corner perspective across the 10 developer workstations facing across central acoustic partition with dual displays.',
+        duration: 4000, floor: 1, roof: false
       },
       {
-        cam: [-18, 2.8, 23.0], tgt: [-22, 1.6, 18],
-        title: 'Floor 1: East Access Core & Elevator Lobby',
-        desc: 'Service core featuring structural elevator shaft and architectural staircase.',
-        duration: 3200, floor: 1
+        cam: [-32.5, 1.65, 24.5], tgt: [-24.0, 1.1, 20.5],
+        title: 'Floor 1: South Developer Wing (10 PCs · VLAN 10)',
+        desc: 'Corner perspective across the 10 south workstations and dual departmental laser printers.',
+        duration: 4000, floor: 1, roof: false
       },
       {
-        cam: [-18, 3.2, 12.0], tgt: [-25, 1.4, 15.0],
-        title: 'Floor 1: North Developer Pod (10 PCs · VLAN 10)',
-        desc: 'Collaborative cluster of 10 developer workstations facing across central acoustic partition with dual displays.',
-        duration: 3800, floor: 1
+        cam: [-18.0, 1.65, 18.0], tgt: [-12.5, 2.0, 21.0],
+        title: 'Floor 1: East Service Core, Elevator & Switch SW-EMP-F1',
+        desc: 'Cisco 24-Port Floor Switch, structural elevator, and architectural staircase.',
+        duration: 3600, floor: 1, roof: false
       },
       {
-        cam: [-18, 3.2, 24.0], tgt: [-25, 1.4, 21.0],
-        title: 'Floor 1: South Developer Pod & Department Printers',
-        desc: 'South collaborative pod of 10 workstations and dual network laser printers connected to Cisco switch.',
-        duration: 3800, floor: 1
-      },
-      {
-        cam: [-19, 2.6, 18.0], tgt: [-16, 2.2, 13.0],
-        title: 'Floor 1: Cisco Catalyst Access Switch SW-EMP-F1',
-        desc: '24-port Gigabit access switch with dual 1G fiber uplink to Studio Server Room Core.',
-        duration: 3200, floor: 1
-      },
-      {
-        cam: [-18, 6.6, 22.0], tgt: [-25, 4.8, 18.0],
-        title: 'Floor 2: Developer Operations Floor',
-        desc: 'Standardized collaborative layout with 10 PCs/room across all upper levels.',
-        duration: 3600, floor: 2
+        cam: [-32.5, 5.05, 24.5], tgt: [-24.0, 4.5, 18.0],
+        title: 'Floor 2: Developer Operations Floor (VLAN 10)',
+        desc: 'Corner view of upper development floor with standardized 10 PCs/room layout.',
+        duration: 3800, floor: 2, roof: false
       },
       {
         cam: [-28, 22, 45], tgt: [-22, 7, 18],
-        title: 'Employee Building Tour Completed',
+        title: 'Employee Building Overview',
         desc: '5-floor employee operations overview completed.',
-        duration: 3200, floor: 'all'
-      }
-    ]
-  },
-  datacenter: {
-    name: 'Studio Server Room',
-    steps: [
-      {
-        cam: [-18, 6.5, -9], tgt: [-20, 1.8, -18],
-        title: 'Campus Studio Server Room & Datacenter',
-        desc: 'Climate-controlled mission-critical core facility connecting all campus facilities and WAN links.',
-        duration: 3400
-      },
-      {
-        cam: [-15, 2.6, -14], tgt: [-21, 1.8, -18],
-        title: 'Entrance & Overhead Fiber Cable Ladders',
-        desc: 'Security access doors beneath structured overhead fiber distribution trays.',
-        duration: 3200
-      },
-      {
-        cam: [-22, 2.8, -15], tgt: [-25.5, 1.8, -18.6],
-        title: 'Main Network Rack: Core Switch & Cisco Firepower NGFW',
-        desc: 'Cisco Catalyst 3650 Core L3 Switch and Firepower 1010 Firewall managing VLAN routing and ACL security.',
-        duration: 3600
-      },
-      {
-        cam: [-18, 2.6, -16], tgt: [-21.5, 1.4, -19.0],
-        title: 'Dedicated Enterprise Server Farm',
-        desc: 'SRV-EMP (Employee Operations Server) and SRV-ADM (Administration & Database Server).',
-        duration: 3600
-      },
-      {
-        cam: [-18, 6.5, -9], tgt: [-20, 1.8, -18],
-        title: 'Studio Server Room Tour Completed',
-        desc: 'Server farm inspection completed.',
-        duration: 3200
+        duration: 3200, floor: 'all', roof: true
       }
     ]
   },
@@ -2058,40 +2007,57 @@ var tourRoutes = {
     name: 'Second Branch Office',
     steps: [
       {
-        cam: [38, 8.5, -6], tgt: [38, 2.8, -18],
-        title: 'Remote Second Branch Facility (35 Workstations)',
-        desc: 'Two-story remote branch connected via 500 Mbps private fiber line to Main Branch headquarters.',
-        duration: 3400
+        cam: [28.5, 1.65, -24.0], tgt: [34.5, 1.1, -16.0],
+        title: 'Floor 1: West Customer Support Bay (15 PCs · VLAN 50)',
+        desc: 'Corner view showcasing 15 customer support workstations and departmental laser printer.',
+        duration: 4000, roof: false
       },
       {
-        cam: [38, 2.5, -9], tgt: [38, 1.8, -18],
-        title: 'Floor 1: Main Corridor & Reception',
-        desc: 'Central entrance corridor providing direct access to customer support teams and staircase.',
-        duration: 3200
+        cam: [47.5, 1.65, -24.0], tgt: [39.0, 1.2, -16.0],
+        title: 'Floor 1: East Customer Support Bay (15 PCs) & Staircase',
+        desc: 'Corner perspective across support workstations and central corridor staircase.',
+        duration: 4000, roof: false
       },
       {
-        cam: [37.0, 3.2, -13.0], tgt: [32.0, 1.3, -19.0],
-        title: 'Floor 1: Customer Support Operations (30 PCs · VLAN 50)',
-        desc: 'Elevated view across 30 technical and customer support workstations arranged in high-density teams.',
-        duration: 3800
-      },
-      {
-        cam: [34.0, 2.8, -13.0], tgt: [40.0, 2.0, -17.0],
-        title: 'Floor 1: Architectural Corridor Staircase',
-        desc: 'Architectural staircase with solid treads and handrails leading up to Floor 2 Accounting.',
-        duration: 3400
-      },
-      {
-        cam: [36.0, 6.2, -13.0], tgt: [44.0, 4.8, -18.0],
-        title: 'Floor 2: Accounting Suite & Dedicated Branch Server (SRV-BR)',
-        desc: '5 Accounting workstations and dedicated Branch Server connected to Cisco 4331 ISR Router.',
-        duration: 3800
+        cam: [39.0, 5.05, -12.5], tgt: [45.5, 4.5, -18.5],
+        title: 'Floor 2: Accounting Suite & Branch Server (SRV-BR)',
+        desc: 'Corner view of Accounting workstations, laser printer, and Branch Server rack.',
+        duration: 4000, roof: false
       },
       {
         cam: [42.0, 9.5, -6.0], tgt: [38, 2.5, -18],
-        title: 'Second Branch Tour Completed',
+        title: 'Second Branch Overview',
         desc: 'Remote facility walkthrough completed.',
-        duration: 3200
+        duration: 3200, roof: true
+      }
+    ]
+  },
+  datacenter: {
+    name: 'Studio Server Room',
+    steps: [
+      {
+        cam: [-13.5, 1.7, -18.0], tgt: [-22.0, 1.6, -18.0],
+        title: 'Studio Server Room: Entrance & Overhead Trays',
+        desc: 'View from the doorway looking across structured fiber cable distribution trays.',
+        duration: 3600, roof: false
+      },
+      {
+        cam: [-13.5, 1.7, -13.0], tgt: [-25.0, 1.6, -18.5],
+        title: 'Network Core Rack: Cisco 3650 & Firepower NGFW',
+        desc: 'Corner view of Cisco Catalyst Core Switch and Firepower Firewall managing security.',
+        duration: 3800, roof: false
+      },
+      {
+        cam: [-25.5, 1.7, -13.5], tgt: [-20.5, 1.3, -18.5],
+        title: 'Dedicated Server Farm: SRV-EMP & SRV-ADM',
+        desc: 'Corner inspection of dedicated enterprise servers connected at 1 Gbps.',
+        duration: 3800, roof: false
+      },
+      {
+        cam: [-18, 6.5, -9], tgt: [-20, 1.8, -18],
+        title: 'Studio Server Room Overview',
+        desc: 'Server farm inspection completed.',
+        duration: 3200, roof: true
       }
     ]
   }
@@ -2143,8 +2109,18 @@ function executeTourStep(index) {
   var stx = document.getElementById('tourStatusText');
   if (stx) stx.textContent = step.title + ' — ' + step.desc;
 
-  if (step.floor && tourState.facility === 'emp') {
-    selectFloor(step.floor, true);
+  if (tourState.facility === 'emp') {
+    selectFloor(step.floor || 'all', true);
+  }
+  var showRoof = (step.roof === true);
+  if (tourState.facility === 'admin' && typeof adminRoof !== 'undefined') {
+    adminRoof.visible = showRoof;
+  }
+  if (tourState.facility === 'branch' && typeof branchRoof !== 'undefined') {
+    branchRoof.visible = showRoof;
+  }
+  if (tourState.facility === 'datacenter' && typeof datacenterRoof !== 'undefined') {
+    datacenterRoof.visible = showRoof;
   }
 
   var moveDuration = Math.round(step.duration * 0.7);
@@ -2192,7 +2168,11 @@ function exitTour() {
   var hud = document.getElementById('tourHUD');
   if (hud) hud.style.display = 'none';
 
+  if (typeof datacenterRoof !== 'undefined') datacenterRoof.visible = true;
+  if (typeof adminRoof !== 'undefined') adminRoof.visible = true;
+  if (typeof branchRoof !== 'undefined') branchRoof.visible = true;
   selectFloor('all', true);
+
   if (tourState.facility) {
     focusFacility(tourState.facility);
   }
