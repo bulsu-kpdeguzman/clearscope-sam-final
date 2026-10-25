@@ -2192,6 +2192,7 @@ function exitTour() {
   var hud = document.getElementById('tourHUD');
   if (hud) hud.style.display = 'none';
 
+  selectFloor('all', true);
   if (tourState.facility) {
     focusFacility(tourState.facility);
   }
@@ -3037,17 +3038,19 @@ function buildEmployeeFloor(floorNum) {
   box(fg, 7.5, 1.7, 5.3, 0.2, 3.2, 5.4, mats.corridorWall); // East partition separating from stairs
   box(fg, 5.5, 1.15, 2.6, 1.0, 2.3, 0.08, mats.doorWood); // Door to hallway
 
-  // Southeast Architectural Staircase (Z = 2.6 to 8.0, X = 7.5 to 11.5)
-  createArchitecturalStairs(fg, {
-    x: 9.5, y: 0.1, z: 2.8,
-    rotY: 0,
-    width: 2.4,
-    totalHeight: 3.4,
-    totalDepth: 4.6,
-    steps: 12,
-    hasLanding: true,
-    landingDepth: 1.0
-  });
+  // Southeast Architectural Staircase (Floors 1-4 only - Floor 5 has no stairs into ceiling)
+  if (floorNum < 5) {
+    createArchitecturalStairs(fg, {
+      x: 9.5, y: 0.1, z: 2.8,
+      rotY: 0,
+      width: 2.4,
+      totalHeight: 3.4,
+      totalDepth: 4.6,
+      steps: 12,
+      hasLanding: true,
+      landingDepth: 1.0
+    });
+  }
 
   // Ceiling plate / structural lintels
   box(fg, 0, 3.35, 0, 24, 0.1, 16, mats.tileLight);
@@ -3065,71 +3068,71 @@ function buildEmployeeFloor(floorNum) {
   });
   makeTag('SW-EMP-F' + floorNum, -22 + 4.2, baseY + 2.45, 18 - 5.0, 0.22, 'device');
 
-  // 7. Workstations Pods (Matching CAD Blueprint 1:1)
-  // North Wing: 2 Pods of 6 Workstations (facing North/South)
-  makeTag('RM ' + floorNum + '01: DEV NORTH (12 PCs)', -22 - 5.0, baseY + 2.3, 18 - 3.8, 0.25, 'room');
-  var nOffsets = [-8.8, -7.0, -5.2, -2.4, -0.6, 1.2];
-  for (var i = 0; i < 6; i++) {
+  // 7. Workstations (Exactly 10 PCs in Room 1 and 10 PCs in Room 2 = 20 PCs/Floor, 100 PCs in Building)
+  // Room 1 (North Wing): 10 PCs (5 facing 5 across central partition)
+  makeTag('RM ' + floorNum + '01: DEV NORTH (10 PCs)', -22 - 6.0, baseY + 2.3, 18 - 3.2, 0.25, 'room');
+  var nOffsets = [-10.0, -8.0, -6.0, -4.0, -2.0];
+  for (var i = 0; i < 5; i++) {
     var pX = nOffsets[i];
     var idA1 = (i + 1) < 10 ? '0' + (i + 1) : '' + (i + 1);
-    var idA2 = (i + 7) < 10 ? '0' + (i + 7) : '' + (i + 7);
-    var ipA1 = '192.168.10.' + ((floorNum - 1) * 20 + 10 + (i % 5));
-    var ipA2 = '192.168.10.' + ((floorNum - 1) * 20 + 15 + (i % 5));
-    // Desk 1 facing South (towards central divider)
-    createWorkstation(fg, pX, 0, -4.5, 0, 'PC-EMP-F' + floorNum + '-R1-' + idA1, 'Dev Team ' + floorNum + 'A', 'VLAN 10', ipA1, mats.screenCode);
-    // Desk 2 facing North
+    var idA2 = (i + 6) < 10 ? '0' + (i + 6) : '' + (i + 6);
+    var ipA1 = '192.168.10.' + ((floorNum - 1) * 20 + 10 + i);
+    var ipA2 = '192.168.10.' + ((floorNum - 1) * 20 + 15 + i);
+    // Desk row 1 facing South (towards central divider)
+    createWorkstation(fg, pX, 0, -4.2, 0, 'PC-EMP-F' + floorNum + '-R1-' + idA1, 'Dev Team ' + floorNum + 'A', 'VLAN 10', ipA1, mats.screenCode);
+    // Desk row 2 facing North
     createWorkstation(fg, pX, 0, -2.2, Math.PI, 'PC-EMP-F' + floorNum + '-R1-' + idA2, 'Dev Team ' + floorNum + 'A', 'VLAN 10', ipA2, mats.screenCode);
   }
 
   // North Wing Departmental Laser Printers
-  createPrinter(fg, -11.0, 0, -6.2, 0, {
+  createPrinter(fg, -11.2, 0, -6.2, 0, {
     id: 'PRN-DEV-F' + floorNum + '-01',
     dept: 'Engineering Bay ' + floorNum + '01',
     vlan: 'VLAN 10 (192.168.10.0/24)',
     ip: '192.168.10.' + (200 + (floorNum - 1) * 4 + 1),
     switchPort: 'SW-EMP-F' + floorNum + ' Port Gi0/21',
-    worldX: -22 - 11.0, worldY: baseY, worldZ: 18 - 6.2
+    worldX: -22 - 11.2, worldY: baseY, worldZ: 18 - 6.2
   });
-  createPrinter(fg, 2.0, 0, -6.2, 0, {
+  createPrinter(fg, 1.8, 0, -6.2, 0, {
     id: 'PRN-DEV-F' + floorNum + '-02',
     dept: 'Engineering Bay ' + floorNum + '01',
     vlan: 'VLAN 10 (192.168.10.0/24)',
     ip: '192.168.10.' + (200 + (floorNum - 1) * 4 + 2),
     switchPort: 'SW-EMP-F' + floorNum + ' Port Gi0/22',
-    worldX: -22 + 2.0, worldY: baseY, worldZ: 18 - 6.2
+    worldX: -22 + 1.8, worldY: baseY, worldZ: 18 - 6.2
   });
 
-  // South Wing: 2 Pods of 6 Workstations (facing North/South)
-  makeTag('RM ' + floorNum + '02: DEV SOUTH (12 PCs)', -22 - 5.0, baseY + 2.3, 18 + 3.8, 0.25, 'room');
-  var sOffsets = [-8.8, -7.0, -5.2, -2.4, -0.6, 1.2];
-  for (var j = 0; j < 6; j++) {
+  // Room 2 (South Wing): 10 PCs (5 facing 5 across central partition)
+  makeTag('RM ' + floorNum + '02: DEV SOUTH (10 PCs)', -22 - 6.0, baseY + 2.3, 18 + 3.2, 0.25, 'room');
+  var sOffsets = [-10.0, -8.0, -6.0, -4.0, -2.0];
+  for (var j = 0; j < 5; j++) {
     var pXs = sOffsets[j];
     var idB1 = (j + 1) < 10 ? '0' + (j + 1) : '' + (j + 1);
-    var idB2 = (j + 7) < 10 ? '0' + (j + 7) : '' + (j + 7);
-    var ipB1 = '192.168.10.' + ((floorNum - 1) * 20 + 20 + (j % 5));
-    var ipB2 = '192.168.10.' + ((floorNum - 1) * 20 + 25 + (j % 5));
-    // Desk 1 facing North (towards central divider)
+    var idB2 = (j + 6) < 10 ? '0' + (j + 6) : '' + (j + 6);
+    var ipB1 = '192.168.10.' + ((floorNum - 1) * 20 + 20 + j);
+    var ipB2 = '192.168.10.' + ((floorNum - 1) * 20 + 25 + j);
+    // Desk row 1 facing North (towards central divider)
     createWorkstation(fg, pXs, 0, 2.2, 0, 'PC-EMP-F' + floorNum + '-R2-' + idB1, 'Dev Team ' + floorNum + 'B', 'VLAN 10', ipB1, mats.screenCode);
-    // Desk 2 facing South
-    createWorkstation(fg, pXs, 0, 4.5, Math.PI, 'PC-EMP-F' + floorNum + '-R2-' + idB2, 'Dev Team ' + floorNum + 'B', 'VLAN 10', ipB2, mats.screenCode);
+    // Desk row 2 facing South
+    createWorkstation(fg, pXs, 0, 4.2, Math.PI, 'PC-EMP-F' + floorNum + '-R2-' + idB2, 'Dev Team ' + floorNum + 'B', 'VLAN 10', ipB2, mats.screenCode);
   }
 
   // South Wing Departmental Laser Printers
-  createPrinter(fg, -11.0, 0, 6.2, 0, {
+  createPrinter(fg, -11.2, 0, 6.2, 0, {
     id: 'PRN-DEV-F' + floorNum + '-03',
     dept: 'Engineering Bay ' + floorNum + '02',
     vlan: 'VLAN 10 (192.168.10.0/24)',
     ip: '192.168.10.' + (200 + (floorNum - 1) * 4 + 3),
     switchPort: 'SW-EMP-F' + floorNum + ' Port Gi0/23',
-    worldX: -22 - 11.0, worldY: baseY, worldZ: 18 + 6.2
+    worldX: -22 - 11.2, worldY: baseY, worldZ: 18 + 6.2
   });
-  createPrinter(fg, 2.0, 0, 6.2, 0, {
+  createPrinter(fg, 1.8, 0, 6.2, 0, {
     id: 'PRN-DEV-F' + floorNum + '-04',
     dept: 'Engineering Bay ' + floorNum + '02',
     vlan: 'VLAN 10 (192.168.10.0/24)',
     ip: '192.168.10.' + (200 + (floorNum - 1) * 4 + 4),
     switchPort: 'SW-EMP-F' + floorNum + ' Port Gi0/24',
-    worldX: -22 + 2.0, worldY: baseY, worldZ: 18 + 6.2
+    worldX: -22 + 1.8, worldY: baseY, worldZ: 18 + 6.2
   });
 }
 
@@ -4214,21 +4217,39 @@ function selectFloor(floor, skipCam) {
   }
 }
 
-function tweenCam(pos, tgt) {
+function tweenCam(pos, tgt, duration, onComplete) {
   var startCam = camera.position.clone();
   var startTgt = orbit.target.clone();
   var endCam = new THREE.Vector3(pos[0], pos[1], pos[2]);
   var endTgt = new THREE.Vector3(tgt[0], tgt[1], tgt[2]);
-  var t = 0;
 
-  function step() {
-    t += 0.05;
-    camera.position.lerpVectors(startCam, endCam, t);
-    orbit.target.lerpVectors(startTgt, endTgt, t);
-    orbit.update();
-    if (t < 1) requestAnimationFrame(step);
+  if (typeof duration === 'function') {
+    onComplete = duration;
+    duration = 900;
   }
-  step();
+  duration = duration || 900;
+  var startTime = performance.now();
+
+  function step(now) {
+    var elapsed = now - startTime;
+    var rawT = Math.min(1.0, elapsed / duration);
+    // Smooth easeInOutCubic for cinematic gliding
+    var easeT = rawT < 0.5 ? 4 * rawT * rawT * rawT : 1 - Math.pow(-2 * rawT + 2, 3) / 2;
+
+    camera.position.lerpVectors(startCam, endCam, easeT);
+    orbit.target.lerpVectors(startTgt, endTgt, easeT);
+    orbit.update();
+
+    if (rawT < 1.0) {
+      requestAnimationFrame(step);
+    } else {
+      camera.position.copy(endCam);
+      orbit.target.copy(endTgt);
+      orbit.update();
+      if (typeof onComplete === 'function') onComplete();
+    }
+  }
+  requestAnimationFrame(step);
 }
 
 // -------------------------------------------------------------
