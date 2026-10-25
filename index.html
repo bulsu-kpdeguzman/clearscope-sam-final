@@ -1084,7 +1084,7 @@ if (typeof THREE === 'undefined') {
   </button>
 
   <div class="dock-sep"></div>
-  <div class="dock-stat" id="dockCoords">165 Desktops · Online</div>
+  <div class="dock-stat" id="dockCoords">165 Desktops · 31 Printers · Online</div>
 </div>
 
 <!-- FLOATING EXIT WALK BUTTON (MOBILE WALK MODE ONLY) -->
@@ -1511,6 +1511,11 @@ var mats = {
   chair: new THREE.MeshStandardMaterial({ color: '#1e293b', roughness: 0.7 }),
   
   pcCase: new THREE.MeshStandardMaterial({ color: '#0f172a', roughness: 0.5, metalness: 0.5 }),
+  printerBody: new THREE.MeshStandardMaterial({ color: '#f8fafc', roughness: 0.35 }),
+  printerDark: new THREE.MeshStandardMaterial({ color: '#1e293b', roughness: 0.55 }),
+  printerTray: new THREE.MeshStandardMaterial({ color: '#475569', roughness: 0.5 }),
+  printerScreen: new THREE.MeshBasicMaterial({ color: '#00e5ff' }),
+  printerLed: new THREE.MeshBasicMaterial({ color: '#10b981' }),
   monitorBezel: new THREE.MeshStandardMaterial({ color: '#020617', roughness: 0.3, metalness: 0.4 }),
   screenCode: new THREE.MeshBasicMaterial({ color: '#0284c7' }),
   screenAdmin: new THREE.MeshBasicMaterial({ color: '#10b981' }),
@@ -1935,6 +1940,62 @@ scene.add(bEmployees);
 
 var employeeFloors = [];
 
+// ENTERPRISE MULTI-FUNCTION NETWORK LASER PRINTER (3D Model with Scanner & Trays)
+function createPrinter(parent, x, y, z, rotY, data) {
+  var g = new THREE.Group();
+  g.position.set(x, y, z);
+  g.rotation.y = rotY || 0;
+  parent.add(g);
+
+  // 1. Mobile Cabinet Stand with dual paper drawer cassettes
+  var stand = box(g, 0, 0.22, 0, 0.65, 0.44, 0.58, mats.printerDark);
+  box(g, 0, 0.30, 0.292, 0.36, 0.04, 0.02, mats.printerTray, false);
+  box(g, 0, 0.15, 0.292, 0.36, 0.04, 0.02, mats.printerTray, false);
+
+  // 2. Main Laser Engine Body (clean crisp off-white housing)
+  var body = box(g, 0, 0.58, 0, 0.62, 0.28, 0.55, mats.printerBody);
+
+  // 3. Central Recessed Paper Output Bay (with fresh output page)
+  box(g, 0, 0.56, 0.12, 0.46, 0.12, 0.28, mats.printerDark, false);
+  box(g, 0, 0.51, 0.14, 0.30, 0.01, 0.20, mats.striping, false);
+
+  // 4. Flatbed Scanner Assembly & Automatic Document Feeder (ADF)
+  var scanner = box(g, 0, 0.77, -0.02, 0.62, 0.08, 0.54, mats.printerBody);
+  box(g, 0, 0.83, -0.05, 0.52, 0.04, 0.36, mats.printerDark, false);
+
+  // 5. Digital Touch Control Panel (angled display on front-right)
+  var panel = box(g, 0.20, 0.76, 0.24, 0.16, 0.08, 0.06, mats.printerDark);
+  panel.rotation.x = -0.35;
+  box(panel, 0, 0, 0.032, 0.13, 0.06, 0.01, mats.printerScreen, false);
+
+  // 6. Glowing Status LED
+  box(g, -0.22, 0.73, 0.26, 0.03, 0.03, 0.02, mats.printerLed, false);
+
+  // Interactive device data
+  var devData = {
+    id: data.id,
+    type: 'Departmental Network Laser Printer',
+    dept: data.dept,
+    vlan: data.vlan,
+    ip: data.ip,
+    mac: data.mac || ('00:1B:77:4A:' + (Math.floor(Math.random()*89)+10) + ':' + (Math.floor(Math.random()*89)+10)),
+    specs: 'Enterprise Workgroup Multi-Function Laser (Duplex · 1 Gbps Cat6)',
+    diskUsage: 'Tray 1: 500 Sheets · Tray 2: 500 Sheets · Toner: 95%',
+    switchPort: data.switchPort || 'Access Switch Port Gi0/21 (1 Gbps)',
+    desc: 'Departmental shared network laser printer with secure print queue managed by SRV-ADM Active Directory.'
+  };
+
+  registerInteractable(body, devData);
+  registerInteractable(stand, devData);
+  registerInteractable(scanner, devData);
+
+  if (data.worldX !== undefined && data.worldY !== undefined && data.worldZ !== undefined) {
+    makeTag(data.id, data.worldX, data.worldY + 1.15, data.worldZ, 0.18, 'device');
+  }
+
+  return g;
+}
+
 function buildEmployeeFloor(floorNum) {
   var fg = new THREE.Group();
   var floorHeight = 3.4;
@@ -1980,14 +2041,22 @@ function buildEmployeeFloor(floorNum) {
     createWorkstation(fg, -10 + i * 1.8, 0, -1.4, Math.PI, 'PC-EMP-F' + floorNum + '-R1-' + idA2, 'Dev Team ' + floorNum + 'A', 'VLAN 10', ipA2, mats.screenCode);
   }
 
-  var prnA = box(fg, -11, 0.45, -5.5, 0.6, 0.8, 0.6, mats.pcCase);
-  registerInteractable(prnA, {
-    id: 'PRN-EMP-F' + floorNum + '-A',
-    type: 'Floor Network Printer',
-    dept: 'Engineering Floor ' + floorNum,
+  // Room A (RM {floorNum}01): 2 Departmental Network Laser Printers
+  createPrinter(fg, -11.0, 0, -5.8, 0, {
+    id: 'PRN-DEV-F' + floorNum + '-01',
+    dept: 'Engineering Bay ' + floorNum + '01',
     vlan: 'VLAN 10 (192.168.10.0/24)',
-    ip: '192.168.10.' + (110 + (floorNum - 1) * 4 + 1),
-    specs: 'Enterprise Workgroup Laser Printer · 1 Gbps NIC'
+    ip: '192.168.10.' + (200 + (floorNum - 1) * 4 + 1),
+    switchPort: 'SW-EMP-F' + floorNum + ' Port Gi0/21',
+    worldX: -22 - 11.0, worldY: baseY, worldZ: 18 - 5.8
+  });
+  createPrinter(fg, -1.8, 0, -5.8, 0, {
+    id: 'PRN-DEV-F' + floorNum + '-02',
+    dept: 'Engineering Bay ' + floorNum + '01',
+    vlan: 'VLAN 10 (192.168.10.0/24)',
+    ip: '192.168.10.' + (200 + (floorNum - 1) * 4 + 2),
+    switchPort: 'SW-EMP-F' + floorNum + ' Port Gi0/22',
+    worldX: -22 - 1.8, worldY: baseY, worldZ: 18 - 5.8
   });
 
   // Room B (10 PCs: IDs 01-10, IPs 192.168.10.x starting at .20)
@@ -2001,14 +2070,22 @@ function buildEmployeeFloor(floorNum) {
     createWorkstation(fg, 2.5 + i * 1.8, 0, -1.4, Math.PI, 'PC-EMP-F' + floorNum + '-R2-' + idB2, 'Dev Team ' + floorNum + 'B', 'VLAN 10', ipB2, mats.screenCode);
   }
 
-  var prnB = box(fg, 10.5, 0.45, -5.5, 0.6, 0.8, 0.6, mats.pcCase);
-  registerInteractable(prnB, {
-    id: 'PRN-EMP-F' + floorNum + '-B',
-    type: 'Floor Network Printer',
-    dept: 'Engineering Floor ' + floorNum,
+  // Room B (RM {floorNum}02): 2 Departmental Network Laser Printers
+  createPrinter(fg, 1.8, 0, -5.8, 0, {
+    id: 'PRN-DEV-F' + floorNum + '-03',
+    dept: 'Engineering Bay ' + floorNum + '02',
     vlan: 'VLAN 10 (192.168.10.0/24)',
-    ip: '192.168.10.' + (110 + (floorNum - 1) * 4 + 2),
-    specs: 'Enterprise Workgroup Laser Printer · 1 Gbps NIC'
+    ip: '192.168.10.' + (200 + (floorNum - 1) * 4 + 3),
+    switchPort: 'SW-EMP-F' + floorNum + ' Port Gi0/23',
+    worldX: -22 + 1.8, worldY: baseY, worldZ: 18 - 5.8
+  });
+  createPrinter(fg, 11.0, 0, -5.8, 0, {
+    id: 'PRN-DEV-F' + floorNum + '-04',
+    dept: 'Engineering Bay ' + floorNum + '02',
+    vlan: 'VLAN 10 (192.168.10.0/24)',
+    ip: '192.168.10.' + (200 + (floorNum - 1) * 4 + 4),
+    switchPort: 'SW-EMP-F' + floorNum + ' Port Gi0/24',
+    worldX: -22 + 11.0, worldY: baseY, worldZ: 18 - 5.8
   });
 }
 
@@ -2128,6 +2205,31 @@ for (var i = 0; i < 5; i++) {
 }
 
 makeTag('RM 102: HR & OPS\n10 PCs', 16 + 5.5, 2.3, 18 - 5.5, 0.25, 'room');
+  // Admin Floor 1: 3 Shared Network Laser Printers (Finance and HR)
+  createPrinter(bAdmin, -10.0, 0, -5.5, 0, {
+    id: 'PRN-ADM-F1-01',
+    dept: 'Finance and Accounting (RM 101)',
+    vlan: 'VLAN 20 (192.168.20.0/24)',
+    ip: '192.168.20.201',
+    switchPort: 'SW-ADM-F1 Port Gi0/21',
+    worldX: 16 - 10.0, worldY: 0, worldZ: 18 - 5.5
+  });
+  createPrinter(bAdmin, -1.5, 0, -5.5, 0, {
+    id: 'PRN-ADM-F1-02',
+    dept: 'Finance and Accounting (RM 101)',
+    vlan: 'VLAN 20 (192.168.20.0/24)',
+    ip: '192.168.20.202',
+    switchPort: 'SW-ADM-F1 Port Gi0/22',
+    worldX: 16 - 1.5, worldY: 0, worldZ: 18 - 5.5
+  });
+  createPrinter(bAdmin, 10.0, 0, -5.5, 0, {
+    id: 'PRN-ADM-F1-03',
+    dept: 'Human Resources and Operations (RM 102)',
+    vlan: 'VLAN 20 (192.168.20.0/24)',
+    ip: '192.168.20.203',
+    switchPort: 'SW-ADM-F1 Port Gi0/23',
+    worldX: 16 + 10.0, worldY: 0, worldZ: 18 - 5.5
+  });
 for (var i = 0; i < 5; i++) {
   createWorkstation(bAdmin, 2.5 + i * 1.7, 0, -3.0, 0, 'PC-ADM-HR-0' + (i+1), 'Human Resources & Ops', 'VLAN 20', '192.168.20.' + (20+i), mats.screenAdmin);
   createWorkstation(bAdmin, 2.5 + i * 1.7, 0, -1.2, Math.PI, 'PC-ADM-HR-0' + (i+6), 'Human Resources & Ops', 'VLAN 20', '192.168.20.' + (25+i), mats.screenAdmin);
@@ -2145,6 +2247,31 @@ box(bAdmin, 0, 5.2, 8.15, 5.0, 3.4, 0.08, mats.timber);
 
 var adminRoof = createGabledRoof(bAdmin, 0, 6.9, 0, 22, 16, 3.0, mats.roofSlate, mats.wallExterior);
 makeTag('RM 201: EXECUTIVE\n10 PCs', 16, 5.8, 18 - 5.5, 0.25, 'room');
+  // Admin Floor 2: 3 Shared Network Laser Printers (Executive & NetOps)
+  createPrinter(bAdmin, -9.5, 3.5, -5.5, 0, {
+    id: 'PRN-ADM-F2-01',
+    dept: 'Executive Director Suite (RM 201)',
+    vlan: 'VLAN 20 (192.168.20.0/24)',
+    ip: '192.168.20.204',
+    switchPort: 'SW-ADM-F2 Port Gi0/21',
+    worldX: 16 - 9.5, worldY: 3.5, worldZ: 18 - 5.5
+  });
+  createPrinter(bAdmin, 1.5, 3.5, -5.5, 0, {
+    id: 'PRN-ADM-F2-02',
+    dept: 'Network Operations & IT (RM 202)',
+    vlan: 'VLAN 20 (192.168.20.0/24)',
+    ip: '192.168.20.205',
+    switchPort: 'SW-ADM-F2 Port Gi0/22',
+    worldX: 16 + 1.5, worldY: 3.5, worldZ: 18 - 5.5
+  });
+  createPrinter(bAdmin, 9.5, 3.5, -5.5, 0, {
+    id: 'PRN-ADM-F2-03',
+    dept: 'Network Operations & IT (RM 202)',
+    vlan: 'VLAN 20 (192.168.20.0/24)',
+    ip: '192.168.20.206',
+    switchPort: 'SW-ADM-F2 Port Gi0/23',
+    worldX: 16 + 9.5, worldY: 3.5, worldZ: 18 - 5.5
+  });
 for (var i = 0; i < 5; i++) {
   createWorkstation(bAdmin, -8 + i * 1.8, 3.5, 0, 0, 'PC-ADM-EXEC-0' + (i+1), 'Executive Suite', 'VLAN 20', '192.168.20.' + (30+i), mats.screenAdmin);
   createWorkstation(bAdmin, 1.5 + i * 1.8, 3.5, 0, 0, 'PC-ADM-NET-0' + (i+1), 'Network Administration', 'VLAN 20', '192.168.20.' + (35+i), mats.screenAdmin);
@@ -2202,15 +2329,22 @@ for (var r = 0; r < 5; r++) {
     supIdx++;
   }
 }
-// Laser Printer in Room 1 corner
-var prnBr1 = box(bBranch, -3.2, 0.45, -6.5, 0.6, 0.8, 0.6, mats.pcCase);
-registerInteractable(prnBr1, {
+// Second Branch Floor 1: Room B101 Printers (Top & Bottom utility alcoves)
+createPrinter(bBranch, -3.2, 0, -6.5, 0, {
   id: 'PRN-BR-F1-01',
-  type: 'Floor Network Laser Printer',
-  dept: 'Technical Support Room 1',
+  dept: 'Technical Support Team 1 (RM B101)',
   vlan: 'VLAN 50 (192.168.50.0/24)',
-  ip: '192.168.50.120',
-  specs: 'Enterprise Workgroup Laser Printer · 1 Gbps Cat6'
+  ip: '192.168.50.201',
+  switchPort: 'SW-BR-F1 Port Gi0/21',
+  worldX: 38 - 3.2, worldY: 0, worldZ: -18 - 6.5
+});
+createPrinter(bBranch, -3.2, 0, 6.5, Math.PI, {
+  id: 'PRN-BR-F1-02',
+  dept: 'Technical Support Team 1 (RM B101)',
+  vlan: 'VLAN 50 (192.168.50.0/24)',
+  ip: '192.168.50.202',
+  switchPort: 'SW-BR-F1 Port Gi0/22',
+  worldX: 38 - 3.2, worldY: 0, worldZ: -18 + 6.5
 });
 
 makeTag('RM B102: SUPPORT 2\n15 PCs', 38 + 6.5, 2.3, -18 - 5.5, 0.25, 'room');
@@ -2223,15 +2357,22 @@ for (var r = 0; r < 5; r++) {
     supIdx++;
   }
 }
-// Laser Printer in Room 2 corner
-var prnBr2 = box(bBranch, 3.2, 0.45, -6.5, 0.6, 0.8, 0.6, mats.pcCase);
-registerInteractable(prnBr2, {
-  id: 'PRN-BR-F1-02',
-  type: 'Floor Network Laser Printer',
-  dept: 'Technical Support Room 2',
+// Second Branch Floor 1: Room B102 Printers (Top-left alcove matching 2D floor plan printer icon & bottom alcove)
+createPrinter(bBranch, 3.2, 0, -6.5, 0, {
+  id: 'PRN-BR-F1-03',
+  dept: 'Technical Support Team 2 (RM B102)',
   vlan: 'VLAN 50 (192.168.50.0/24)',
-  ip: '192.168.50.121',
-  specs: 'Enterprise Workgroup Laser Printer · 1 Gbps Cat6'
+  ip: '192.168.50.203',
+  switchPort: 'SW-BR-F1 Port Gi0/23',
+  worldX: 38 + 3.2, worldY: 0, worldZ: -18 - 6.5
+});
+createPrinter(bBranch, 3.2, 0, 6.5, Math.PI, {
+  id: 'PRN-BR-F1-04',
+  dept: 'Technical Support Team 2 (RM B102)',
+  vlan: 'VLAN 50 (192.168.50.0/24)',
+  ip: '192.168.50.204',
+  switchPort: 'SW-BR-F1 Port Gi0/24',
+  worldX: 38 + 3.2, worldY: 0, worldZ: -18 + 6.5
 });
 
 // =========================================================================
@@ -2255,6 +2396,15 @@ var branchRoof = createGabledRoof(bBranch, 0, 6.9, 0, 22, 16, 3.0, mats.roofSlat
 
 // Left Room: 5 Branch Admin Workstations (VLAN 60)
 makeTag('RM B201: BRANCH ADMIN\n5 PCs', 38 - 6.5, 5.8, -18 - 5.5, 0.25, 'room');
+// Second Branch Floor 2: Branch Administration Printer (VLAN 60)
+createPrinter(bBranch, -3.2, 3.5, 2.0, 0, {
+  id: 'PRN-BR-F2-01',
+  dept: 'Branch Administration (RM B201)',
+  vlan: 'VLAN 60 (192.168.60.0/24)',
+  ip: '192.168.60.201',
+  switchPort: 'SW-BR-F2 Port Gi0/21',
+  worldX: 38 - 3.2, worldY: 3.5, worldZ: -18 + 2.0
+});
 createWorkstation(bBranch, -8.5, 3.5, -5.5, 0, 'PC-BR-ADM-01', 'Branch Administration', 'VLAN 60', '192.168.60.10', mats.screenAdmin);
 createWorkstation(bBranch, -8.5, 3.5, -2.0, 0, 'PC-BR-ADM-02', 'Branch Administration', 'VLAN 60', '192.168.60.11', mats.screenAdmin);
 createWorkstation(bBranch, -8.5, 3.5, 1.5, 0, 'PC-BR-ADM-03', 'Branch Administration', 'VLAN 60', '192.168.60.12', mats.screenAdmin);
