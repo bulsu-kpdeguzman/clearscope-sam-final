@@ -1942,7 +1942,7 @@ function box(parent, x, y, z, w, h, d, mat, shadow) {
 }
 
 // REALISTIC SINGLE SEAMLESS GABLED ROOF (NO DUPLICATE ROOFS, NO FLOATING EAVES)
-function createGabledRoof(parent, x, baseY, z, width, length, height, roofMat, wallMat) {
+function createGabledRoof(parent, x, baseY, z, width, length, height, roofMat, wallMat, frontGableMat) {
   var g = new THREE.Group();
   g.position.set(x, baseY, z);
   parent.add(g);
@@ -1995,11 +1995,14 @@ function createGabledRoof(parent, x, baseY, z, width, length, height, roofMat, w
   triGeom.center();
 
   var gableMat = wallMat || mats.wallExterior;
+  var fMat = frontGableMat !== undefined ? frontGableMat : gableMat;
 
-  var frontGable = new THREE.Mesh(triGeom, gableMat);
-  frontGable.position.set(0, height / 2, length / 2 - 0.12);
-  frontGable.castShadow = true;
-  g.add(frontGable);
+  if (fMat) {
+    var frontGable = new THREE.Mesh(triGeom, fMat);
+    frontGable.position.set(0, height / 2, length / 2 - 0.12);
+    frontGable.castShadow = true;
+    g.add(frontGable);
+  }
 
   var backGable = new THREE.Mesh(triGeom, gableMat);
   backGable.position.set(0, height / 2, -length / 2 + 0.12);
@@ -2602,16 +2605,17 @@ scene.add(bAdmin);
 // FLOOR 1 (Y: 0.0 to 3.4m)
 box(bAdmin, 0, 0.15, 0, 20.4, 0.3, 20.4, mats.woodFloor);
 
-// Exterior Walls with Window Mullions
-box(bAdmin, 0, 1.7, -10.0, 20.4, 3.4, 0.25, mats.wallExterior);
-box(bAdmin, 0, 1.7, 10.0, 20.4, 3.4, 0.25, mats.wallExterior);
-box(bAdmin, -10.0, 1.7, 0.0, 0.25, 3.4, 20.4, mats.wallExterior);
-box(bAdmin, 10.0, 1.7, 0.0, 0.25, 3.4, 20.4, mats.wallExterior);
+// Exterior Walls (North & East Solid, South & West Glass Cutaway)
+box(bAdmin, 0, 1.7, -10.0, 20.4, 3.4, 0.25, mats.wallExterior); // North (Rear)
+box(bAdmin, 10.0, 1.7, 0.0, 0.25, 3.4, 20.4, mats.wallExterior); // East (Solid)
+box(bAdmin, -10.0, 1.7, 0.0, 0.25, 3.4, 20.4, mats.glassWall);   // West (Glass Courtyard View)
+box(bAdmin, 0, 1.7, 10.0, 20.4, 3.4, 0.25, mats.glassWall);     // South (Front Viewing Glass)
 
-// Exterior Timber Accents & Glass Windows
-box(bAdmin, -10.15, 1.7, -5.0, 0.08, 3.4, 4.0, mats.timber);
+// Architectural Mullions & Timber Trim
 box(bAdmin, 10.15, 1.7, -5.0, 0.08, 3.4, 4.0, mats.timber);
-box(bAdmin, 0.0, 1.7, 10.15, 5.0, 3.4, 0.08, mats.timber);
+box(bAdmin, -10.0, 1.7, 10.0, 0.35, 3.4, 0.35, mats.wallExterior);
+box(bAdmin, 10.0, 1.7, 10.0, 0.35, 3.4, 0.35, mats.wallExterior);
+box(bAdmin, 0.0, 1.7, 10.0, 0.25, 3.4, 0.25, mats.wallExterior);
 
 // West Hallway Entrance Door (inward swinging at X = -9.8, Z = 1.25)
 box(bAdmin, -9.8, 1.2, 1.25, 0.08, 2.4, 1.4, mats.doorWood);
@@ -2738,14 +2742,18 @@ createPrinter(bAdmin, -2.2, 0, 3.6, Math.PI, {
 var f2Y = 3.5;
 box(bAdmin, 0, f2Y + 0.1, 0, 20.4, 0.2, 20.4, mats.woodFloor);
 
-// Floor 2 Exterior Walls
-box(bAdmin, 0, f2Y + 1.7, -10.0, 20.4, 3.4, 0.25, mats.wallExterior);
-box(bAdmin, 0, f2Y + 1.7, 10.0, 20.4, 3.4, 0.25, mats.wallExterior);
-box(bAdmin, -10.0, f2Y + 1.7, 0.0, 0.25, 3.4, 20.4, mats.wallExterior);
-box(bAdmin, 10.0, f2Y + 1.7, 0.0, 0.25, 3.4, 20.4, mats.wallExterior);
-box(bAdmin, -10.15, f2Y + 1.7, -5.0, 0.08, 3.4, 4.0, mats.timber);
+// Floor 2 Exterior Walls (North & East Solid, South & West Glass Cutaway)
+box(bAdmin, 0, f2Y + 1.7, -10.0, 20.4, 3.4, 0.25, mats.wallExterior); // North (Rear)
+box(bAdmin, 10.0, f2Y + 1.7, 0.0, 0.25, 3.4, 20.4, mats.wallExterior); // East (Solid)
+box(bAdmin, -10.0, f2Y + 1.7, 0.0, 0.25, 3.4, 20.4, mats.glassWall);   // West (Glass Courtyard View)
+box(bAdmin, 0, f2Y + 1.7, 10.0, 20.4, 3.4, 0.25, mats.glassWall);     // South (Front Viewing Glass)
+
+// Floor 2 Mullions & Dividing Beam
 box(bAdmin, 10.15, f2Y + 1.7, -5.0, 0.08, 3.4, 4.0, mats.timber);
-box(bAdmin, 0.0, f2Y + 1.7, 10.15, 5.0, 3.4, 0.08, mats.timber);
+box(bAdmin, -10.0, f2Y + 1.7, 10.0, 0.35, 3.4, 0.35, mats.wallExterior);
+box(bAdmin, 10.0, f2Y + 1.7, 10.0, 0.35, 3.4, 0.35, mats.wallExterior);
+box(bAdmin, 0.0, f2Y + 1.7, 10.0, 0.25, 3.4, 0.25, mats.wallExterior);
+box(bAdmin, 0.0, f2Y, 10.0, 20.4, 0.30, 0.35, mats.wallExterior); // Floor divider beam
 
 // Floor 2 Interior Walls
 box(bAdmin, -7.5, f2Y + 1.7, 0.0, 5.0, 3.4, 0.2, mats.corridorWall);
@@ -2848,7 +2856,7 @@ wifiCircle.position.set(0.0, f2Y + 0.15, 1.25);
 bAdmin.add(wifiCircle);
 
 // Roof
-var adminRoof = createGabledRoof(bAdmin, 0.0, 6.9, 0.0, 20.4, 20.4, 3.2, mats.roofSlate, mats.wallExterior);
+var adminRoof = createGabledRoof(bAdmin, 0.0, 6.9, 0.0, 20.4, 20.4, 3.2, mats.roofSlate, mats.wallExterior, mats.glassWall);
 makeTag('ADMINISTRATION BUILDING\nMAIN BRANCH (30 PCs)', 16, 11.2, 18, 0.85, 'building');
 
 // 4. SECOND BRANCH OFFICE (2 Floors · 35 PCs Total)
