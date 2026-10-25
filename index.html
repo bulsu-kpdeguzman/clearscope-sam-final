@@ -3512,9 +3512,6 @@ registerInteractable(apAdmin, {
 });
 makeTag('AP-ADM-F2 (WAP)', 16, f2Y + 3.55, 18 + 1.25, 0.22, 'device');
 
-// Floor 2 Solid Architectural Ceiling Plate (clean white ceiling tile)
-var adminCeilingPlate = box(bAdmin, 0, f2Y + 3.4, 0, 20.2, 0.12, 20.2, mats.tileLight);
-
 // Translucent Cyan Wi-Fi Umbrella Ring representing circular CAD coverage zone
 var wifiGeo = new THREE.CylinderGeometry(8.5, 8.5, 0.15, 32);
 var wifiMat = new THREE.MeshBasicMaterial({ color: '#38bdf8', transparent: true, opacity: 0.12 });
@@ -3522,10 +3519,8 @@ var wifiCircle = new THREE.Mesh(wifiGeo, wifiMat);
 wifiCircle.position.set(0.0, f2Y + 0.15, 1.25);
 bAdmin.add(wifiCircle);
 
-// Roof
+// Roof (Pitched Slate with Transparent Glass Front Gable)
 var adminRoof = createGabledRoof(bAdmin, 0.0, 6.9, 0.0, 20.4, 20.4, 3.2, mats.roofSlate, mats.wallExterior, mats.glassWall);
-bAdmin.remove(adminCeilingPlate);
-adminRoof.add(adminCeilingPlate);
 makeTag('ADMINISTRATION BUILDING\nMAIN BRANCH (30 PCs)', 16, 11.2, 18, 0.85, 'building');
 // 4. SECOND BRANCH OFFICE (2 Floors · 35 PCs Total)
 // -------------------------------------------------------------
