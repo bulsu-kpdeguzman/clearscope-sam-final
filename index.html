@@ -134,6 +134,45 @@ body {
   color: #a7f3d0;
 }
 
+/* FLOATING MOBILE MORE POPOVER */
+#mobileMorePopover {
+  position: fixed;
+  bottom: 56px;
+  right: max(16px, calc(50% - 140px));
+  z-index: 200;
+  display: none;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 10px;
+  border-radius: 14px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
+#mobileMorePopover .dock-btn {
+  justify-content: flex-start;
+  width: 100%;
+  padding: 7px 12px;
+  font-size: 11.5px;
+}
+#joystickSprintBadge {
+  display: none;
+  position: absolute;
+  top: -26px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(37, 99, 235, 0.9);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  pointer-events: none;
+  letter-spacing: 0.04em;
+}
+
 /* FLOATING BOTTOM DOCK - STRICT SINGLE-ROW PROFESSIONAL DOCK */
 #bottomDock {
   position: fixed;
@@ -821,21 +860,27 @@ body {
     font-size: 11px;
   }
 
-  /* 2. BOTTOM DOCK: Compact Mobile Pill */
+  /* 2. BOTTOM DOCK: Compact Mobile Pill (Zero Overflow) */
   #bottomDock {
     bottom: 8px;
-    width: 94vw;
-    max-width: 420px;
-    padding: 5px 8px;
+    width: auto;
+    max-width: 96vw;
+    padding: 4px 8px;
     gap: 4px;
-    justify-content: space-around;
-    border-radius: 16px;
+    justify-content: center;
+    border-radius: 999px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  #bottomDock::-webkit-scrollbar {
+    display: none;
   }
   .dock-btn {
-    padding: 6px 10px;
-    font-size: 11.5px;
+    padding: 5px 8px;
+    font-size: 11px;
     gap: 4px;
-    border-radius: 10px;
+    border-radius: 999px;
+    flex-shrink: 0;
   }
   .dock-sep {
     display: none;
@@ -844,12 +889,9 @@ body {
     display: none;
   }
 
-  /* Secondary options collapsed on mobile */
+  /* Secondary options cleanly moved to popover on mobile */
   .dock-opt-btn {
-    display: none;
-  }
-  .dock-opt-btn.mobile-show {
-    display: inline-flex;
+    display: none !important;
   }
   .mobile-more-btn {
     display: inline-flex;
@@ -1167,10 +1209,11 @@ if (typeof THREE === 'undefined') {
 <div id="crosshair"></div>
 <!-- MOBILE VIRTUAL JOYSTICK (SHOWN IN WALK MODE ON TOUCH/MOBILE) -->
 <div id="mobileJoystickContainer">
+  <div id="joystickSprintBadge">⚡ SPRINT</div>
   <div id="mobileJoystickBase">
     <div id="mobileJoystickKnob"></div>
   </div>
-  <div class="joystick-hint">MOVE</div>
+  <div class="joystick-hint">MOVE · 2x TAP RUN</div>
 </div>
 
 
@@ -1241,12 +1284,24 @@ if (typeof THREE === 'undefined') {
   </button>
 
   <!-- Mobile Extra Options Toggle (Visible on Mobile Only) -->
-  <button class="dock-btn mobile-more-btn" id="btnMobileMore" onclick="toggleMobileMore()" title="More View Options">
+  <button class="dock-btn mobile-more-btn" id="btnMobileMore" onclick="toggleMobileMore(event)" title="More View Options">
     <span>⋯ More</span>
   </button>
 
   <div class="dock-sep"></div>
   <div class="dock-stat" id="dockCoords">165 Desktops · 31 Printers</div>
+</div>
+
+<!-- MOBILE MORE OPTIONS POPOVER (CLEAN POPUP WITHOUT TAB OVERFLOW) -->
+<div class="glass" id="mobileMorePopover" style="display:none;">
+  <button class="dock-btn" onclick="cycleLabels()">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><circle cx="7" cy="7" r="1.5"/></svg>
+    <span>Labels: <strong id="lblModeTextPopover">Smart</strong></span>
+  </button>
+  <button class="dock-btn" onclick="toggleStyleMode()">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+    <span id="lblStyleTextPopover">Campus</span>
+  </button>
 </div>
 
 <!-- FLOATING EXIT WALK BUTTON (MOBILE WALK MODE ONLY) -->
@@ -1437,6 +1492,7 @@ scene.add(walk.getObject());
 var activeNav = 'orbit';
 
 var joystickInput = { x: 0, y: 0 };
+var isMobileSprint = false;
 var isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.innerWidth <= 768);
 
 
@@ -1516,12 +1572,27 @@ function handleFacilitySelect(facName) {
   if (lbl) lbl.textContent = labels[facName] || 'Facilities';
 }
 
-function toggleMobileMore() {
-  var optBtns = document.querySelectorAll('.dock-opt-btn');
-  optBtns.forEach(function(b) {
-    b.classList.toggle('mobile-show');
-  });
+function toggleMobileMore(e) {
+  if (e && e.stopPropagation) e.stopPropagation();
+  var pop = document.getElementById('mobileMorePopover');
+  if (!pop) return;
+  var isHidden = (pop.style.display === 'none' || pop.style.display === '');
+  pop.style.display = isHidden ? 'flex' : 'none';
+  var btn = document.getElementById('btnMobileMore');
+  if (btn) btn.classList.toggle('active', isHidden);
 }
+
+// Click outside popover to close
+window.addEventListener('click', function(e) {
+  var pop = document.getElementById('mobileMorePopover');
+  var btn = document.getElementById('btnMobileMore');
+  if (pop && pop.style.display === 'flex') {
+    if (!pop.contains(e.target) && (!btn || !btn.contains(e.target))) {
+      pop.style.display = 'none';
+      if (btn) btn.classList.remove('active');
+    }
+  }
+});
 
 function updateJoystickVisibility() {
   var j = document.getElementById('mobileJoystickContainer');
@@ -1619,12 +1690,23 @@ function updateJoystickVisibility() {
   });
   window.addEventListener('touchcancel', resetJoystick);
 
-  // Touch look-around on right/upper portion of screen in Walk mode
+  // Touch look-around and double-tap sprint detection in Walk mode
   var lookTouchId = null;
   var lastLookPos = { x: 0, y: 0 };
+  var lastWalkTapTime = 0;
 
   renderer.domElement.addEventListener('touchstart', function(e) {
     if (activeNav !== 'walk') return;
+    
+    // Double tap screen to toggle sprint!
+    var now = performance.now();
+    if (now - lastWalkTapTime < 320) {
+      isMobileSprint = !isMobileSprint;
+      var badge = document.getElementById('joystickSprintBadge');
+      if (badge) badge.style.display = isMobileSprint ? 'block' : 'none';
+    }
+    lastWalkTapTime = now;
+
     for (var i = 0; i < e.changedTouches.length; i++) {
       var t = e.changedTouches[i];
       // Only treat touches outside joystick area as look gestures
@@ -3183,15 +3265,22 @@ function cycleLabels() {
   else if (labelMode === 'minimal') labelMode = 'off';
   else labelMode = 'smart';
 
-  document.getElementById('lblModeText').textContent =
-    labelMode === 'smart' ? 'Smart' : (labelMode === 'minimal' ? 'Bldg Only' : 'Off');
+  var ltxt = labelMode === 'smart' ? 'Smart' : (labelMode === 'minimal' ? 'Bldg Only' : 'Off');
+  var l1 = document.getElementById('lblModeText');
+  if (l1) l1.textContent = ltxt;
+  var l2 = document.getElementById('lblModeTextPopover');
+  if (l2) l2.textContent = ltxt;
   document.getElementById('btnDockTags').className =
     labelMode === 'off' ? 'dock-btn' : 'dock-btn active';
 }
 
 function toggleStyleMode() {
   currentStyle = (currentStyle === 'realistic' ? 'studio' : 'realistic');
-  document.getElementById('lblStyleText').textContent = currentStyle === 'realistic' ? 'Campus' : 'Studio';
+  var stxt = currentStyle === 'realistic' ? 'Campus' : 'Studio';
+  var s1 = document.getElementById('lblStyleText');
+  if (s1) s1.textContent = stxt;
+  var s2 = document.getElementById('lblStyleTextPopover');
+  if (s2) s2.textContent = stxt;
 
   if (currentStyle === 'studio') {
     // Option B: Pristine White Studio Architectural Model
@@ -3790,14 +3879,26 @@ function animate() {
       if (keys.KeyA || keys.ArrowLeft) walk.moveRight(-speed);
       if (keys.KeyD || keys.ArrowRight) walk.moveRight(speed);
     }
-    // Mobile Virtual Joystick Input (Smooth & Controllable Walk Speed)
+    // Mobile Virtual Joystick Input (Comfortable Walk + 2x Tap / Outer-Rim Sprint)
     var jMag = Math.hypot(joystickInput.x, joystickInput.y);
     if (jMag > 0.04) {
-      // Smooth natural walking: 0.08 indoors, 0.14 outdoors
-      var baseSpeed = isOutdoors ? 0.14 : 0.08;
+      var isSprinting = isMobileSprint || (jMag > 0.75);
+      var sprintBadge = document.getElementById('joystickSprintBadge');
+      if (sprintBadge) sprintBadge.style.display = isSprinting ? 'block' : 'none';
+
+      // Comfortable swift walk: 0.14 indoors, 0.25 outdoors
+      // Fast sprint: 0.28 indoors, 0.50 outdoors
+      var walkBase = isOutdoors ? 0.25 : 0.14;
+      var sprintBase = isOutdoors ? 0.50 : 0.28;
+      var baseSpeed = isSprinting ? sprintBase : walkBase;
       var jSpeed = baseSpeed * Math.min(1.0, jMag);
+
       walk.moveForward(-joystickInput.y * jSpeed);
       walk.moveRight(joystickInput.x * jSpeed);
+    } else {
+      var sprintBadge = document.getElementById('joystickSprintBadge');
+      if (sprintBadge) sprintBadge.style.display = 'none';
+      isMobileSprint = false;
     }
     walk.getObject().position.y = 1.65;
   }
