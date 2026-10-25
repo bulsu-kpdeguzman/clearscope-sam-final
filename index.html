@@ -45,7 +45,7 @@ body {
   position: fixed;
   top: 14px;
   left: 14px;
-  z-index: 50;
+  z-index: 100;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -107,6 +107,11 @@ body {
   left: 0;
   width: 320px;
   max-width: 90vw;
+  max-height: calc(100dvh - 54px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
   background: rgba(15, 23, 42, 0.96);
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.14);
@@ -119,6 +124,13 @@ body {
   animation: fadeIn 0.18s ease;
   z-index: 60;
   pointer-events: auto;
+}
+.nav-dropdown-menu::-webkit-scrollbar {
+  width: 4px;
+}
+.nav-dropdown-menu::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
 }
 .dropdown-header {
   font-size: 10px;
@@ -1146,6 +1158,25 @@ body {
     top: 6px;
     left: 8px;
   }
+  .nav-dropdown-menu {
+    max-height: calc(100dvh - 46px);
+    width: 295px;
+    padding: 4px;
+    gap: 2px;
+  }
+  .dropdown-item {
+    padding: 5px 8px;
+  }
+  .item-title {
+    font-size: 11px;
+  }
+  .item-desc {
+    font-size: 9.5px;
+  }
+  .tour-btn {
+    padding: 3px 7px;
+    font-size: 9.5px;
+  }
   #bottomDock {
     bottom: 4px;
     padding: 3px 6px;
@@ -1891,6 +1922,16 @@ function setNavMode(mode) {
 // -------------------------------------------------------------
 // FACILITY DROPDOWN CONTROLS
 // -------------------------------------------------------------
+// Ensure mobile touch scrolling works smoothly on dropdown menu
+window.addEventListener('DOMContentLoaded', function() {
+  var menu = document.getElementById('navDropdownMenu');
+  if (menu) {
+    ['touchstart', 'touchmove', 'touchend', 'wheel'].forEach(function(evt) {
+      menu.addEventListener(evt, function(e) { e.stopPropagation(); }, { passive: true });
+    });
+  }
+});
+
 function toggleFacilityDropdown(e) {
   if (e && e.stopPropagation) e.stopPropagation();
   var menu = document.getElementById('navDropdownMenu');
