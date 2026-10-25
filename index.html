@@ -866,6 +866,125 @@ body {
   }
 }
 
+
+/* -------------------------------------------------------------
+   2D ARCHITECTURAL BLUEPRINT VIEWER MODAL
+   ------------------------------------------------------------- */
+#blueprintModal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 900px;
+  max-width: 94vw;
+  max-height: 90vh;
+  background: rgba(11, 20, 38, 0.95);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-radius: 16px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(56, 189, 248, 0.15);
+  backdrop-filter: blur(16px);
+  z-index: 2000;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+  animation: modalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bp-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+  background: rgba(15, 23, 42, 0.6);
+}
+.bp-title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.bp-title {
+  font-size: 13.5px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #fff;
+}
+.bp-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.bp-tabs {
+  display: flex;
+  gap: 6px;
+  padding: 10px 18px;
+  background: rgba(15, 23, 42, 0.4);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+  overflow-x: auto;
+  white-space: nowrap;
+}
+.bp-tab {
+  background: transparent;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  color: var(--text-muted);
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.bp-tab:hover {
+  color: #fff;
+  border-color: rgba(56, 189, 248, 0.5);
+}
+.bp-tab.active {
+  background: rgba(14, 165, 233, 0.25);
+  border-color: var(--cyan-accent);
+  color: #fff;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
+}
+
+.bp-body {
+  padding: 16px 18px;
+  overflow-y: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.bp-image-box {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  max-width: 100%;
+}
+.bp-image-box img {
+  max-width: 100%;
+  max-height: 52vh;
+  object-fit: contain;
+  border-radius: 4px;
+}
+.bp-legend-card {
+  width: 100%;
+  margin-top: 14px;
+  padding: 12px 14px;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-radius: 10px;
+  font-size: 11.5px;
+  color: #e2e8f0;
+  line-height: 1.5;
+}
+.bp-legend-title {
+  font-weight: 700;
+  color: var(--cyan-accent);
+  margin-bottom: 4px;
+}
+
 </style>
 
 <script src="./vendor/three.min.js"></script>
@@ -948,6 +1067,11 @@ if (typeof THREE === 'undefined') {
   </button>
 
   <div class="dock-sep"></div>
+
+  <button class="dock-btn" onclick="openBlueprintModal('server')" title="View 2D Floor Plan Blueprints">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    <span>Blueprints</span>
+  </button>
 
   <button class="dock-btn" onclick="toggleTestDrawer()">
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
@@ -1032,6 +1156,35 @@ if (typeof THREE === 'undefined') {
     <span style="color:#f59e0b;font-size:11px;">●</span> 5. Test Internet Backup (Failover)
   </button>
   <div class="sim-console" id="simConsole"><span style="color:#64748b;">[READY]</span> Select any test above to watch data travel through the facility in 3D.</div>
+</div>
+
+<!-- 2D ARCHITECTURAL BLUEPRINT VIEWER MODAL -->
+<div id="blueprintModal">
+  <div class="bp-header">
+    <div class="bp-title-group">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--cyan-accent);"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      <div>
+        <div class="bp-title">OFFICIAL 2D ARCHITECTURAL FLOOR PLANS</div>
+        <div class="bp-sub">ClearScope Technologies Campus Blueprints & Equipment Placement</div>
+      </div>
+    </div>
+    <button class="drawer-close" onclick="closeBlueprintModal()" title="Close">×</button>
+  </div>
+  <div class="bp-tabs">
+    <button class="bp-tab active" id="bpTab1" onclick="switchBlueprint('server')">Main Branch | Server Room</button>
+    <button class="bp-tab" id="bpTab2" onclick="switchBlueprint('branch1')">Second Branch | 1st Floor (Support)</button>
+    <button class="bp-tab" id="bpTab3" onclick="switchBlueprint('branch2')">Second Branch | 2nd Floor (Admin & Lounge)</button>
+    <button class="bp-tab" id="bpTab4" onclick="switchBlueprint('full')">Full Campus Sheet</button>
+  </div>
+  <div class="bp-body">
+    <div class="bp-image-box">
+      <img id="bpImg" src="./blueprints/floorplan_server_room.png" alt="Architectural Floor Plan" />
+    </div>
+    <div class="bp-legend-card" id="bpLegend">
+      <div class="bp-legend-title">Main Branch | Studio Server Room (Building A)</div>
+      <div><strong>Layout Architecture:</strong> 3-column data-center layout matching blueprint. Left: Dual Redundant Routers (PLDT & Globe) · Center: Cisco Firepower NGFW & Catalyst 3650 Core Switch · Right: Dedicated SRV-EMP & SRV-ADM Servers · Bottom-Left: Inward swinging access door.</div>
+    </div>
+  </div>
 </div>
 
 <!-- SLIDE-OVER DEVICE INSPECTOR (RIGHT) -->
@@ -1178,10 +1331,11 @@ function updateJoystickVisibility() {
   var insp = document.getElementById('inspectorDrawer');
   var testD = document.getElementById('testDrawer');
   var bigS = document.getElementById('simBigScreen');
+  var bpModal = document.getElementById('blueprintModal');
 
   var isDrawerOpen = (insp && insp.style.display === 'block') ||
                      (testD && testD.classList.contains('open')) ||
-                     (bigS && bigS.style.display === 'block');
+                     (bigS && bigS.style.display === 'block') || (bpModal && bpModal.style.display === 'flex');
 
   if (activeNav === 'walk') {
     if (isMobile) {
@@ -1886,26 +2040,44 @@ var datacenterRoof = createGabledRoof(bDatacenter, 0, 3.8, 0, 22, 16, 2.8, mats.
 // Overhead Cable Tray linking Networking Rack to Server PCs
 box(bDatacenter, -3.25, 2.30, -1.0, 4.5, 0.08, 0.35, mats.cableTray);
 
-// 1. NETWORKING DEVICES RACK (Switch, Routers, Firewall, NAS Storage)
-createServerCabinet(bDatacenter, -5.0, 0, -1.0, 'RACK-NET', 'NETWORKING RACK\nSWITCH · FIREWALL · ROUTERS', {
-  ip: '172.16.1.1 (Core), 172.16.0.4 (FW) & 192.168.30.20 (NAS)',
-  specs: 'Cisco Firepower 1010 NGFW + Catalyst 3650 Core + Dual 4331 ISRs + 16TB NAS',
-  desc: 'Consolidated network enclosure housing the core switch, perimeter firewall, PLDT/Globe routers, and NAS backup storage array.'
+// =========================================================================
+// 3D LAYOUT MATCHING BLUEPRINT (3-COLUMN DATA CENTER ARCHITECTURE)
+// =========================================================================
+
+// Left Column: Edge Routers Cabinet (Primary RTR-MAIN-1 & Secondary RTR-MAIN-2)
+createServerCabinet(bDatacenter, -5.5, 0, 0.0, 'RACK-ROUTERS', 'ROUTERS ENCLOSURE\nRTR-MAIN-1 & RTR-MAIN-2', {
+  ip: '203.0.113.2 (PLDT) & 203.0.113.6 (Globe)',
+  specs: 'Dual Cisco 4331 ISR Routers · HSRP Active/Standby · Diverse Dual Carrier Uplinks',
+  desc: 'Terminates primary PLDT Enterprise 200M fiber and secondary Globe Business 100M backup connection.'
 });
 
-// 2. SERVER PC FOR THE EMPLOYEES (SRV-EMP)
-createServerPC(bDatacenter, -1.5, 0, -1.0, 0, 'SRV-EMP', 'SRV-EMP', 'SERVER PC (EMPLOYEES)',
+// Center Column: Core Switch & Cisco Firepower NGFW Enclosure
+createServerCabinet(bDatacenter, 0.0, 0, 0.0, 'RACK-NET', 'CORE ENCLOSURE\nCATALYST 3650 & FIREWALL', {
+  ip: '172.16.1.1 (Core SVI), 172.16.0.4 (FW) & 192.168.99.1 (Mgmt)',
+  specs: 'Cisco Catalyst 3650 L3 Core Switch + Cisco Firepower 1010 NGFW + 16TB NAS',
+  desc: 'Central routing backbone enforcing inter-VLAN routing, ACL security policies, and carrier failover.'
+});
+
+// Right Column: Dedicated Server PCs (SRV-EMP on Top, SRV-ADM on Bottom)
+// 1. Employees Server (SRV-EMP)
+createServerPC(bDatacenter, 5.5, 0, -3.2, 0, 'SRV-EMP', 'SRV-EMP', 'SERVER PC (EMPLOYEES)',
   'Main Branch Software Development', 'VLAN 30 (192.168.30.0/24)', '192.168.30.10', mats.screenCode,
   'Dedicated Server PC · 4.0 TB NVMe Array · 64GB RAM · Xeon Processor',
   'The dedicated server PC for the employees, hosting GitLab distributed version control, Docker registry, and local web staging environments.'
 );
 
-// 3. SERVER PC FOR THE ADMINISTRATION (SRV-ADM)
-createServerPC(bDatacenter, 1.5, 0, -1.0, 0, 'SRV-ADM', 'SRV-ADM', 'SERVER PC (ADMINISTRATION)',
+// 2. Administration Server (SRV-ADM)
+createServerPC(bDatacenter, 5.5, 0, 3.2, 0, 'SRV-ADM', 'SRV-ADM', 'SERVER PC (ADMINISTRATION)',
   'Main Branch Corporate Administration', 'VLAN 30 (192.168.30.0/24)', '192.168.30.11', mats.screenAdmin,
   'Dedicated Server PC · 2.0 TB SAS Storage · 64GB RAM · Xeon Processor',
   'The dedicated server PC for the administration, hosting Microsoft Active Directory Domain Controller, accounting suites, and enterprise ERP database.'
 );
+
+// Overhead Cable Tray spanning the 3 columns (matching blueprint connection)
+box(bDatacenter, 0.0, 2.30, 0.0, 11.5, 0.08, 0.35, mats.cableTray);
+
+// Inward swinging corner door (matching bottom-left door in blueprint)
+var srvDoor = box(bDatacenter, -8.8, 1.2, 7.9, 1.6, 2.4, 0.08, mats.doorWood);
 
 // 4. STUDIO WIRELESS ACCESS POINT (AP-STUDIO)
 var apStudio = box(bDatacenter, -2.5, 3.6, 1.0, 0.35, 0.08, 0.35, mats.ap);
@@ -2007,18 +2179,64 @@ box(bBranch, 0, 1.8, 8, 22, 3.4, 0.25, mats.glassWall);
 box(bBranch, 11.15, 1.8, -2.0, 0.08, 3.4, 4.0, mats.timber);
 box(bBranch, 0, 1.8, 8.15, 4.5, 3.4, 0.08, mats.timber);
 
-makeTag('RM B101: SUPPORT 1\n10 PCs', 38 - 5.5, 2.3, -18 - 5.5, 0.25, 'room');
-for (var i = 0; i < 5; i++) {
-  createWorkstation(bBranch, -9 + i * 1.7, 0, -3.0, 0, 'PC-BR-SUP-0' + (i+1), 'Customer Support T1', 'VLAN 50', '192.168.50.' + (10+i), mats.screenSupport);
-  createWorkstation(bBranch, -9 + i * 1.7, 0, -1.2, Math.PI, 'PC-BR-SUP-0' + (i+6), 'Customer Support T1', 'VLAN 50', '192.168.50.' + (15+i), mats.screenSupport);
+// Central dividing hallway walls (matching blueprint central corridor)
+box(bBranch, -2.2, 1.8, 0, 0.25, 3.4, 16, mats.corridorWall);
+box(bBranch, 2.2, 1.8, 0, 0.25, 3.4, 16, mats.corridorWall);
+
+// Staircase landing in rear corridor leading upstairs (matching blueprint)
+for (var st = 0; st < 6; st++) {
+  box(bBranch, 0, 0.25 + st * 0.25, 4.5 + st * 0.45, 3.8, 0.25, 0.45, mats.concrete);
 }
 
-makeTag('RM B102: SUPPORT 2\n10 PCs', 38 + 5.5, 2.3, -18 - 5.5, 0.25, 'room');
-for (var i = 0; i < 5; i++) {
-  createWorkstation(bBranch, 2.5 + i * 1.7, 0, -3.0, 0, 'PC-BR-SUP-1' + (i+1), 'Technical Helpdesk T2', 'VLAN 50', '192.168.50.' + (20+i), mats.screenSupport);
-  createWorkstation(bBranch, 2.5 + i * 1.7, 0, -1.2, Math.PI, 'PC-BR-SUP-1' + (i+6), 'Technical Helpdesk T2', 'VLAN 50', '192.168.50.' + (25+i), mats.screenSupport);
+// =========================================================================
+// 1ST FLOOR: 30 SUPPORT WORKSTATIONS (15 in Room 1 + 15 in Room 2, VLAN 50)
+// =========================================================================
+makeTag('RM B101: SUPPORT 1\n15 PCs', 38 - 6.5, 2.3, -18 - 5.5, 0.25, 'room');
+// Room 1 (Left): 3 columns x 5 rows = 15 PCs
+var supIdx = 1;
+for (var r = 0; r < 5; r++) {
+  for (var c = 0; c < 3; c++) {
+    var pid = 'PC-BR-SUP-' + (supIdx < 10 ? '0' + supIdx : '' + supIdx);
+    var pip = '192.168.50.' + (9 + supIdx);
+    createWorkstation(bBranch, -9.5 + c * 2.5, 0, -5.5 + r * 2.3, 0, pid, 'Customer Support T1', 'VLAN 50', pip, mats.screenSupport);
+    supIdx++;
+  }
 }
+// Laser Printer in Room 1 corner
+var prnBr1 = box(bBranch, -3.2, 0.45, -6.5, 0.6, 0.8, 0.6, mats.pcCase);
+registerInteractable(prnBr1, {
+  id: 'PRN-BR-F1-01',
+  type: 'Floor Network Laser Printer',
+  dept: 'Technical Support Room 1',
+  vlan: 'VLAN 50 (192.168.50.0/24)',
+  ip: '192.168.50.120',
+  specs: 'Enterprise Workgroup Laser Printer · 1 Gbps Cat6'
+});
 
+makeTag('RM B102: SUPPORT 2\n15 PCs', 38 + 6.5, 2.3, -18 - 5.5, 0.25, 'room');
+// Room 2 (Right): 3 columns x 5 rows = 15 PCs
+for (var r = 0; r < 5; r++) {
+  for (var c = 0; c < 3; c++) {
+    var pid = 'PC-BR-SUP-' + (supIdx < 10 ? '0' + supIdx : '' + supIdx);
+    var pip = '192.168.50.' + (9 + supIdx);
+    createWorkstation(bBranch, 4.5 + c * 2.5, 0, -5.5 + r * 2.3, 0, pid, 'Customer Support T2', 'VLAN 50', pip, mats.screenSupport);
+    supIdx++;
+  }
+}
+// Laser Printer in Room 2 corner
+var prnBr2 = box(bBranch, 3.2, 0.45, -6.5, 0.6, 0.8, 0.6, mats.pcCase);
+registerInteractable(prnBr2, {
+  id: 'PRN-BR-F1-02',
+  type: 'Floor Network Laser Printer',
+  dept: 'Technical Support Room 2',
+  vlan: 'VLAN 50 (192.168.50.0/24)',
+  ip: '192.168.50.121',
+  specs: 'Enterprise Workgroup Laser Printer · 1 Gbps Cat6'
+});
+
+// =========================================================================
+// 2ND FLOOR: 5 BRANCH ADMIN WORKSTATIONS + SERVER ROOM + WAITING LOUNGE
+// =========================================================================
 box(bBranch, 0, 3.5, 0, 22, 0.2, 16, mats.tileLight);
 // Floor 2 Exterior Walls & Timber Accents
 box(bBranch, 0, 5.2, -8, 22, 3.4, 0.25, mats.wallExterior);
@@ -2028,23 +2246,36 @@ box(bBranch, 0, 5.2, 8, 22, 3.4, 0.25, mats.glassWall);
 box(bBranch, 11.15, 5.2, -2.0, 0.08, 3.4, 4.0, mats.timber);
 box(bBranch, 0, 5.2, 8.15, 4.5, 3.4, 0.08, mats.timber);
 
+// Floor 2 Interior Corridor Walls
+box(bBranch, -2.2, 5.2, 0, 0.25, 3.4, 16, mats.corridorWall);
+box(bBranch, 2.2, 5.2, -2.5, 0.25, 3.4, 11, mats.corridorWall);
+box(bBranch, 6.5, 5.2, 0.0, 8.5, 3.4, 0.25, mats.corridorWall); // Separates Server Room from Lounge
+
 var branchRoof = createGabledRoof(bBranch, 0, 6.9, 0, 22, 16, 3.0, mats.roofSlate, mats.wallExterior);
-makeTag('RM B201: BRANCH ADMIN\n5 PCs', 38 - 5.5, 5.8, -18 - 5.5, 0.25, 'room');
-for (var i = 0; i < 5; i++) {
-  createWorkstation(bBranch, -8 + i * 1.8, 3.5, 0, 0, 'PC-BR-ADM-0' + (i+1), 'Branch Administration', 'VLAN 60', '192.168.60.' + (10+i), mats.screenAdmin);
-}
 
-makeTag('RM B202: SUPPORT 3\n10 PCs', 38 + 5.5, 5.8, -18 - 5.5, 0.25, 'room');
-for (var i = 0; i < 5; i++) {
-  createWorkstation(bBranch, 2.5 + i * 1.7, 3.5, -3.0, 0, 'PC-BR-SUP-2' + (i+1), 'Escalation Support', 'VLAN 50', '192.168.50.' + (30+i), mats.screenSupport);
-  createWorkstation(bBranch, 2.5 + i * 1.7, 3.5, -1.2, Math.PI, 'PC-BR-SUP-2' + (i+6), 'Escalation Support', 'VLAN 50', '192.168.50.' + (35+i), mats.screenSupport);
-}
+// Left Room: 5 Branch Admin Workstations (VLAN 60)
+makeTag('RM B201: BRANCH ADMIN\n5 PCs', 38 - 6.5, 5.8, -18 - 5.5, 0.25, 'room');
+createWorkstation(bBranch, -8.5, 3.5, -5.5, 0, 'PC-BR-ADM-01', 'Branch Administration', 'VLAN 60', '192.168.60.10', mats.screenAdmin);
+createWorkstation(bBranch, -8.5, 3.5, -2.0, 0, 'PC-BR-ADM-02', 'Branch Administration', 'VLAN 60', '192.168.60.11', mats.screenAdmin);
+createWorkstation(bBranch, -8.5, 3.5, 1.5, 0, 'PC-BR-ADM-03', 'Branch Administration', 'VLAN 60', '192.168.60.12', mats.screenAdmin);
+createWorkstation(bBranch, -8.5, 3.5, 5.0, 0, 'PC-BR-ADM-04', 'Branch Operations', 'VLAN 60', '192.168.60.13', mats.screenAdmin);
+createWorkstation(bBranch, -4.5, 3.5, 5.0, -Math.PI / 2, 'PC-BR-ADM-05', 'Branch Management', 'VLAN 60', '192.168.60.14', mats.screenAdmin);
 
-createServerCabinet(bBranch, 8, 3.5, 4, 'RACK-BRANCH', 'BRANCH CABINET\nRTR-BR & SRV-BR', {
+// Right Top Room: Dedicated IT Enclosure (RTR-BR & SRV-BR)
+makeTag('IT CLOSET\nRTR-BR & SRV-BR', 38 + 6.5, 5.8, -18 - 4.5, 0.22, 'device');
+createServerCabinet(bBranch, 6.5, 3.5, -4.5, 'RACK-BRANCH', 'BRANCH CABINET\nRTR-BR & SRV-BR', {
   ip: '203.0.113.10 & 192.168.60.10',
   specs: 'Cisco 4331 ISR (Converge 100M DIA) + SRV-BR (1.0 TB Ticket Cache)',
   desc: 'Branch edge router terminating local internet and leased lines back to Main Branch.'
 });
+
+// Right Bottom Room: Executive Waiting Lounge (Sofas in U-shape matching blueprint)
+makeTag('WAITING LOUNGE', 38 + 6.5, 5.8, -18 + 4.5, 0.22, 'room');
+var sofaMat = new THREE.MeshStandardMaterial({ color: '#1e293b', roughness: 0.85 });
+box(bBranch, 6.5, 3.5 + 0.35, 1.8, 3.6, 0.45, 1.1, sofaMat);   // Top couch
+box(bBranch, 6.5, 3.5 + 0.35, 6.2, 3.6, 0.45, 1.1, sofaMat);   // Bottom couch
+box(bBranch, 9.6, 3.5 + 0.35, 4.0, 1.1, 0.45, 3.4, sofaMat);   // Right couch
+box(bBranch, 6.5, 3.5 + 0.22, 4.0, 1.8, 0.24, 1.8, mats.deskTop); // Coffee table
 
 makeTag('SECOND BRANCH OFFICE\n35 PCs TOTAL', 38, 10.6, -18, 0.85, 'building');
 
@@ -2655,6 +2886,63 @@ function inspectDevice(d) {
   updateJoystickVisibility();
   document.getElementById('dockCoords').textContent = 'Inspecting: ' + d.id;
 }
+
+
+// -------------------------------------------------------------
+// 2D BLUEPRINT VIEWER CONTROLLERS
+// -------------------------------------------------------------
+var blueprintData = {
+  server: {
+    title: 'Main Branch | Studio Server Room (Building A)',
+    img: './blueprints/floorplan_server_room.png',
+    desc: '<strong>Equipment Layout Architecture:</strong> 3-column data-center topology. Left: Dual Cisco 4331 ISR Routers (PLDT & Globe) · Center: Cisco Firepower 1010 NGFW & Catalyst 3650 Core Switch · Right: Dedicated SRV-EMP (VLAN 30) & SRV-ADM (VLAN 30) Server PCs · Bottom-Left: Inward swinging access door.'
+  },
+  branch1: {
+    title: 'Second Branch | 1st Floor (Technical Support)',
+    img: './blueprints/floorplan_branch_f1.png',
+    desc: '<strong>Floor 1 Layout:</strong> Central access corridor with front double doors and rear staircase to 2nd floor. Left Room: 15 Support Workstations (3 columns x 5 rows) + Network Printer. Right Room: 15 Support Workstations (3 columns x 5 rows) + Network Printer. Total: 30 PCs provisioned on VLAN 50 (192.168.50.0/24).'
+  },
+  branch2: {
+    title: 'Second Branch | 2nd Floor (Branch Admin & Waiting Lounge)',
+    img: './blueprints/floorplan_branch_f2.png',
+    desc: '<strong>Floor 2 Layout:</strong> Central landing corridor. Left Room: 5 Branch Administration Workstations (VLAN 60, 192.168.60.0/24). Right Upper Room: Dedicated IT server enclosure housing Cisco 4331 ISR Router (RTR-BR) and Ticket Cache Server (SRV-BR). Right Lower Room: Client waiting lounge with U-shaped sofa seating.'
+  },
+  full: {
+    title: 'ClearScope Technologies | Complete Campus Blueprints',
+    img: './blueprints/floorplan_full.png',
+    desc: '<strong>Comprehensive Blueprint Sheet:</strong> Full architectural documentation covering Server Room compute core, Second Branch ground floor technical operations, and Second Branch upper executive administration.'
+  }
+};
+
+function openBlueprintModal(tabKey) {
+  var m = document.getElementById('blueprintModal');
+  if (m) m.style.display = 'flex';
+  switchBlueprint(tabKey || 'server');
+  if (typeof updateJoystickVisibility === 'function') updateJoystickVisibility();
+}
+
+function closeBlueprintModal() {
+  var m = document.getElementById('blueprintModal');
+  if (m) m.style.display = 'none';
+  if (typeof updateJoystickVisibility === 'function') updateJoystickVisibility();
+}
+
+function switchBlueprint(tabKey) {
+  var data = blueprintData[tabKey] || blueprintData.server;
+  document.getElementById('bpImg').src = data.img;
+  document.getElementById('bpLegend').innerHTML = '<div class="bp-legend-title">' + data.title + '</div><div>' + data.desc + '</div>';
+
+  var tabs = { server: 'bpTab1', branch1: 'bpTab2', branch2: 'bpTab3', full: 'bpTab4' };
+  for (var k in tabs) {
+    var btn = document.getElementById(tabs[k]);
+    if (btn) btn.className = (k === tabKey) ? 'bp-tab active' : 'bp-tab';
+  }
+}
+
+// Close blueprint modal on Escape key
+window.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeBlueprintModal();
+});
 
 function closeInspector() {
   setTimeout(updateJoystickVisibility, 50);
