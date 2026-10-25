@@ -1468,60 +1468,60 @@ if (typeof THREE === 'undefined') {
     <button class="glass nav-dropdown-trigger" id="btnNavDropdown" onclick="toggleFacilityDropdown(event)">
       <span class="nav-brand-tag">ClearScope</span>
       <span class="nav-divider"></span>
-      <span class="nav-facility-current" id="lblFacilityCurrent">🏢 All Facilities</span>
+      <span class="nav-facility-current" id="lblFacilityCurrent">All Facilities</span>
       <span class="nav-chevron" id="navChevron">▼</span>
     </button>
     <div class="glass nav-dropdown-menu" id="navDropdownMenu">
       <div class="dropdown-header">Campus Facilities &amp; Tours</div>
       <div class="dropdown-item active" id="itemFacOverview" onclick="selectFacilityItem('overview')">
         <div class="item-info">
-          <span class="item-icon">🌐</span>
+          <span class="item-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span>
           <div class="item-text">
             <span class="item-title">All Facilities</span>
             <span class="item-desc">Full campus aerial overview</span>
           </div>
         </div>
-        <button class="tour-btn" title="Start Continuous Tour Across All Buildings" onclick="startBuildingTour(event, 'all')">▶ Tour All</button>
+        <button class="tour-btn" title="Start Continuous Tour Across All Buildings" onclick="startBuildingTour(event, 'all')">Tour All</button>
       </div>
       <div class="dropdown-item" id="itemFacServer" onclick="selectFacilityItem('datacenter')">
         <div class="item-info">
-          <span class="item-icon">🖥️</span>
+          <span class="item-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg></span>
           <div class="item-text">
             <span class="item-title">Studio Server Room</span>
             <span class="item-desc">Core switch, firewall, servers</span>
           </div>
         </div>
-        <button class="tour-btn" title="Start Automated Walkthrough" onclick="startBuildingTour(event, 'datacenter')">▶ Tour</button>
+        <button class="tour-btn" title="Start Automated Walkthrough" onclick="startBuildingTour(event, 'datacenter')">Tour</button>
       </div>
       <div class="dropdown-item" id="itemFacEmp" onclick="selectFacilityItem('emp')">
         <div class="item-info">
-          <span class="item-icon">🏢</span>
+          <span class="item-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="9" y1="6" x2="9.01" y2="6"/><line x1="15" y1="6" x2="15.01" y2="6"/><line x1="9" y1="10" x2="9.01" y2="10"/><line x1="15" y1="10" x2="15.01" y2="10"/><line x1="9" y1="14" x2="9.01" y2="14"/><line x1="15" y1="14" x2="15.01" y2="14"/><line x1="9" y1="18" x2="15" y2="18"/></svg></span>
           <div class="item-text">
             <span class="item-title">Employee Building</span>
             <span class="item-desc">5-floor workspace pods &amp; service core</span>
           </div>
         </div>
-        <button class="tour-btn" title="Start Automated Walkthrough" onclick="startBuildingTour(event, 'emp')">▶ Tour</button>
+        <button class="tour-btn" title="Start Automated Walkthrough" onclick="startBuildingTour(event, 'emp')">Tour</button>
       </div>
       <div class="dropdown-item" id="itemFacAdmin" onclick="selectFacilityItem('admin')">
         <div class="item-info">
-          <span class="item-icon">🏛️</span>
+          <span class="item-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M3 10h18M5 10v11M9 10v11M15 10v11M19 10v11M12 2L2 7h20L12 2z"/></svg></span>
           <div class="item-text">
             <span class="item-title">Admin Building</span>
             <span class="item-desc">2-floor executive suites &amp; staircase</span>
           </div>
         </div>
-        <button class="tour-btn" title="Start Automated Walkthrough" onclick="startBuildingTour(event, 'admin')">▶ Tour</button>
+        <button class="tour-btn" title="Start Automated Walkthrough" onclick="startBuildingTour(event, 'admin')">Tour</button>
       </div>
       <div class="dropdown-item" id="itemFacBranch" onclick="selectFacilityItem('branch')">
         <div class="item-info">
-          <span class="item-icon">🏬</span>
+          <span class="item-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
           <div class="item-text">
             <span class="item-title">Second Branch</span>
             <span class="item-desc">Customer support &amp; accounting branch</span>
           </div>
         </div>
-        <button class="tour-btn" title="Start Automated Walkthrough" onclick="startBuildingTour(event, 'branch')">▶ Tour</button>
+        <button class="tour-btn" title="Start Automated Walkthrough" onclick="startBuildingTour(event, 'branch')">Tour</button>
       </div>
     </div>
   </div>
@@ -1542,7 +1542,7 @@ if (typeof THREE === 'undefined') {
 <div class="glass" id="tourHUD" style="display:none;">
   <div class="tour-hud-info">
     <div class="tour-badge-row">
-      <span class="tour-badge" id="tourBadgeIcon">🎬 TOUR</span>
+      <span class="tour-badge" id="tourBadgeIcon">TOUR</span>
       <span class="tour-facility-title" id="tourFacilityTitle">Admin Building</span>
       <span class="tour-step-counter" id="tourStepCounter">1/10</span>
     </div>
@@ -1796,9 +1796,10 @@ scene.add(sunLight);
 var orbit = new THREE.OrbitControls(camera, renderer.domElement);
 orbit.enableDamping = true;
 orbit.dampingFactor = 0.05;
-orbit.rotateSpeed = isTouchDevice ? 0.65 : 0.85;
-orbit.panSpeed = isTouchDevice ? 0.65 : 0.85;
-orbit.zoomSpeed = 0.8;
+orbit.rotateSpeed = isTouchDevice ? 0.35 : 0.32;
+orbit.panSpeed = isTouchDevice ? 0.35 : 0.32;
+orbit.zoomSpeed = 0.6;
+orbit.dampingFactor = 0.08;
 orbit.maxPolarAngle = Math.PI / 2.05;
 orbit.target.set(6, 2, 0);
 
@@ -2005,57 +2006,43 @@ var tourRoutes = {
     name: 'Employee Building',
     steps: [
       {
-        cam: [-31.5, 1.8, 12.0], tgt: [-25.0, 1.1, 15.5],
-        facility: 'emp', floor: 1, roof: false,
-        title: 'Floor 1: Room 101 (North Developer Wing · 10 PCs & 2 Printers)',
-        desc: 'Collaborative pod of 10 developer workstations facing across acoustic partition with dual displays.',
-        duration: 4000
-      },
-      {
-        cam: [-31.5, 1.8, 24.0], tgt: [-25.0, 1.1, 20.5],
-        facility: 'emp', floor: 1, roof: false,
-        title: 'Floor 1: Room 102 (South Developer Wing · 10 PCs & 2 Printers)',
-        desc: 'South collaborative pod of 10 workstations and dual departmental laser printers.',
-        duration: 4000
-      },
-      {
-        cam: [-18.5, 1.8, 18.0], tgt: [-12.5, 2.0, 21.0],
-        facility: 'emp', floor: 1, roof: false,
-        title: 'Floor 1: East Service Core (Elevator, Staircase & Switch SW-EMP-F1)',
-        desc: 'Lobby perspective framing Cisco 24-Port Floor Switch, structural elevator, and architectural staircase.',
+        cam: [-22.0, 2.8, 32.0], tgt: [-22.0, 1.8, 18.0],
+        facility: 'emp',
+        title: 'Floor 1: Developer Operations (RM 101 & 102 · 20 PCs)',
+        desc: 'Front panoramic perspective through glass facade showcasing 20 developer workstations and departmental laser printers.',
         duration: 3800
       },
       {
-        cam: [-31.5, 5.2, 24.0], tgt: [-25.0, 4.6, 18.0],
-        facility: 'emp', floor: 2, roof: false,
-        title: 'Floor 2: Developer Operations (RM 201 & 202 · 20 PCs)',
-        desc: 'Second floor developer teams arranged in identical 10 PCs/room collaborative layout (VLAN 10).',
+        cam: [-22.0, 6.2, 32.0], tgt: [-22.0, 5.2, 18.0],
+        facility: 'emp',
+        title: 'Floor 2: Systems Engineering (RM 201 & 202 · 20 PCs)',
+        desc: 'Ascending to Floor 2 showing identical collaborative pod layout and central acoustic wall divider.',
         duration: 3800
       },
       {
-        cam: [-31.5, 8.6, 24.0], tgt: [-25.0, 8.0, 18.0],
-        facility: 'emp', floor: 3, roof: false,
+        cam: [-22.0, 9.6, 32.0], tgt: [-22.0, 8.6, 18.0],
+        facility: 'emp',
         title: 'Floor 3: Software Engineering (RM 301 & 302 · 20 PCs)',
-        desc: 'Third floor engineering wings with 20 workstations and 4 network laser printers.',
+        desc: 'Third floor software engineering teams with 20 workstations and dual display configurations.',
         duration: 3800
       },
       {
-        cam: [-31.5, 12.0, 24.0], tgt: [-25.0, 11.4, 18.0],
-        facility: 'emp', floor: 4, roof: false,
+        cam: [-22.0, 13.0, 32.0], tgt: [-22.0, 12.0, 18.0],
+        facility: 'emp',
         title: 'Floor 4: Systems Architecture (RM 401 & 402 · 20 PCs)',
         desc: 'Fourth floor systems architecture and devops workstations.',
         duration: 3800
       },
       {
-        cam: [-31.5, 15.4, 24.0], tgt: [-25.0, 14.8, 18.0],
-        facility: 'emp', floor: 5, roof: false,
+        cam: [-22.0, 16.4, 32.0], tgt: [-22.0, 15.4, 18.0],
+        facility: 'emp',
         title: 'Floor 5: Quality Assurance & Infrastructure (RM 501 & 502 · 20 PCs)',
         desc: 'Top floor QA facilities with solid roof slab and elevator core access.',
         duration: 4000
       },
       {
-        cam: [-28, 24, 48], tgt: [-22, 7, 18],
-        facility: 'emp', floor: 'all', roof: true,
+        cam: [-28.0, 24.0, 48.0], tgt: [-22.0, 7.0, 18.0],
+        facility: 'emp',
         title: 'Employee Building 5-Story Complete Overview',
         desc: 'Full 5-story employee operations walkthrough completed (100 Workstations total).',
         duration: 3400
@@ -2171,7 +2158,7 @@ tourRoutes.all = {
     }
   ]
     .concat(tourRoutes.datacenter.steps.slice(0, 4))
-    .concat(tourRoutes.emp.steps.slice(0, 7))
+    .concat(tourRoutes.emp.steps.slice(0, 5))
     .concat(tourRoutes.admin.steps.slice(0, 9))
     .concat(tourRoutes.branch.steps.slice(0, 6))
     .concat([
@@ -2232,11 +2219,8 @@ function executeTourStep(index) {
   if (stx) stx.textContent = step.title + ' — ' + step.desc;
 
   var currentFac = step.facility || tourState.facility;
-  if (currentFac === 'emp') {
-    selectFloor(step.floor || 'all', true);
-  } else {
-    selectFloor('all', true);
-  }
+  // Always keep all floors visible for Employee Building during tour
+  selectFloor('all', true);
 
   // Hide roof of whichever building is currently being toured
   var showRoof = (step.roof === true);
@@ -4262,7 +4246,7 @@ function focusFacility(name) {
     branch: 'Second Branch'
   };
   var lblCurrent = document.getElementById('lblFacilityCurrent');
-  if (lblCurrent) lblCurrent.textContent = (name === 'overview' ? '🏢 ' : '') + (facilityDisplay[name] || 'All Facilities');
+  if (lblCurrent) lblCurrent.textContent = facilityDisplay[name] || 'All Facilities';
 
   var itemIds = {
     overview: 'itemFacOverview',
