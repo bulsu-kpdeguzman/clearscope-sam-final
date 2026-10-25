@@ -1481,6 +1481,7 @@ if (typeof THREE === 'undefined') {
             <span class="item-desc">Full campus aerial overview</span>
           </div>
         </div>
+        <button class="tour-btn" title="Start Continuous Tour Across All Buildings" onclick="startBuildingTour(event, 'all')">▶ Tour All</button>
       </div>
       <div class="dropdown-item" id="itemFacServer" onclick="selectFacilityItem('datacenter')">
         <div class="item-info">
@@ -1537,21 +1538,19 @@ if (typeof THREE === 'undefined') {
   </div>
 </div>
 
-<!-- AUTO-WALKTHROUGH TOUR HUD -->
+<!-- AUTO-WALKTHROUGH TOUR HUD (CLEAN CINEMATIC PRESENTATION) -->
 <div class="glass" id="tourHUD" style="display:none;">
   <div class="tour-hud-info">
     <div class="tour-badge-row">
-      <span class="tour-badge">🎬 TOUR</span>
+      <span class="tour-badge" id="tourBadgeIcon">🎬 TOUR</span>
       <span class="tour-facility-title" id="tourFacilityTitle">Admin Building</span>
-      <span class="tour-step-counter" id="tourStepCounter">1/6</span>
+      <span class="tour-step-counter" id="tourStepCounter">1/10</span>
     </div>
     <span class="nav-divider" style="height:12px;opacity:0.4;"></span>
-    <div class="tour-status-text" id="tourStatusText">Entering Room...</div>
+    <div class="tour-status-text" id="tourStatusText">Showcasing Room...</div>
   </div>
   <div class="tour-hud-controls">
-    <button class="tour-ctrl-btn" id="btnTourPause" onclick="toggleTourPause()">⏸ Pause</button>
-    <button class="tour-ctrl-btn" id="btnTourNext" onclick="nextTourStep()">⏭ Next</button>
-    <button class="tour-ctrl-btn tour-exit-btn" id="btnTourExit" onclick="exitTour()">✕ Exit</button>
+    <button class="tour-ctrl-btn tour-exit-btn" id="btnTourExit" onclick="exitTour()" title="Exit Walkthrough">✕ Exit</button>
   </div>
 </div>
 
@@ -1931,45 +1930,73 @@ var tourRoutes = {
     name: 'Admin Building',
     steps: [
       {
+        cam: [16.0, 2.0, 25.0], tgt: [16.0, 1.8, 17.0],
+        facility: 'admin',
+        title: 'Floor 1: Main Reception & Foyer',
+        desc: 'South entrance foyer connecting West operations wings and East administrative core.',
+        duration: 3600, roof: false
+      },
+      {
         cam: [9.0, 2.0, 22.0], tgt: [12.5, 1.1, 25.5],
-        title: 'Floor 1: Suite 1 (Operations Bay · 5 PCs & Printer)',
-        desc: 'Wide-angle corner view across executive workstations, dual monitors, and department laser printer.',
+        facility: 'admin',
+        title: 'Floor 1: Room 103 (Executive Operations · 5 PCs & Printer)',
+        desc: 'Perimeter executive desks with dual monitors, dedicated power/network drops, and laser printer.',
         duration: 3800, roof: false
       },
       {
         cam: [9.0, 2.0, 16.5], tgt: [12.5, 1.1, 11.5],
-        title: 'Floor 1: Suite 2 (Administration · 5 PCs & Printer)',
-        desc: 'Wide corner perspective of administration workstations and network drops.',
-        duration: 3800, roof: false
+        facility: 'admin',
+        title: 'Floor 1: Room 101 (Administration Operations · 10 PCs & Printer)',
+        desc: 'Wide corner view across 10 administration workstations (VLAN 20) and high-speed laser printer.',
+        duration: 4000, roof: false
       },
       {
-        cam: [17.5, 2.0, 18.5], tgt: [22.5, 2.2, 20.5],
-        title: 'Floor 1: East Service Core & Architectural Staircase',
-        desc: 'Clear hallway view framing the full architectural staircase, railings, and elevator shaft.',
+        cam: [20.5, 2.0, 16.5], tgt: [21.5, 1.1, 11.5],
+        facility: 'admin',
+        title: 'Floor 1: Room 102 (Facilities & Records Suite)',
+        desc: 'Administrative records office and departmental archiving workstations.',
         duration: 3600, roof: false
       },
       {
+        cam: [17.5, 2.0, 18.5], tgt: [22.5, 2.2, 20.5],
+        facility: 'admin',
+        title: 'Floor 1: East Service Core (Architectural Staircase & Elevator)',
+        desc: 'Full view framing the architectural stepped staircase with safety handrails and elevator shaft.',
+        duration: 3800, roof: false
+      },
+      {
         cam: [10.5, 5.0, 19.2], tgt: [16.0, 5.4, 19.2],
+        facility: 'admin',
         title: 'Floor 2: Central Hallway & Enterprise Wi-Fi 6',
-        desc: 'Unobstructed corridor view framing the ceiling-mounted Cisco Catalyst 9115 Wi-Fi 6 Access Point.',
+        desc: 'Central corridor framing the ceiling-mounted Cisco Catalyst 9115 Wi-Fi 6 Access Point.',
         duration: 3600, roof: false
       },
       {
         cam: [9.0, 5.2, 16.5], tgt: [12.5, 4.6, 11.5],
-        title: 'Floor 2: Executive Directorate Suite (5 PCs & Printer)',
-        desc: 'Wide-angle view across executive director workstations, laser printer, and switch.',
+        facility: 'admin',
+        title: 'Floor 2: Room 201 (Executive Directorate · 5 PCs & Printer)',
+        desc: 'Director suites, manager conference desks, and Cisco Gigabit switch drop.',
+        duration: 3800, roof: false
+      },
+      {
+        cam: [20.5, 5.2, 16.5], tgt: [21.5, 4.6, 11.5],
+        facility: 'admin',
+        title: 'Floor 2: Room 202 (Network Operations Center · 5 PCs, Switch & Printer)',
+        desc: 'Cisco Catalyst 1000 Access Switch (SW-ADM-F2) and network administration monitoring stations.',
         duration: 4000, roof: false
       },
       {
         cam: [9.0, 5.2, 22.0], tgt: [12.5, 4.6, 25.5],
-        title: 'Floor 2: Corporate Strategy Suite (5 PCs & Printer)',
-        desc: 'Wide-angle view across corporate strategy desks and network access ports.',
-        duration: 4000, roof: false
+        facility: 'admin',
+        title: 'Floor 2: Room 203 (Corporate Strategy · 5 PCs & Printer)',
+        desc: 'Corporate strategy workstations and dedicated high-speed laser printer.',
+        duration: 3800, roof: false
       },
       {
         cam: [16.0, 15.0, 42.0], tgt: [16.0, 3.5, 18.0],
+        facility: 'admin',
         title: 'Admin Building Complete Overview',
-        desc: 'Walkthrough completed. Restoring full architectural roof and campus view.',
+        desc: 'Full 2-floor walkthrough completed. Restoring full architectural roof and campus view.',
         duration: 3400, roof: true
       }
     ]
@@ -1979,62 +2006,113 @@ var tourRoutes = {
     steps: [
       {
         cam: [-31.5, 1.8, 12.0], tgt: [-25.0, 1.1, 15.5],
-        title: 'Floor 1: North Developer Wing (10 PCs · VLAN 10)',
-        desc: 'Wide-angle corner view across 10 developer workstations facing across acoustic partition with dual displays.',
-        duration: 4000, floor: 1, roof: false
+        facility: 'emp', floor: 1, roof: false,
+        title: 'Floor 1: Room 101 (North Developer Wing · 10 PCs & 2 Printers)',
+        desc: 'Collaborative pod of 10 developer workstations facing across acoustic partition with dual displays.',
+        duration: 4000
       },
       {
         cam: [-31.5, 1.8, 24.0], tgt: [-25.0, 1.1, 20.5],
-        title: 'Floor 1: South Developer Wing (10 PCs · VLAN 10)',
-        desc: 'Wide corner view across 10 developer workstations and departmental laser printers.',
-        duration: 4000, floor: 1, roof: false
+        facility: 'emp', floor: 1, roof: false,
+        title: 'Floor 1: Room 102 (South Developer Wing · 10 PCs & 2 Printers)',
+        desc: 'South collaborative pod of 10 workstations and dual departmental laser printers.',
+        duration: 4000
       },
       {
         cam: [-18.5, 1.8, 18.0], tgt: [-12.5, 2.0, 21.0],
-        title: 'Floor 1: East Service Core, Elevator & Switch SW-EMP-F1',
+        facility: 'emp', floor: 1, roof: false,
+        title: 'Floor 1: East Service Core (Elevator, Staircase & Switch SW-EMP-F1)',
         desc: 'Lobby perspective framing Cisco 24-Port Floor Switch, structural elevator, and architectural staircase.',
-        duration: 3600, floor: 1, roof: false
+        duration: 3800
       },
       {
         cam: [-31.5, 5.2, 24.0], tgt: [-25.0, 4.6, 18.0],
-        title: 'Floor 2: Developer Operations Floor (VLAN 10)',
-        desc: 'Wide view of upper development floor with standardized 10 PCs/room layout.',
-        duration: 3800, floor: 2, roof: false
+        facility: 'emp', floor: 2, roof: false,
+        title: 'Floor 2: Developer Operations (RM 201 & 202 · 20 PCs)',
+        desc: 'Second floor developer teams arranged in identical 10 PCs/room collaborative layout (VLAN 10).',
+        duration: 3800
+      },
+      {
+        cam: [-31.5, 8.6, 24.0], tgt: [-25.0, 8.0, 18.0],
+        facility: 'emp', floor: 3, roof: false,
+        title: 'Floor 3: Software Engineering (RM 301 & 302 · 20 PCs)',
+        desc: 'Third floor engineering wings with 20 workstations and 4 network laser printers.',
+        duration: 3800
+      },
+      {
+        cam: [-31.5, 12.0, 24.0], tgt: [-25.0, 11.4, 18.0],
+        facility: 'emp', floor: 4, roof: false,
+        title: 'Floor 4: Systems Architecture (RM 401 & 402 · 20 PCs)',
+        desc: 'Fourth floor systems architecture and devops workstations.',
+        duration: 3800
+      },
+      {
+        cam: [-31.5, 15.4, 24.0], tgt: [-25.0, 14.8, 18.0],
+        facility: 'emp', floor: 5, roof: false,
+        title: 'Floor 5: Quality Assurance & Infrastructure (RM 501 & 502 · 20 PCs)',
+        desc: 'Top floor QA facilities with solid roof slab and elevator core access.',
+        duration: 4000
       },
       {
         cam: [-28, 24, 48], tgt: [-22, 7, 18],
-        title: 'Employee Building Overview',
-        desc: '5-floor employee operations overview completed.',
-        duration: 3200, floor: 'all', roof: true
+        facility: 'emp', floor: 'all', roof: true,
+        title: 'Employee Building 5-Story Complete Overview',
+        desc: 'Full 5-story employee operations walkthrough completed (100 Workstations total).',
+        duration: 3400
       }
     ]
   },
   branch: {
-    name: 'Second Branch Office',
+    name: 'Second Branch',
     steps: [
       {
+        cam: [38.0, 2.5, -9.0], tgt: [38.0, 1.8, -18.0],
+        facility: 'branch', roof: false,
+        title: 'Floor 1: Main Corridor & Customer Reception',
+        desc: 'Central entrance corridor providing direct access to customer support teams and staircase.',
+        duration: 3400
+      },
+      {
         cam: [29.5, 1.8, -23.5], tgt: [35.0, 1.1, -16.5],
-        title: 'Floor 1: West Customer Support Bay (15 PCs · VLAN 50)',
-        desc: 'Wide corner perspective showcasing 15 customer support workstations and laser printer.',
-        duration: 4000, roof: false
+        facility: 'branch', roof: false,
+        title: 'Floor 1: Room B101 (West Support Bay · 15 PCs & Printer)',
+        desc: 'Customer support tier 1 workstations (VLAN 50) and departmental laser printer.',
+        duration: 4000
       },
       {
         cam: [46.5, 1.8, -23.5], tgt: [41.0, 1.1, -16.5],
-        title: 'Floor 1: East Customer Support Bay (15 PCs) & Staircase',
-        desc: 'Wide view across 15 support desks and central corridor staircase leading upstairs.',
-        duration: 4000, roof: false
+        facility: 'branch', roof: false,
+        title: 'Floor 1: Room B102 (East Support Bay · 15 PCs & Printer)',
+        desc: 'Customer support tier 2 workstations and central corridor staircase leading upstairs.',
+        duration: 4000
+      },
+      {
+        cam: [34.0, 2.0, -13.0], tgt: [40.0, 2.0, -17.0],
+        facility: 'branch', roof: false,
+        title: 'Floor 1: Central Architectural Corridor Staircase',
+        desc: 'Architectural staircase with solid stepped treads and handrails ascending to Floor 2.',
+        duration: 3600
       },
       {
         cam: [39.5, 5.2, -13.0], tgt: [45.0, 4.5, -18.0],
-        title: 'Floor 2: Accounting Suite & Dedicated Branch Server (SRV-BR)',
-        desc: 'Wide corner view of Accounting workstations, laser printer, and Branch Server rack.',
-        duration: 4000, roof: false
+        facility: 'branch', roof: false,
+        title: 'Floor 2: Room B201 (Accounting Department · 5 PCs & Printer)',
+        desc: 'Accounting workstations (VLAN 60) and dedicated laser printer on Floor 2.',
+        duration: 4000
+      },
+      {
+        cam: [45.5, 5.2, -13.0], tgt: [46.0, 4.8, -18.0],
+        facility: 'branch', roof: false,
+        title: 'Floor 2: Branch Server Room & Cisco 4331 ISR Edge Router',
+        desc: 'Dedicated Branch Server (SRV-BR) and Cisco 4331 ISR Router terminating 500M private WAN link.',
+        duration: 4000
       },
       {
         cam: [42.0, 14.0, 0.0], tgt: [38, 3.0, -18],
-        title: 'Second Branch Overview',
-        desc: 'Remote facility walkthrough completed.',
-        duration: 3400, roof: true
+        facility: 'branch', roof: true,
+        title: 'Second Branch Complete Overview',
+        desc: 'Full remote facility walkthrough completed (35 Workstations total).',
+        duration: 3400
       }
     ]
   },
@@ -2043,30 +2121,68 @@ var tourRoutes = {
     steps: [
       {
         cam: [-14.0, 1.8, -18.0], tgt: [-22.0, 1.6, -18.0],
-        title: 'Studio Server Room: Entrance & Overhead Trays',
-        desc: 'View from the doorway looking across structured fiber cable distribution trays.',
-        duration: 3600, roof: false
+        facility: 'datacenter', roof: false,
+        title: 'Entrance & Overhead Fiber Distribution Ladders',
+        desc: 'Security access doors beneath structured overhead fiber distribution trays.',
+        duration: 3600
       },
       {
         cam: [-15.0, 1.8, -14.0], tgt: [-24.5, 1.6, -18.5],
-        title: 'Network Core Rack: Cisco 3650 & Firepower NGFW',
-        desc: 'Wide corner view of Cisco Catalyst Core Switch and Firepower Firewall managing security.',
-        duration: 3800, roof: false
+        facility: 'datacenter', roof: false,
+        title: 'Network Core Rack: Cisco 3650 L3 Switch & Firepower 1010 NGFW',
+        desc: 'Core Catalyst Switch and Firepower Firewall managing VLAN routing and ACL security policies.',
+        duration: 3800
       },
       {
         cam: [-24.5, 1.8, -14.0], tgt: [-21.0, 1.3, -18.5],
-        title: 'Dedicated Server Farm: SRV-EMP & SRV-ADM',
-        desc: 'Wide corner inspection of dedicated enterprise servers connected at 1 Gbps.',
-        duration: 3800, roof: false
+        facility: 'datacenter', roof: false,
+        title: 'Dedicated Enterprise Server Farm (SRV-EMP & SRV-ADM)',
+        desc: 'Dedicated enterprise servers connected at full 1 Gbps speed with redundant uplinks.',
+        duration: 3800
+      },
+      {
+        cam: [-24.5, 1.8, -21.0], tgt: [-21.0, 1.8, -18.5],
+        facility: 'datacenter', roof: false,
+        title: 'WAN Edge Carrier Ingress: Dual ISP Fiber Lines',
+        desc: 'PLDT Enterprise 1 Gbps primary fiber link and Globe Business 500 Mbps automatic failover link.',
+        duration: 3600
       },
       {
         cam: [-18, 10.0, -5], tgt: [-20, 2.0, -18],
+        facility: 'datacenter', roof: true,
         title: 'Studio Server Room Overview',
         desc: 'Server farm inspection completed.',
-        duration: 3200, roof: true
+        duration: 3200
       }
     ]
   }
+};
+
+// GRAND CAMPUS TOUR: Combines all facilities in logical sequence
+tourRoutes.all = {
+  name: 'Full Campus Tour',
+  steps: [
+    {
+      cam: [-30, 48, 65], tgt: [6, 2, 0],
+      facility: 'overview',
+      title: 'ClearScope Technologies: Grand Campus Overview',
+      desc: 'Aerial perspective across all 4 networked campus facilities and WAN infrastructure.',
+      duration: 3800, roof: true
+    }
+  ]
+    .concat(tourRoutes.datacenter.steps.slice(0, 4))
+    .concat(tourRoutes.emp.steps.slice(0, 7))
+    .concat(tourRoutes.admin.steps.slice(0, 9))
+    .concat(tourRoutes.branch.steps.slice(0, 6))
+    .concat([
+      {
+        cam: [-30, 48, 65], tgt: [6, 2, 0],
+        facility: 'overview',
+        title: 'Full Campus Tour Completed',
+        desc: 'Complete walkthrough of all rooms across all facilities finished.',
+        duration: 3600, roof: true
+      }
+    ])
 };
 
 function startBuildingTour(e, facKey) {
@@ -2115,18 +2231,23 @@ function executeTourStep(index) {
   var stx = document.getElementById('tourStatusText');
   if (stx) stx.textContent = step.title + ' — ' + step.desc;
 
-  if (tourState.facility === 'emp') {
+  var currentFac = step.facility || tourState.facility;
+  if (currentFac === 'emp') {
     selectFloor(step.floor || 'all', true);
+  } else {
+    selectFloor('all', true);
   }
+
+  // Hide roof of whichever building is currently being toured
   var showRoof = (step.roof === true);
-  if (tourState.facility === 'admin' && typeof adminRoof !== 'undefined') {
-    adminRoof.visible = showRoof;
+  if (typeof adminRoof !== 'undefined') {
+    adminRoof.visible = (currentFac === 'admin') ? showRoof : true;
   }
-  if (tourState.facility === 'branch' && typeof branchRoof !== 'undefined') {
-    branchRoof.visible = showRoof;
+  if (typeof branchRoof !== 'undefined') {
+    branchRoof.visible = (currentFac === 'branch') ? showRoof : true;
   }
-  if (tourState.facility === 'datacenter' && typeof datacenterRoof !== 'undefined') {
-    datacenterRoof.visible = showRoof;
+  if (typeof datacenterRoof !== 'undefined') {
+    datacenterRoof.visible = (currentFac === 'datacenter') ? showRoof : true;
   }
 
   var moveDuration = Math.round(step.duration * 0.7);
