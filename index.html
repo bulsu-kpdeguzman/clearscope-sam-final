@@ -483,15 +483,33 @@ body {
 /* SLIDE-OVER DEVICE INSPECTOR (RIGHT) */
 #inspectorDrawer {
   position: fixed;
-  top: 14px;
-  right: 14px;
+  top: max(12px, env(safe-area-inset-top, 12px));
+  right: max(12px, env(safe-area-inset-right, 12px));
   width: 340px;
-  max-height: calc(100vh - 28px);
-  z-index: 50;
-  padding: 16px;
+  max-height: calc(100dvh - 24px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+  z-index: 1000;
+  padding: 14px;
   display: none;
-  overflow-y: auto;
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
   animation: slideLeft 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.insp-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(56, 189, 248, 0.2);
+  flex-shrink: 0;
+}
+.insp-scrollable-body {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  flex: 1 1 auto;
+  min-height: 0;
+  padding-right: 4px;
 }
 .insp-head {
   display: flex;
@@ -849,12 +867,30 @@ body {
     font-size: 10.5px;
   }
   #inspectorDrawer {
-    width: 350px;
-    left: auto;
-    right: 8px;
-    bottom: 8px;
-    max-height: 92vh;
-    border-radius: 14px;
+    position: fixed !important;
+    top: max(6px, env(safe-area-inset-top, 6px)) !important;
+    bottom: max(6px, env(safe-area-inset-bottom, 6px)) !important;
+    right: max(8px, env(safe-area-inset-right, 8px)) !important;
+    left: auto !important;
+    width: min(340px, 46vw) !important;
+    height: auto !important;
+    max-height: calc(100dvh - 12px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)) !important;
+    border-radius: 14px !important;
+    padding: 10px 12px !important;
+    z-index: 1000 !important;
+  }
+  .insp-name {
+    font-size: 13.5px !important;
+  }
+  .insp-sub {
+    font-size: 10.5px !important;
+  }
+  .insp-card {
+    padding: 8px 10px !important;
+  }
+  .insp-desc {
+    padding: 8px 10px !important;
+    font-size: 10.5px !important;
   }
   #testDrawer {
     width: 380px;
@@ -1200,8 +1236,11 @@ if (typeof THREE === 'undefined') {
     </div>
   </div>
 
-  <div class="insp-card" id="inspSpecs"></div>
-  <div class="insp-desc" id="inspDesc"></div>
+  
+  <div class="insp-scrollable-body">
+    <div class="insp-card" id="inspSpecs"></div>
+    <div class="insp-desc" id="inspDesc"></div>
+  </div>
 </div>
 
 <script>
@@ -1267,6 +1306,23 @@ var activeNav = 'orbit';
 
 var joystickInput = { x: 0, y: 0 };
 var isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.innerWidth <= 768);
+
+
+function toggleFullscreen() {
+  if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen().catch(function(e){});
+    } else if (document.documentElement.webkitRequestFullscreen) {
+      document.documentElement.webkitRequestFullscreen();
+    }
+  } else {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    }
+  }
+}
 
 function setNavMode(mode) {
   activeNav = mode;
@@ -3045,7 +3101,7 @@ function inspectDevice(d) {
   document.getElementById('inspDesc').textContent = d.desc;
 
   var drawer = document.getElementById('inspectorDrawer');
-  drawer.style.display = 'block';
+  drawer.style.display = 'flex';
   updateJoystickVisibility();
   document.getElementById('dockCoords').textContent = 'Inspecting: ' + d.id;
 }
@@ -3509,16 +3565,29 @@ function animate() {
     // Strict YXZ zero-roll enforcement in first-person walk mode
     if (camera.rotation.order !== 'YXZ') camera.rotation.order = 'YXZ';
     if (camera.rotation.z !== 0) camera.rotation.z = 0;
+    // Outdoor vs Indoor walk speed optimization
+    var pPos = walk.getObject().position;
+    var inServer = (pPos.x >= -27 && pPos.x <= -13 && pPos.z >= -23 && pPos.z <= -13);
+    var inEmp = (pPos.x >= -34 && pPos.x <= -10 && pPos.z >= 10 && pPos.z <= 26);
+    var inAdmin = (pPos.x >= 5 && pPos.x <= 27 && pPos.z >= 10 && pPos.z <= 26);
+    var inBranch = (pPos.x >= 26 && pPos.x <= 50 && pPos.z >= -26 && pPos.z <= -10);
+    var isOutdoors = !(inServer || inEmp || inAdmin || inBranch);
+
     if (walk.isLocked) {
-      var speed = keys.ShiftLeft ? 0.32 : 0.16;
+      var baseSpd = isOutdoors ? 0.36 : 0.18;
+      var speed = keys.ShiftLeft ? (isOutdoors ? 0.65 : 0.38) : baseSpd;
       if (keys.KeyW || keys.ArrowUp) walk.moveForward(speed);
       if (keys.KeyS || keys.ArrowDown) walk.moveForward(-speed);
       if (keys.KeyA || keys.ArrowLeft) walk.moveRight(-speed);
       if (keys.KeyD || keys.ArrowRight) walk.moveRight(speed);
     }
-    // Mobile Virtual Joystick Input
-    if (joystickInput.x !== 0 || joystickInput.y !== 0) {
-      var jSpeed = 0.16;
+    // Mobile Virtual Joystick Input (Progressive Speed + Fast Outdoor Acceleration)
+    var jMag = Math.hypot(joystickInput.x, joystickInput.y);
+    if (jMag > 0.05) {
+      // Gentle push (0.16-0.22) for room precision, full stick tilt sprints (up to 0.58) outdoors
+      var outdoorMult = isOutdoors ? 1.85 : 1.0;
+      var sprintMult = (jMag > 0.70) ? 1.45 : 1.0;
+      var jSpeed = (0.16 + (jMag * 0.16)) * outdoorMult * sprintMult;
       walk.moveForward(-joystickInput.y * jSpeed);
       walk.moveRight(joystickInput.x * jSpeed);
     }
