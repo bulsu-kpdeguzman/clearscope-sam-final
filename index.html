@@ -528,15 +528,28 @@ body {
   margin-bottom: 10px;
 }
 .spec-line {
-  display: flex;
-  justify-content: space-between;
-  padding: 3.5px 0;
-  border-bottom: 1px dotted rgba(148, 163, 184, 0.12);
-  font-size: 11px;
+  display: grid;
+  grid-template-columns: 86px 1fr;
+  column-gap: 14px;
+  align-items: baseline;
+  padding: 6px 0;
+  border-bottom: 1px dotted rgba(148, 163, 184, 0.18);
+  font-size: 11.5px;
+  line-height: 1.45;
 }
 .spec-line:last-child { border-bottom: none; }
-.sk { color: var(--text-muted); }
-.sv { color: #f8fafc; font-weight: 600; font-family: Consolas, monospace; }
+.sk {
+  color: var(--text-muted);
+  font-weight: 500;
+  white-space: nowrap;
+}
+.sv {
+  color: #f8fafc;
+  font-weight: 600;
+  font-family: Consolas, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+  text-align: right;
+  word-break: break-word;
+}
 .insp-desc {
   font-size: 11px;
   color: var(--text-muted);
@@ -622,61 +635,122 @@ body {
   flex-shrink: 0;
 }
 
-@media (max-width: 768px) {
+/* Desktop default for mobile-only elements */
+.mobile-nav-trigger {
+  display: none;
+}
+.mobile-more-btn {
+  display: none;
+}
+#btnMobileExitWalk {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(56, 189, 248, 0.5);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  z-index: 950;
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   MOBILE RESPONSIVE STYLES (PORTRAIT & LANDSCAPE PHONES)
+   ========================================================================== */
+@media (max-width: 860px), (max-height: 520px) {
+  /* 1. TOP BAR: Compact Click-to-Expand Trigger */
   #topNav {
     top: 8px;
-    width: 96vw;
+    width: 94vw;
+    max-width: 440px;
     left: 50%;
     transform: translateX(-50%);
-  }
-  .nav-capsule {
-    overflow-x: auto;
-    white-space: nowrap;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    max-width: 100%;
-    padding: 6px 10px;
-    gap: 6px;
-    justify-content: flex-start;
-    border-radius: 14px;
-  }
-  .nav-capsule::-webkit-scrollbar {
-    display: none;
-  }
-  .nav-brand {
-    font-size: 11px;
-    padding-right: 8px;
-    flex-shrink: 0;
-  }
-  .nav-btn {
-    font-size: 11px;
-    padding: 5px 9px;
-    flex-shrink: 0;
-    border-radius: 8px;
-  }
-  #floorSubNav {
-    overflow-x: auto;
-    white-space: nowrap;
-    max-width: 100%;
-    padding: 4px 8px;
-    margin-top: 5px;
-    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 
+  .mobile-nav-trigger {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 14px;
+    border-radius: 999px;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--cyan-accent);
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+    pointer-events: auto;
+  }
+  .mobile-chevron {
+    font-size: 9px;
+    transition: transform 0.2s ease;
+    opacity: 0.75;
+  }
+  .mobile-chevron.open {
+    transform: rotate(180deg);
+  }
+
+  /* Facility Menu is Hidden by default on mobile, expands on click */
+  .nav-capsule {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    margin-top: 6px;
+    padding: 8px;
+    border-radius: 14px;
+    background: rgba(11, 20, 38, 0.94);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+  }
+  .nav-capsule.mobile-open {
+    display: flex;
+  }
+  .nav-brand {
+    display: none;
+  }
+  .nav-btn {
+    width: 100%;
+    text-align: left;
+    padding: 8px 12px;
+    font-size: 12px;
+    border-radius: 8px;
+  }
+
+  /* Floor selector sub-bar */
+  #floorSubNav {
+    width: 100%;
+    justify-content: center;
+    padding: 4px 6px;
+    margin-top: 4px;
+    border-radius: 10px;
+  }
+  .floor-pill {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+
+  /* 2. BOTTOM DOCK: Compact Mobile Pill */
   #bottomDock {
-    bottom: 10px;
-    width: 96vw;
-    max-width: 430px;
-    padding: 6px 8px;
+    bottom: 8px;
+    width: 94vw;
+    max-width: 420px;
+    padding: 5px 8px;
     gap: 4px;
     justify-content: space-around;
     border-radius: 16px;
   }
   .dock-btn {
-    padding: 5px 8px;
-    font-size: 11px;
+    padding: 6px 10px;
+    font-size: 11.5px;
     gap: 4px;
-    border-radius: 8px;
+    border-radius: 10px;
   }
   .dock-sep {
     display: none;
@@ -685,6 +759,35 @@ body {
     display: none;
   }
 
+  /* Secondary options collapsed on mobile */
+  .dock-opt-btn {
+    display: none;
+  }
+  .dock-opt-btn.mobile-show {
+    display: inline-flex;
+  }
+  .mobile-more-btn {
+    display: inline-flex;
+  }
+
+  /* 3. VIRTUAL JOYSTICK POSITION & Z-INDEX */
+  #mobileJoystickContainer {
+    bottom: 75px;
+    left: 16px;
+    width: 100px;
+    height: 100px;
+    z-index: 150;
+  }
+  #mobileJoystickBase {
+    width: 90px;
+    height: 90px;
+  }
+  #mobileJoystickKnob {
+    width: 38px;
+    height: 38px;
+  }
+
+  /* 4. MODALS & DRAWERS ADAPTED FOR PHONE & LANDSCAPE */
   #testDrawer {
     width: 100vw;
     max-width: 100vw;
@@ -692,21 +795,36 @@ body {
     right: 0;
     bottom: 0;
     border-radius: 18px 18px 0 0;
-    padding: 16px;
+    padding: 14px;
     box-sizing: border-box;
-    max-height: 80vh;
+    max-height: 82vh;
     overflow-y: auto;
+    z-index: 1000;
   }
   .test-btn-grid {
     grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  #inspectorDrawer {
+    width: 100vw;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: auto;
+    border-radius: 18px 18px 0 0;
+    max-height: 65vh;
+    overflow-y: auto;
+    z-index: 1000;
   }
 
   #simBigScreen {
     width: 95vw;
     max-width: 95vw;
-    padding: 16px;
-    max-height: 86vh;
+    padding: 14px;
+    max-height: 85vh;
     overflow-y: auto;
+    z-index: 1000;
   }
   .big-screen-hops {
     grid-template-columns: 1fr;
@@ -715,14 +833,36 @@ body {
   .bs-meta-grid {
     grid-template-columns: 1fr;
   }
+}
 
+/* Landscape Mode Specifically (max-height <= 480px) */
+@media (max-height: 480px) and (orientation: landscape) {
+  #topNav {
+    top: 4px;
+  }
+  #bottomDock {
+    bottom: 4px;
+    padding: 3px 6px;
+  }
+  .dock-btn {
+    padding: 4px 8px;
+    font-size: 10.5px;
+  }
   #inspectorDrawer {
-    width: 100vw;
-    right: 0;
-    bottom: 0;
-    top: auto;
-    border-radius: 18px 18px 0 0;
-    max-height: 65vh;
+    width: 350px;
+    left: auto;
+    right: 8px;
+    bottom: 8px;
+    max-height: 92vh;
+    border-radius: 14px;
+  }
+  #testDrawer {
+    width: 380px;
+    left: auto;
+    right: 8px;
+    bottom: 8px;
+    max-height: 92vh;
+    border-radius: 14px;
   }
 }
 
@@ -751,18 +891,26 @@ if (typeof THREE === 'undefined') {
 </div>
 
 
-<!-- TOP FLOATING NAVIGATION -->
+<!-- TOP FLOATING NAVIGATION (COLLAPSIBLE ON MOBILE) -->
 <div id="topNav">
-  <div class="glass nav-capsule">
+  <!-- Mobile Compact Trigger (Visible on Mobile Only) -->
+  <button class="glass mobile-nav-trigger" id="btnMobileNavToggle" onclick="toggleMobileNav()">
+    <span class="nav-brand-dot"></span>
+    <span id="lblMobileFacility">All Facilities</span>
+    <span class="mobile-chevron" id="mobileNavChevron">▼</span>
+  </button>
+
+  <!-- Full Facility Capsule (Desktop Default, Expandable Dropdown on Mobile) -->
+  <div class="glass nav-capsule" id="navCapsule">
     <div class="nav-brand">
       <span class="nav-brand-dot"></span>
       <span>ClearScope BIM</span>
     </div>
-    <button class="nav-btn active" id="btnNavOverview" onclick="focusFacility('overview')">All Facilities</button>
-    <button class="nav-btn" id="btnNavServer" onclick="focusFacility('datacenter')">Studio Server Room</button>
-    <button class="nav-btn" id="btnNavEmp" onclick="focusFacility('emp')">Employees' Bldg (5F)</button>
-    <button class="nav-btn" id="btnNavAdmin" onclick="focusFacility('admin')">Admin Bldg (2F)</button>
-    <button class="nav-btn" id="btnNavBranch" onclick="focusFacility('branch')">Second Branch (35 PCs)</button>
+    <button class="nav-btn active" id="btnNavOverview" onclick="handleFacilitySelect('overview')">All Facilities</button>
+    <button class="nav-btn" id="btnNavServer" onclick="handleFacilitySelect('datacenter')">Studio Server Room</button>
+    <button class="nav-btn" id="btnNavEmp" onclick="handleFacilitySelect('emp')">Employees' Bldg (5F)</button>
+    <button class="nav-btn" id="btnNavAdmin" onclick="handleFacilitySelect('admin')">Admin Bldg (2F)</button>
+    <button class="nav-btn" id="btnNavBranch" onclick="handleFacilitySelect('branch')">Second Branch (35 PCs)</button>
   </div>
 
   <!-- Floor Selector Sub-Bar (Appears for Employees Building) -->
@@ -777,7 +925,7 @@ if (typeof THREE === 'undefined') {
   </div>
 </div>
 
-<!-- FLOATING BOTTOM DOCK (CLEANED - NO EMOJIS, CRISP ICONS) -->
+<!-- FLOATING BOTTOM DOCK -->
 <div class="glass" id="bottomDock">
   <button class="dock-btn active" id="btnDockOrbit" onclick="setNavMode('orbit')">
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18v-9h9"/></svg>
@@ -790,11 +938,11 @@ if (typeof THREE === 'undefined') {
 
   <div class="dock-sep"></div>
 
-  <button class="dock-btn" id="btnDockTags" onclick="cycleLabels()">
+  <button class="dock-btn dock-opt-btn" id="btnDockTags" onclick="cycleLabels()">
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><circle cx="7" cy="7" r="1.5"/></svg>
     <span>Labels: <strong id="lblModeText">Smart</strong></span>
   </button>
-  <button class="dock-btn" id="btnDockStyle" onclick="toggleStyleMode()">
+  <button class="dock-btn dock-opt-btn" id="btnDockStyle" onclick="toggleStyleMode()">
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
     <span id="lblStyleText">Campus</span>
   </button>
@@ -806,9 +954,20 @@ if (typeof THREE === 'undefined') {
     <span>Tests <span style="font-size:9px;opacity:0.7;">▼</span></span>
   </button>
 
+  <!-- Mobile Extra Options Toggle (Visible on Mobile Only) -->
+  <button class="dock-btn mobile-more-btn" id="btnMobileMore" onclick="toggleMobileMore()" title="More View Options">
+    <span>⋯ More</span>
+  </button>
+
   <div class="dock-sep"></div>
   <div class="dock-stat" id="dockCoords">165 Desktops · Online</div>
 </div>
+
+<!-- FLOATING EXIT WALK BUTTON (MOBILE WALK MODE ONLY) -->
+<button class="glass" id="btnMobileExitWalk" onclick="setNavMode('orbit')" style="display:none;">
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18v-9h9"/></svg>
+  Exit Walk
+</button>
 
 <!-- LIVE DRONE CHASE TRACKING PILL (MINIMAL TOP HUD) -->
 <div id="simTrackingPill">
@@ -964,22 +1123,83 @@ function setNavMode(mode) {
     walk.unlock();
     orbit.enabled = true;
     if (crosshair) crosshair.style.display = 'none';
-    if (jContainer) jContainer.style.display = 'none';
   } else {
     orbit.enabled = false;
     if (crosshair) crosshair.style.display = 'block';
-    
-    // On touch/mobile, display virtual joystick
-    if (isTouchDevice || window.innerWidth <= 768) {
-      if (jContainer) jContainer.style.display = 'block';
-      document.getElementById('dockCoords').textContent = 'Use Joystick to Walk · Drag Screen to Turn';
-    } else {
+    if (!isTouchDevice && window.innerWidth > 860) {
       walk.lock();
     }
   }
+  updateJoystickVisibility();
 }
 
 // SETUP MOBILE VIRTUAL JOYSTICK & TOUCH LOOK CONTROLS
+
+// MOBILE NAVIGATION COLLAPSIBLE CONTROLS
+function toggleMobileNav() {
+  var cap = document.getElementById('navCapsule');
+  var chev = document.getElementById('mobileNavChevron');
+  if (!cap) return;
+  var isOpen = cap.classList.toggle('mobile-open');
+  if (chev) chev.className = isOpen ? 'mobile-chevron open' : 'mobile-chevron';
+}
+
+function handleFacilitySelect(facName) {
+  focusFacility(facName);
+  var cap = document.getElementById('navCapsule');
+  var chev = document.getElementById('mobileNavChevron');
+  if (cap) cap.classList.remove('mobile-open');
+  if (chev) chev.className = 'mobile-chevron';
+
+  var labels = {
+    overview: 'All Facilities',
+    datacenter: 'Studio Server Room',
+    emp: "Employees' Bldg (5F)",
+    admin: 'Admin Bldg (2F)',
+    branch: 'Second Branch (35 PCs)'
+  };
+  var lbl = document.getElementById('lblMobileFacility');
+  if (lbl) lbl.textContent = labels[facName] || 'Facilities';
+}
+
+function toggleMobileMore() {
+  var optBtns = document.querySelectorAll('.dock-opt-btn');
+  optBtns.forEach(function(b) {
+    b.classList.toggle('mobile-show');
+  });
+}
+
+function updateJoystickVisibility() {
+  var j = document.getElementById('mobileJoystickContainer');
+  var exitBtn = document.getElementById('btnMobileExitWalk');
+  var dock = document.getElementById('bottomDock');
+  var isMobile = (window.innerWidth <= 860) || (window.innerHeight <= 520) || isTouchDevice;
+
+  var insp = document.getElementById('inspectorDrawer');
+  var testD = document.getElementById('testDrawer');
+  var bigS = document.getElementById('simBigScreen');
+
+  var isDrawerOpen = (insp && insp.style.display === 'block') ||
+                     (testD && testD.classList.contains('open')) ||
+                     (bigS && bigS.style.display === 'block');
+
+  if (activeNav === 'walk') {
+    if (isMobile) {
+      if (dock) dock.style.display = 'none';
+      if (j) j.style.display = isDrawerOpen ? 'none' : 'block';
+      if (exitBtn) exitBtn.style.display = isDrawerOpen ? 'none' : 'flex';
+    } else {
+      if (dock) dock.style.display = 'flex';
+      if (j) j.style.display = 'none';
+      if (exitBtn) exitBtn.style.display = 'none';
+    }
+  } else {
+    if (dock) dock.style.display = 'flex';
+    if (j) j.style.display = 'none';
+    if (exitBtn) exitBtn.style.display = 'none';
+  }
+}
+
 (function setupMobileControls() {
   var jContainer = document.getElementById('mobileJoystickContainer');
   var jBase = document.getElementById('mobileJoystickBase');
@@ -1074,11 +1294,16 @@ function setNavMode(mode) {
         lastLookPos.x = t.clientX;
         lastLookPos.y = t.clientY;
 
-        // Apply camera rotation
-        var obj = walk.getObject();
-        obj.rotation.y -= deltaX * 0.004;
-        camera.rotation.x -= deltaY * 0.003;
-        camera.rotation.x = Math.max(-Math.PI / 2.3, Math.min(Math.PI / 2.3, camera.rotation.x));
+        // STRICT LEVEL HORIZON: YXZ Euler with roll (z) strictly locked to 0
+        camera.rotation.order = 'YXZ';
+        var euler = new THREE.Euler(0, 0, 0, 'YXZ');
+        euler.setFromQuaternion(camera.quaternion);
+        euler.y -= deltaX * 0.0032;
+        euler.x -= deltaY * 0.0028;
+        euler.x = Math.max(-Math.PI / 2.25, Math.min(Math.PI / 2.25, euler.x));
+        euler.z = 0; // ZERO ROLL - PREVENTS HORIZON TILT PERMANENTLY
+        camera.quaternion.setFromEuler(euler);
+        camera.rotation.z = 0;
         break;
       }
     }
@@ -1583,18 +1808,22 @@ function buildEmployeeFloor(floorNum) {
     id: 'SW-EMP-F' + floorNum,
     type: 'Floor Access Switch (24-Port Gigabit)',
     dept: "Employees' Building Floor " + floorNum,
-    vlan: 'VLAN 10 (10.10.10.0/24)',
-    ip: '10.10.10.' + (100 + floorNum),
+    vlan: 'VLAN 10 (192.168.10.0/24)',
+    ip: '192.168.10.' + (1 + floorNum),
     specs: 'Cisco Catalyst 1000-24T-4G-L · Dual 1G Fiber LACP Uplink to Core',
     desc: 'Supplies 20 desktop ports across Room A (10 PCs) and Room B (10 PCs).'
   });
   makeTag('SW-EMP-F' + floorNum, -22 + 0.4, baseY + 2.45, 18, 0.22, 'device');
 
-  // Room A (10 PCs)
+  // Room A (10 PCs: IDs 01-10, IPs 192.168.10.x starting at .10)
   makeTag('RM ' + floorNum + '01 (10 PCs)', -22 - 6, baseY + 2.3, 18 - 5.5, 0.25, 'room');
   for (var i = 0; i < 5; i++) {
-    createWorkstation(fg, -10 + i * 1.8, 0, -3.2, 0, 'PC-EMP-F' + floorNum + '-R1-0' + (i + 1), 'Dev Team ' + floorNum + 'A', 'VLAN 10', '10.10.10.' + ((floorNum - 1) * 20 + i + 1), mats.screenCode);
-    createWorkstation(fg, -10 + i * 1.8, 0, -1.4, Math.PI, 'PC-EMP-F' + floorNum + '-R1-0' + (i + 6), 'Dev Team ' + floorNum + 'A', 'VLAN 10', '10.10.10.' + ((floorNum - 1) * 20 + i + 6), mats.screenCode);
+    var idA1 = (i + 1) < 10 ? '0' + (i + 1) : '' + (i + 1);
+    var idA2 = (i + 6) < 10 ? '0' + (i + 6) : '' + (i + 6);
+    var ipA1 = '192.168.10.' + ((floorNum - 1) * 20 + 10 + i);
+    var ipA2 = '192.168.10.' + ((floorNum - 1) * 20 + 15 + i);
+    createWorkstation(fg, -10 + i * 1.8, 0, -3.2, 0, 'PC-EMP-F' + floorNum + '-R1-' + idA1, 'Dev Team ' + floorNum + 'A', 'VLAN 10', ipA1, mats.screenCode);
+    createWorkstation(fg, -10 + i * 1.8, 0, -1.4, Math.PI, 'PC-EMP-F' + floorNum + '-R1-' + idA2, 'Dev Team ' + floorNum + 'A', 'VLAN 10', ipA2, mats.screenCode);
   }
 
   var prnA = box(fg, -11, 0.45, -5.5, 0.6, 0.8, 0.6, mats.pcCase);
@@ -1602,16 +1831,20 @@ function buildEmployeeFloor(floorNum) {
     id: 'PRN-EMP-F' + floorNum + '-A',
     type: 'Floor Network Printer',
     dept: 'Engineering Floor ' + floorNum,
-    vlan: 'VLAN 10 (10.10.10.0/24)',
-    ip: '10.10.10.' + (200 + floorNum * 2 - 1),
+    vlan: 'VLAN 10 (192.168.10.0/24)',
+    ip: '192.168.10.' + (110 + (floorNum - 1) * 4 + 1),
     specs: 'Enterprise Workgroup Laser Printer · 1 Gbps NIC'
   });
 
-  // Room B (10 PCs)
+  // Room B (10 PCs: IDs 01-10, IPs 192.168.10.x starting at .20)
   makeTag('RM ' + floorNum + '02 (10 PCs)', -22 + 6, baseY + 2.3, 18 - 5.5, 0.25, 'room');
   for (var i = 0; i < 5; i++) {
-    createWorkstation(fg, 2.5 + i * 1.8, 0, -3.2, 0, 'PC-EMP-F' + floorNum + '-R2-0' + (i + 1), 'Dev Team ' + floorNum + 'B', 'VLAN 10', '10.10.10.' + ((floorNum - 1) * 20 + i + 11), mats.screenCode);
-    createWorkstation(fg, 2.5 + i * 1.8, 0, -1.4, Math.PI, 'PC-EMP-F' + floorNum + '-R2-0' + (i + 6), 'Dev Team ' + floorNum + 'B', 'VLAN 10', '10.10.10.' + ((floorNum - 1) * 20 + i + 16), mats.screenCode);
+    var idB1 = (i + 1) < 10 ? '0' + (i + 1) : '' + (i + 1);
+    var idB2 = (i + 6) < 10 ? '0' + (i + 6) : '' + (i + 6);
+    var ipB1 = '192.168.10.' + ((floorNum - 1) * 20 + 20 + i);
+    var ipB2 = '192.168.10.' + ((floorNum - 1) * 20 + 25 + i);
+    createWorkstation(fg, 2.5 + i * 1.8, 0, -3.2, 0, 'PC-EMP-F' + floorNum + '-R2-' + idB1, 'Dev Team ' + floorNum + 'B', 'VLAN 10', ipB1, mats.screenCode);
+    createWorkstation(fg, 2.5 + i * 1.8, 0, -1.4, Math.PI, 'PC-EMP-F' + floorNum + '-R2-' + idB2, 'Dev Team ' + floorNum + 'B', 'VLAN 10', ipB2, mats.screenCode);
   }
 
   var prnB = box(fg, 10.5, 0.45, -5.5, 0.6, 0.8, 0.6, mats.pcCase);
@@ -1619,8 +1852,8 @@ function buildEmployeeFloor(floorNum) {
     id: 'PRN-EMP-F' + floorNum + '-B',
     type: 'Floor Network Printer',
     dept: 'Engineering Floor ' + floorNum,
-    vlan: 'VLAN 10 (10.10.10.0/24)',
-    ip: '10.10.10.' + (200 + floorNum * 2),
+    vlan: 'VLAN 10 (192.168.10.0/24)',
+    ip: '192.168.10.' + (110 + (floorNum - 1) * 4 + 2),
     specs: 'Enterprise Workgroup Laser Printer · 1 Gbps NIC'
   });
 }
@@ -2128,6 +2361,7 @@ var currentTestKey = null;
 var activeTestPlan = null;
 
 function closeBigScreen() {
+  setTimeout(updateJoystickVisibility, 50);
   var bs = document.getElementById('simBigScreen');
   if (bs) bs.style.display = 'none';
 }
@@ -2391,6 +2625,7 @@ function toggleStyleMode() {
 }
 
 function toggleTestDrawer() {
+  setTimeout(updateJoystickVisibility, 50);
   var d = document.getElementById('testDrawer');
   d.style.display = (d.style.display === 'block') ? 'none' : 'block';
 }
@@ -2417,10 +2652,12 @@ function inspectDevice(d) {
 
   var drawer = document.getElementById('inspectorDrawer');
   drawer.style.display = 'block';
+  updateJoystickVisibility();
   document.getElementById('dockCoords').textContent = 'Inspecting: ' + d.id;
 }
 
 function closeInspector() {
+  setTimeout(updateJoystickVisibility, 50);
   document.getElementById('inspectorDrawer').style.display = 'none';
 }
 
@@ -2814,6 +3051,10 @@ window.addEventListener('keyup', function(e) { keys[e.code] = false; });
 // -------------------------------------------------------------
 function animate() {
   requestAnimationFrame(animate);
+
+  // STRICT LEVEL HORIZON: Never allow camera to roll / tilt diagonally
+  if (camera.rotation.z !== 0) camera.rotation.z = 0;
+  camera.up.set(0, 1, 0);
 
   if (activeNav === 'orbit' && (!packetAnim || !packetAnim.chaseCamera)) {
     orbit.update();
