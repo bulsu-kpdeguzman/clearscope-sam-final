@@ -2589,58 +2589,71 @@ makeTag('HVAC UNIT 2\nHOT STANDBY', -20 - 8.5, 2.40, -18 + 4.5, 0.22, 'device');
 makeTag('STUDIO SERVER ROOM\nMAIN BRANCH', -20, 7.5, -18, 0.85, 'building');
 
 // -------------------------------------------------------------
-// 3. ADMINISTRATION BUILDING (EXACT 2D CAD BLUEPRINT ARCHITECTURE)
+// 3. ADMINISTRATION BUILDING (EXACT 2D CAD BLUEPRINT ARCHITECTURE - GAP-FREE)
 // Matches floorplan_main_admin_f1.png & floorplan_main_admin_f2.png:
 // - 3 Dedicated Office Suites per floor (Top-Left 5 PCs, Top-Right 5 PCs, Bottom-Left 5 PCs)
 // - Central Entrance Hallway Corridor with Inward-Swinging West Door
 // - East Core with Multi-Step Staircase, Structural Elevator Shaft, and Facilities Room
 // - Central Ceiling-Mounted Cisco Catalyst 9120 WAP (Floor 2 Wi-Fi Umbrella)
+// - Fully enclosed walls with wall headers / lintels above all doors and zero ceiling gaps
 // - Total: 30 Workstations (15 on F1, 15 on F2) + 6 Network Printers on VLAN 20
 // -------------------------------------------------------------
 var bAdmin = new THREE.Group();
 bAdmin.position.set(16, 0, 18);
 scene.add(bAdmin);
 
-// Outer Dimensions: 20m x 20m footprint
-// FLOOR 1 (Y: 0.0 to 3.4m)
-box(bAdmin, 0, 0.15, 0, 20.4, 0.3, 20.4, mats.woodFloor);
+// Outer Dimensions: 20.4m x 20.4m footprint
+// FLOOR 1 (Y: 0.0 to 3.5m)
+box(bAdmin, 0, 0.08, 0, 20.4, 0.16, 20.4, mats.woodFloor);
 
-// Exterior Walls (North & East Solid, South & West Glass Cutaway)
-box(bAdmin, 0, 1.7, -10.0, 20.4, 3.4, 0.25, mats.wallExterior); // North (Rear)
-box(bAdmin, 10.0, 1.7, 0.0, 0.25, 3.4, 20.4, mats.wallExterior); // East (Solid)
-box(bAdmin, -10.0, 1.7, 0.0, 0.25, 3.4, 20.4, mats.glassWall);   // West (Glass Courtyard View)
-box(bAdmin, 0, 1.7, 10.0, 20.4, 3.4, 0.25, mats.glassWall);     // South (Front Viewing Glass)
+// Floor 1 Exterior Walls (Height 3.5m, Center Y = 1.75m)
+box(bAdmin, 0, 1.75, -10.0, 20.4, 3.5, 0.25, mats.wallExterior); // North (Rear)
+box(bAdmin, 10.0, 1.75, 0.0, 0.25, 3.5, 20.4, mats.wallExterior); // East (Solid)
+box(bAdmin, -10.0, 1.75, 0.0, 0.25, 3.5, 20.4, mats.glassWall);   // West (Glass Courtyard View)
+box(bAdmin, 0, 1.75, 10.0, 20.4, 3.5, 0.25, mats.glassWall);     // South (Front Viewing Glass)
 
 // Architectural Mullions & Timber Trim
-box(bAdmin, 10.15, 1.7, -5.0, 0.08, 3.4, 4.0, mats.timber);
-box(bAdmin, -10.0, 1.7, 10.0, 0.35, 3.4, 0.35, mats.wallExterior);
-box(bAdmin, 10.0, 1.7, 10.0, 0.35, 3.4, 0.35, mats.wallExterior);
-box(bAdmin, 0.0, 1.7, 10.0, 0.25, 3.4, 0.25, mats.wallExterior);
+box(bAdmin, 10.15, 1.75, -5.0, 0.08, 3.5, 4.0, mats.timber);
+box(bAdmin, -10.0, 1.75, 10.0, 0.35, 3.5, 0.35, mats.wallExterior);
+box(bAdmin, 10.0, 1.75, 10.0, 0.35, 3.5, 0.35, mats.wallExterior);
+box(bAdmin, 0.0, 1.75, 10.0, 0.25, 3.5, 0.25, mats.wallExterior);
 
 // West Hallway Entrance Door (inward swinging at X = -9.8, Z = 1.25)
-box(bAdmin, -9.8, 1.2, 1.25, 0.08, 2.4, 1.4, mats.doorWood);
+box(bAdmin, -9.8, 1.15, 1.25, 0.08, 2.3, 1.4, mats.doorWood);
+box(bAdmin, -9.8, 2.9, 1.25, 0.25, 1.2, 1.4, mats.wallExterior); // Lintel above west door
 
 // =========================================================================
-// INTERIOR WALLS MATCHING BLUEPRINT:
+// INTERIOR WALLS MATCHING BLUEPRINT (100% GAP-FREE WITH DOOR LINTELS)
 // 1. Horizontal Main Divider Wall (Z = 0) separating Top Rooms from Hallway
 // =========================================================================
-box(bAdmin, -7.5, 1.7, 0.0, 5.0, 3.4, 0.2, mats.corridorWall);  // West segment
-box(bAdmin, 0.0, 1.7, 0.0, 6.0, 3.4, 0.2, mats.corridorWall);   // Center segment
-box(bAdmin, 7.5, 1.7, 0.0, 5.0, 3.4, 0.2, mats.corridorWall);   // East segment
-// Double Doors: Top-Left at X = -3.8, Top-Right at X = 3.8
-box(bAdmin, -3.8, 1.2, 0.0, 1.6, 2.4, 0.08, mats.doorWood);
-box(bAdmin, 3.8, 1.2, 0.0, 1.6, 2.4, 0.08, mats.doorWood);
+// Segment 1 (West: X = -10.0 to -4.8, width 5.2m, center -7.4m)
+box(bAdmin, -7.4, 1.75, 0.0, 5.2, 3.5, 0.2, mats.corridorWall);
+// Door 1 Opening (Top-Left Room, RM 101: X = -4.8 to -3.2, width 1.6m, center -4.0m)
+box(bAdmin, -4.0, 1.15, 0.0, 1.6, 2.3, 0.08, mats.doorWood);
+box(bAdmin, -4.0, 2.9, 0.0, 1.6, 1.2, 0.2, mats.corridorWall); // Lintel above door
+// Segment 2 (Center: X = -3.2 to +3.2, width 6.4m, center 0.0m)
+box(bAdmin, 0.0, 1.75, 0.0, 6.4, 3.5, 0.2, mats.corridorWall);
+// Door 2 Opening (Top-Right Room, RM 102: X = +3.2 to +4.8, width 1.6m, center +4.0m)
+box(bAdmin, 4.0, 1.15, 0.0, 1.6, 2.3, 0.08, mats.doorWood);
+box(bAdmin, 4.0, 2.9, 0.0, 1.6, 1.2, 0.2, mats.corridorWall); // Lintel above door
+// Segment 3 (East: X = +4.8 to +10.0, width 5.2m, center +7.4m)
+box(bAdmin, 7.4, 1.75, 0.0, 5.2, 3.5, 0.2, mats.corridorWall);
 
 // 2. Vertical Wall dividing Top-Left Room (RM 101) and Top-Right Room (RM 102) at X = 0
-box(bAdmin, 0.0, 1.7, -5.0, 0.2, 3.4, 10.0, mats.corridorWall);
+// Runs seamlessly from Z = -10.0 to Z = 0.0 (length 10.0m, center -5.0m)
+box(bAdmin, 0.0, 1.75, -5.0, 0.2, 3.5, 10.0, mats.corridorWall);
 
-// 3. Bottom-Left Room (RM 103) Enclosure Walls
-// Top wall at Z = 2.5 (from X = -10.0 to X = 2.5) with double doors at X = -3.8
-box(bAdmin, -7.5, 1.7, 2.5, 5.0, 3.4, 0.2, mats.corridorWall);
-box(bAdmin, -0.6, 1.7, 2.5, 4.8, 3.4, 0.2, mats.corridorWall);
-box(bAdmin, -3.8, 1.2, 2.5, 1.6, 2.4, 0.08, mats.doorWood);
-// East wall of Bottom-Left Room at X = 2.5 (from Z = 2.5 to Z = 10.0)
-box(bAdmin, 2.5, 1.7, 6.25, 0.2, 3.4, 7.5, mats.corridorWall);
+// 3. Bottom-Left Room (RM 103) Enclosure Walls (Z = 2.5 to 10.0, X = -10.0 to 2.5)
+// Top wall at Z = 2.5 (from X = -10.0 to X = 2.5, total 12.5m)
+// West segment: from X = -10.0 to -4.8 (width 5.2m, center -7.4m)
+box(bAdmin, -7.4, 1.75, 2.5, 5.2, 3.5, 0.2, mats.corridorWall);
+// Door 3 Opening (Bottom-Left Room, RM 103: X = -4.8 to -3.2, width 1.6m, center -4.0m)
+box(bAdmin, -4.0, 1.15, 2.5, 1.6, 2.3, 0.08, mats.doorWood);
+box(bAdmin, -4.0, 2.9, 2.5, 1.6, 1.2, 0.2, mats.corridorWall); // Lintel above door
+// East segment: from X = -3.2 to +2.5 (width 5.7m, center -0.35m)
+box(bAdmin, -0.35, 1.75, 2.5, 5.7, 3.5, 0.2, mats.corridorWall);
+// East wall of Bottom-Left Room at X = 2.5 (from Z = 2.5 to Z = 10.0, length 7.5m, center 6.25m)
+box(bAdmin, 2.5, 1.75, 6.25, 0.2, 3.5, 7.5, mats.corridorWall);
 
 // =========================================================================
 // EAST CORE: STAIRCASE, ELEVATOR SHAFT & FACILITIES ROOM
@@ -2650,15 +2663,21 @@ for (var st = 0; st < 6; st++) {
   box(bAdmin, 6.5, 0.25 + st * 0.28, 0.8 + st * 0.55, 4.2, 0.28, 0.55, mats.concrete);
 }
 // 2. Structural Elevator Shaft (X = 4.8 to 9.8, Z = 4.8 to 7.8)
-box(bAdmin, 7.3, 1.7, 4.8, 4.8, 3.4, 0.2, mats.corridorWall);
-box(bAdmin, 4.8, 1.7, 6.3, 0.2, 3.4, 3.0, mats.corridorWall);
-box(bAdmin, 5.8, 1.2, 4.9, 1.3, 2.3, 0.08, mats.rackBlade); // Elevator Sliding Steel Doors
-// Elevator Shaft Diagonal Cross Struts (matching the 'X' in CAD blueprint)
-box(bAdmin, 7.3, 1.7, 6.3, 0.12, 3.0, 0.12, mats.rackFrame);
+// Front wall at Z = 4.8:
+box(bAdmin, 5.2, 1.75, 4.8, 0.8, 3.5, 0.2, mats.corridorWall);
+box(bAdmin, 6.3, 1.15, 4.8, 1.4, 2.3, 0.08, mats.rackBlade); // Elevator Doors
+box(bAdmin, 6.3, 2.9, 4.8, 1.4, 1.2, 0.2, mats.corridorWall); // Lintel above elevator door
+box(bAdmin, 8.4, 1.75, 4.8, 2.8, 3.5, 0.2, mats.corridorWall);
+// West wall of elevator shaft at X = 4.8 (from Z = 4.8 to 7.8, length 3.0m, center 6.3m)
+box(bAdmin, 4.8, 1.75, 6.3, 0.2, 3.5, 3.0, mats.corridorWall);
+// Structural elevator guide rail inside shaft
+box(bAdmin, 7.3, 1.75, 6.3, 0.12, 3.2, 0.12, mats.rackFrame);
 
-// 3. Storage / Restroom Vestibule at Bottom-Right (Z = 7.8 to 10.0)
-box(bAdmin, 6.25, 1.7, 7.8, 7.5, 3.4, 0.2, mats.corridorWall);
-box(bAdmin, 3.8, 1.2, 7.8, 1.0, 2.4, 0.08, mats.doorWood); // Single door
+// 3. Storage / Restroom Vestibule at Bottom-Right (Z = 7.8 to 10.0, X = 2.5 to 10.0)
+box(bAdmin, 3.0, 1.75, 7.8, 1.0, 3.5, 0.2, mats.corridorWall);
+box(bAdmin, 4.0, 1.15, 7.8, 1.0, 2.3, 0.08, mats.doorWood); // Single door
+box(bAdmin, 4.0, 2.9, 7.8, 1.0, 1.2, 0.2, mats.corridorWall); // Lintel above door
+box(bAdmin, 7.25, 1.75, 7.8, 5.5, 3.5, 0.2, mats.corridorWall);
 
 // =========================================================================
 // FLOOR 1 WORKSTATIONS & PRINTERS (EXACT CAD POSITIONING)
@@ -2737,42 +2756,57 @@ createPrinter(bAdmin, -2.2, 0, 3.6, Math.PI, {
 });
 
 // =========================================================================
-// FLOOR 2 (Y: 3.5m to 6.9m) - EXACT MATCHING CAD LAYOUT + WAP COVERAGE
+// FLOOR 2 SLAB & CEILING (Seamless Inter-Floor Barrier at Y = 3.5m)
 // =========================================================================
 var f2Y = 3.5;
-box(bAdmin, 0, f2Y + 0.1, 0, 20.4, 0.2, 20.4, mats.woodFloor);
+// Solid Floor 2 Slab spanning whole building (except stairwell hole X: 4.5 to 8.5, Z: 0.5 to 4.5)
+box(bAdmin, -2.7, f2Y, 0, 15.0, 0.2, 20.4, mats.woodFloor); // West & Center floor plate
+box(bAdmin, 7.45, f2Y, -5.0, 5.5, 0.2, 10.4, mats.woodFloor); // East North plate
+box(bAdmin, 7.45, f2Y, 6.25, 5.5, 0.2, 7.9, mats.woodFloor);  // East South plate (over elevator & vestibule)
 
-// Floor 2 Exterior Walls (North & East Solid, South & West Glass Cutaway)
+// Floor 2 Exterior Walls (Height 3.4m, Center Y = f2Y + 1.7m = 5.2m)
 box(bAdmin, 0, f2Y + 1.7, -10.0, 20.4, 3.4, 0.25, mats.wallExterior); // North (Rear)
 box(bAdmin, 10.0, f2Y + 1.7, 0.0, 0.25, 3.4, 20.4, mats.wallExterior); // East (Solid)
 box(bAdmin, -10.0, f2Y + 1.7, 0.0, 0.25, 3.4, 20.4, mats.glassWall);   // West (Glass Courtyard View)
 box(bAdmin, 0, f2Y + 1.7, 10.0, 20.4, 3.4, 0.25, mats.glassWall);     // South (Front Viewing Glass)
 
-// Floor 2 Mullions & Dividing Beam
+// Floor 2 Mullions & Horizontal Floor Divider Beam
 box(bAdmin, 10.15, f2Y + 1.7, -5.0, 0.08, 3.4, 4.0, mats.timber);
 box(bAdmin, -10.0, f2Y + 1.7, 10.0, 0.35, 3.4, 0.35, mats.wallExterior);
 box(bAdmin, 10.0, f2Y + 1.7, 10.0, 0.35, 3.4, 0.35, mats.wallExterior);
 box(bAdmin, 0.0, f2Y + 1.7, 10.0, 0.25, 3.4, 0.25, mats.wallExterior);
 box(bAdmin, 0.0, f2Y, 10.0, 20.4, 0.30, 0.35, mats.wallExterior); // Floor divider beam
 
-// Floor 2 Interior Walls
-box(bAdmin, -7.5, f2Y + 1.7, 0.0, 5.0, 3.4, 0.2, mats.corridorWall);
-box(bAdmin, 0.0, f2Y + 1.7, 0.0, 6.0, 3.4, 0.2, mats.corridorWall);
-box(bAdmin, 7.5, f2Y + 1.7, 0.0, 5.0, 3.4, 0.2, mats.corridorWall);
-box(bAdmin, -3.8, f2Y + 1.2, 0.0, 1.6, 2.4, 0.08, mats.doorWood);
-box(bAdmin, 3.8, f2Y + 1.2, 0.0, 1.6, 2.4, 0.08, mats.doorWood);
+// Floor 2 Interior Walls (Seamless with Door Lintels)
+// Wall 1: Horizontal divider at Z = 0
+box(bAdmin, -7.4, f2Y + 1.7, 0.0, 5.2, 3.4, 0.2, mats.corridorWall);
+box(bAdmin, -4.0, f2Y + 1.15, 0.0, 1.6, 2.3, 0.08, mats.doorWood);
+box(bAdmin, -4.0, f2Y + 2.85, 0.0, 1.6, 1.1, 0.2, mats.corridorWall); // Lintel
+box(bAdmin, 0.0, f2Y + 1.7, 0.0, 6.4, 3.4, 0.2, mats.corridorWall);
+box(bAdmin, 4.0, f2Y + 1.15, 0.0, 1.6, 2.3, 0.08, mats.doorWood);
+box(bAdmin, 4.0, f2Y + 2.85, 0.0, 1.6, 1.1, 0.2, mats.corridorWall); // Lintel
+box(bAdmin, 7.4, f2Y + 1.7, 0.0, 5.2, 3.4, 0.2, mats.corridorWall);
+
+// Wall 2: Vertical divider at X = 0
 box(bAdmin, 0.0, f2Y + 1.7, -5.0, 0.2, 3.4, 10.0, mats.corridorWall);
-box(bAdmin, -7.5, f2Y + 1.7, 2.5, 5.0, 3.4, 0.2, mats.corridorWall);
-box(bAdmin, -0.6, f2Y + 1.7, 2.5, 4.8, 3.4, 0.2, mats.corridorWall);
-box(bAdmin, -3.8, f2Y + 1.2, 2.5, 1.6, 2.4, 0.08, mats.doorWood);
+
+// Wall 3: Bottom-Left Room (RM 203)
+box(bAdmin, -7.4, f2Y + 1.7, 2.5, 5.2, 3.4, 0.2, mats.corridorWall);
+box(bAdmin, -4.0, f2Y + 1.15, 2.5, 1.6, 2.3, 0.08, mats.doorWood);
+box(bAdmin, -4.0, f2Y + 2.85, 2.5, 1.6, 1.1, 0.2, mats.corridorWall); // Lintel
+box(bAdmin, -0.35, f2Y + 1.7, 2.5, 5.7, 3.4, 0.2, mats.corridorWall);
 box(bAdmin, 2.5, f2Y + 1.7, 6.25, 0.2, 3.4, 7.5, mats.corridorWall);
 
 // Floor 2 Elevator Shaft & Stair Landing Core
-box(bAdmin, 7.3, f2Y + 1.7, 4.8, 4.8, 3.4, 0.2, mats.corridorWall);
+box(bAdmin, 5.2, f2Y + 1.7, 4.8, 0.8, 3.4, 0.2, mats.corridorWall);
+box(bAdmin, 6.3, f2Y + 1.15, 4.8, 1.4, 2.3, 0.08, mats.rackBlade);
+box(bAdmin, 6.3, f2Y + 2.85, 4.8, 1.4, 1.1, 0.2, mats.corridorWall);
+box(bAdmin, 8.4, f2Y + 1.7, 4.8, 2.8, 3.4, 0.2, mats.corridorWall);
 box(bAdmin, 4.8, f2Y + 1.7, 6.3, 0.2, 3.4, 3.0, mats.corridorWall);
-box(bAdmin, 5.8, f2Y + 1.2, 4.9, 1.3, 2.3, 0.08, mats.rackBlade);
-box(bAdmin, 6.25, f2Y + 1.7, 7.8, 7.5, 3.4, 0.2, mats.corridorWall);
-box(bAdmin, 3.8, f2Y + 1.2, 7.8, 1.0, 2.4, 0.08, mats.doorWood);
+box(bAdmin, 3.0, f2Y + 1.7, 7.8, 1.0, 3.4, 0.2, mats.corridorWall);
+box(bAdmin, 4.0, f2Y + 1.15, 7.8, 1.0, 2.3, 0.08, mats.doorWood);
+box(bAdmin, 4.0, f2Y + 2.85, 7.8, 1.0, 1.1, 0.2, mats.corridorWall);
+box(bAdmin, 7.25, f2Y + 1.7, 7.8, 5.5, 3.4, 0.2, mats.corridorWall);
 
 // ROOM 201: EXECUTIVE SUITES (Top-Left Suite: 5 PCs + Printer)
 makeTag('RM 201: EXECUTIVE (5 PCs)', 16 - 5.0, f2Y + 2.35, 18 - 5.0, 0.24, 'room');
@@ -2848,6 +2882,9 @@ registerInteractable(apAdmin, {
 });
 makeTag('AP-ADM-F2 (WAP)', 16, f2Y + 3.55, 18 + 1.25, 0.22, 'device');
 
+// Floor 2 Solid Architectural Ceiling Plate (eliminating any sky / roof leaks)
+box(bAdmin, 0, f2Y + 3.4, 0, 20.2, 0.12, 20.2, mats.woodFloor);
+
 // Translucent Cyan Wi-Fi Umbrella Ring representing circular CAD coverage zone
 var wifiGeo = new THREE.CylinderGeometry(8.5, 8.5, 0.15, 32);
 var wifiMat = new THREE.MeshBasicMaterial({ color: '#38bdf8', transparent: true, opacity: 0.12 });
@@ -2858,7 +2895,6 @@ bAdmin.add(wifiCircle);
 // Roof
 var adminRoof = createGabledRoof(bAdmin, 0.0, 6.9, 0.0, 20.4, 20.4, 3.2, mats.roofSlate, mats.wallExterior, mats.glassWall);
 makeTag('ADMINISTRATION BUILDING\nMAIN BRANCH (30 PCs)', 16, 11.2, 18, 0.85, 'building');
-
 // 4. SECOND BRANCH OFFICE (2 Floors · 35 PCs Total)
 // -------------------------------------------------------------
 var bBranch = new THREE.Group();
