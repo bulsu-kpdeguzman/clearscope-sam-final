@@ -7,20 +7,22 @@
 <style>
 :root {
   color-scheme: dark;
-  --glass-bg: rgba(10, 18, 34, 0.78);
-  --glass-border: rgba(56, 189, 248, 0.22);
-  --glass-hover: rgba(56, 189, 248, 0.15);
+  --glass-bg: rgba(17, 24, 39, 0.88);
+  --glass-border: rgba(255, 255, 255, 0.10);
+  --glass-hover: rgba(255, 255, 255, 0.08);
   --text-main: #f8fafc;
   --text-muted: #94a3b8;
+  --brand-accent: #3b82f6;
+  --brand-active: #2563eb;
   --cyan-accent: #38bdf8;
-  --green-accent: #34d399;
-  --amber-accent: #fbbf24;
-  --red-accent: #f87171;
+  --green-accent: #10b981;
+  --amber-accent: #f59e0b;
+  --red-accent: #ef4444;
 }
 * { box-sizing: border-box; }
 body {
   margin: 0;
-  background: #020617;
+  background: #0f172a;
   color: var(--text-main);
   font: 13px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
   overflow: hidden;
@@ -28,14 +30,14 @@ body {
 }
 #scene { position: fixed; inset: 0; }
 
-/* Frosted Glass Floating Panels */
+/* Frosted Glass Floating Panels - Modern Refined Architecture Style */
 .glass {
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   border-radius: 12px;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 /* TOP FLOATING NAV BAR */
@@ -64,9 +66,9 @@ body {
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.04em;
-  color: var(--cyan-accent);
+  color: #f8fafc;
   padding: 0 10px 0 6px;
-  border-right: 1px solid rgba(148, 163, 184, 0.25);
+  border-right: 1px solid rgba(255, 255, 255, 0.12);
   display: flex;
   align-items: center;
   gap: 6px;
@@ -76,9 +78,9 @@ body {
 .nav-brand-dot {
   width: 6px;
   height: 6px;
-  background: var(--cyan-accent);
+  background: var(--green-accent);
   border-radius: 50%;
-  box-shadow: 0 0 8px var(--cyan-accent);
+  box-shadow: none;
 }
 .nav-btn {
   background: transparent;
@@ -89,7 +91,7 @@ body {
   padding: 5px 12px;
   border-radius: 999px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
   white-space: nowrap;
 }
 .nav-btn:hover {
@@ -97,10 +99,10 @@ body {
   background: var(--glass-hover);
 }
 .nav-btn.active {
-  background: rgba(14, 165, 233, 0.25);
-  border-color: rgba(56, 189, 248, 0.4);
-  color: var(--cyan-accent);
-  box-shadow: 0 0 14px rgba(56, 189, 248, 0.2);
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+  box-shadow: none;
 }
 
 /* FLOOR SELECTOR SUB-BAR */
@@ -133,12 +135,12 @@ body {
 }
 .floor-pill:hover { color: #fff; background: var(--glass-hover); }
 .floor-pill.active {
-  background: rgba(52, 211, 153, 0.2);
-  border-color: rgba(52, 211, 153, 0.4);
-  color: var(--green-accent);
+  background: rgba(16, 185, 129, 0.18);
+  border-color: rgba(16, 185, 129, 0.35);
+  color: #a7f3d0;
 }
 
-/* FLOATING BOTTOM DOCK */
+/* FLOATING BOTTOM DOCK - STRICT SINGLE-ROW PROFESSIONAL DOCK */
 #bottomDock {
   position: fixed;
   bottom: 14px;
@@ -147,40 +149,53 @@ body {
   z-index: 50;
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 12px;
+  gap: 6px;
+  padding: 5px 10px;
   border-radius: 999px;
+  white-space: nowrap !important;
+  flex-wrap: nowrap !important;
 }
 .dock-btn {
   background: transparent;
   border: 1px solid transparent;
   color: var(--text-muted);
-  font-size: 11px;
+  font-size: 11.5px;
   font-weight: 600;
-  padding: 6px 11px;
+  padding: 5px 10px;
   border-radius: 999px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
+  transition: all 0.15s ease;
+  display: inline-flex;
   align-items: center;
   gap: 5px;
+  white-space: nowrap !important;
+  flex-shrink: 0;
+  line-height: 1;
+}
+.dock-btn * {
+  white-space: nowrap !important;
 }
 .dock-btn:hover { color: #fff; background: var(--glass-hover); }
 .dock-btn.active {
-  background: rgba(14, 165, 233, 0.2);
-  border-color: rgba(56, 189, 248, 0.35);
-  color: var(--cyan-accent);
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+  box-shadow: none;
 }
 .dock-sep {
   width: 1px;
   height: 14px;
-  background: rgba(148, 163, 184, 0.25);
+  background: rgba(255, 255, 255, 0.12);
+  flex-shrink: 0;
 }
 .dock-stat {
   font-size: 11px;
-  font-family: Consolas, monospace;
-  color: var(--cyan-accent);
-  padding: 0 4px;
+  font-weight: 500;
+  color: #94a3b8;
+  padding: 0 6px;
+  white-space: nowrap !important;
+  flex-shrink: 0;
+  letter-spacing: 0.02em;
 }
 
 /* POPUP TEST DRAWER (BOTTOM LEFT) */
@@ -252,9 +267,9 @@ body {
 }
 .t-btn:hover { background: #1e293b; border-color: var(--cyan-accent); color: #fff; }
 .t-btn.sim-active {
-  background: #0f2744;
-  border-color: var(--cyan-accent);
-  box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+  background: rgba(37, 99, 235, 0.28);
+  border-color: rgba(96, 165, 250, 0.5);
+  box-shadow: none;
   color: #fff;
 }
 .t-btn-red { background: #450a0a; border-color: #ef4444; color: #fca5a5; }
@@ -561,9 +576,9 @@ body {
   font-family: Consolas, monospace;
   padding: 2px 7px;
   border-radius: 4px;
-  background: rgba(56, 189, 248, 0.15);
-  border: 1px solid rgba(56, 189, 248, 0.35);
-  color: var(--cyan-accent);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #e2e8f0;
 }
 .insp-card {
   background: rgba(15, 23, 42, 0.85);
@@ -658,8 +673,8 @@ body {
   width: 46px;
   height: 46px;
   border-radius: 50%;
-  background: rgba(56, 189, 248, 0.85);
-  box-shadow: 0 0 16px rgba(56, 189, 248, 0.6);
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
   position: absolute;
   pointer-events: none;
   transition: transform 0.04s ease-out;
@@ -1003,10 +1018,10 @@ body {
   width: 900px;
   max-width: 94vw;
   max-height: 90vh;
-  background: rgba(11, 20, 38, 0.95);
-  border: 1px solid rgba(56, 189, 248, 0.35);
+  background: rgba(17, 24, 39, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 16px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(56, 189, 248, 0.15);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(16px);
   z-index: 2000;
   display: none;
@@ -1200,7 +1215,7 @@ if (typeof THREE === 'undefined') {
 
   <button class="dock-btn" onclick="toggleTestDrawer()">
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-    <span>Tests <span style="font-size:9px;opacity:0.7;">▼</span></span>
+    <span>Tests ▾</span>
   </button>
 
   <!-- Mobile Extra Options Toggle (Visible on Mobile Only) -->
@@ -1209,7 +1224,7 @@ if (typeof THREE === 'undefined') {
   </button>
 
   <div class="dock-sep"></div>
-  <div class="dock-stat" id="dockCoords">165 Desktops · 31 Printers · Online</div>
+  <div class="dock-stat" id="dockCoords">165 Desktops · 31 Printers</div>
 </div>
 
 <!-- FLOATING EXIT WALK BUTTON (MOBILE WALK MODE ONLY) -->
@@ -1355,13 +1370,8 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.15;
 document.getElementById('scene').appendChild(renderer.domElement);
-  if (isTouchDevice || window.innerWidth <= 768) {
-    var wl = document.getElementById('lblWalkText');
-    if (wl) wl.textContent = 'Walk';
-  } else {
-    var wl = document.getElementById('lblWalkText');
-    if (wl) wl.textContent = 'Walk (WASD)';
-  }
+  var wl = document.getElementById('lblWalkText');
+  if (wl) wl.textContent = 'Walk';
 
 
 // REALISTIC NATURAL DAYLIGHT LIGHTING
@@ -1978,7 +1988,7 @@ function createServerPC(parent, x, y, z, rotY, pcId, labelTitle, labelSub, dept,
   // Large Server Management Monitor
   box(g, -0.15, 0.74 + 0.14, -0.15, 0.08, 0.28, 0.08, mats.monitorBezel);
   var mon = box(g, -0.15, 0.74 + 0.34, -0.15, 0.68, 0.40, 0.04, mats.monitorBezel);
-  box(g, -0.15, 0.74 + 0.34, -0.13, 0.62, 0.34, 0.01, screenMat || mats.screenCode, false);
+  var monScr = box(g, -0.15, 0.74 + 0.34, -0.13, 0.62, 0.34, 0.01, screenMat || mats.screenCode, false);
 
   // Server Keyboard & Mouse
   box(g, -0.15, 0.75, 0.15, 0.45, 0.01, 0.14, mats.pcCase, false);
