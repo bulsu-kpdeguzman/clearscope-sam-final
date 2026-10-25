@@ -1488,18 +1488,20 @@ if (typeof THREE === 'undefined') {
     </button>
   </div>
   <div class="bp-tabs">
-    <button class="bp-tab active" id="bpTab1" onclick="switchBlueprint('server')">Main Branch | Server Room</button>
-    <button class="bp-tab" id="bpTab2" onclick="switchBlueprint('branch1')">Second Branch | 1st Floor (Support)</button>
-    <button class="bp-tab" id="bpTab3" onclick="switchBlueprint('branch2')">Second Branch | 2nd Floor (Admin & Lounge)</button>
-    <button class="bp-tab" id="bpTab4" onclick="switchBlueprint('full')">Full Campus Sheet</button>
+    <button class="bp-tab active" id="bpTab1" onclick="switchBlueprint('server')">Server Room</button>
+    <button class="bp-tab" id="bpTab2" onclick="switchBlueprint('employee')">Employee Building</button>
+    <button class="bp-tab" id="bpTab3" onclick="switchBlueprint('admin1')">Admin 1st Floor</button>
+    <button class="bp-tab" id="bpTab4" onclick="switchBlueprint('admin2')">Admin 2nd Floor (WAP)</button>
+    <button class="bp-tab" id="bpTab5" onclick="switchBlueprint('branch1')">Second Branch (1st Flr)</button>
+    <button class="bp-tab" id="bpTab6" onclick="switchBlueprint('branch2')">Second Branch (2nd Flr)</button>
   </div>
   <div class="bp-body">
     <div class="bp-image-box">
       <img id="bpImg" src="./blueprints/floorplan_server_room.png" alt="Architectural Floor Plan" />
     </div>
     <div class="bp-legend-card" id="bpLegend">
-      <div class="bp-legend-title">Main Branch | Studio Server Room (Building A)</div>
-      <div><strong>Layout Architecture:</strong> 3-column data-center layout matching blueprint. Left: Dual Redundant Routers (PLDT & Globe) · Center: Cisco Firepower NGFW & Catalyst 3650 Core Switch · Right: Dedicated SRV-EMP & SRV-ADM Servers · Bottom-Left: Inward swinging access door.</div>
+      <div class="bp-legend-title">Main Branch | Server Room Floor Layout</div>
+      <div><strong>Equipment Layout Architecture:</strong> 3-column data-center topology matching official CAD layout. Left: Primary Router (PLDT) & Secondary Router (Globe) · Center: Cisco Firepower Firewall, Catalyst Core Switch & Edge Switch · Right: Dedicated Employees Server (SRV-EMP) & Administration Server (SRV-ADM) · Bottom-Left: Inward-swinging access door.</div>
     </div>
   </div>
 </div>
@@ -3479,24 +3481,34 @@ function inspectDevice(d) {
 // -------------------------------------------------------------
 var blueprintData = {
   server: {
-    title: 'Main Branch | Studio Server Room (Building A)',
+    title: 'Main Branch | Server Room Floor Layout',
     img: './blueprints/floorplan_server_room.png',
-    desc: '<strong>Equipment Layout Architecture:</strong> 3-column data-center topology. Left: Dual Cisco 4331 ISR Routers (PLDT & Globe) · Center: Cisco Firepower 1010 NGFW & Catalyst 3650 Core Switch · Right: Dedicated SRV-EMP (VLAN 30) & SRV-ADM (VLAN 30) Server PCs · Bottom-Left: Inward swinging access door.'
+    desc: '<strong>Equipment Layout Architecture:</strong> 3-column data-center topology matching official CAD layout. Left: Primary Router (PLDT) & Secondary Router (Globe) · Center: Cisco Firepower Firewall, Catalyst Core Switch & Edge Switch · Right: Dedicated Employees Server (SRV-EMP) & Administration Server (SRV-ADM) · Bottom-Left: Inward-swinging access door.'
+  },
+  employee: {
+    title: 'Main Branch | Employee Building Floor Layout',
+    img: './blueprints/floorplan_main_employee.png',
+    desc: '<strong>Employee Operations (Floors 1–5):</strong> Open workstation floor plan with 24 employee desktops (VLAN 10) organized into 4 collaborative pods of 6 workstations each, 4 networked printers, central acoustic wall divider, and right stairwell/elevator access core.'
+  },
+  admin1: {
+    title: 'Main Branch | Administration Building (1st Floor Layout)',
+    img: './blueprints/floorplan_main_admin_f1.png',
+    desc: '<strong>Administration 1st Floor:</strong> Executive department suites with 16 workstations across Accounting, Human Resources, and Facilities management (VLAN 20), dedicated network printers, and internal security corridor.'
+  },
+  admin2: {
+    title: 'Main Branch | Administration Building (2nd Floor & WAP Layout)',
+    img: './blueprints/floorplan_main_admin_f2.png',
+    desc: '<strong>Administration 2nd Floor & Wireless Coverage:</strong> Executive suites equipped with a central ceiling-mounted Cisco Catalyst 9120 WAP providing omnidirectional Wi-Fi coverage across the floor for secure staff and isolated guest access (VLAN 40).'
   },
   branch1: {
-    title: 'Second Branch | 1st Floor (Technical Support)',
+    title: 'Second Branch | 1st Floor Layout (Technical Support)',
     img: './blueprints/floorplan_branch_f1.png',
-    desc: '<strong>Floor 1 Layout:</strong> Central access corridor with front double doors and rear staircase to 2nd floor. Left Room: 15 Support Workstations (3 columns x 5 rows) + Network Printer. Right Room: 15 Support Workstations (3 columns x 5 rows) + Network Printer. Total: 30 PCs provisioned on VLAN 50 (192.168.50.0/24).'
+    desc: '<strong>Floor 1 Operations:</strong> Central access corridor with front double doors and rear staircase. Left Room: 15 Support Workstations + Network Printer. Right Room: 15 Support Workstations + Network Printer. Total: 30 PCs provisioned on VLAN 50 (192.168.50.0/24).'
   },
   branch2: {
-    title: 'Second Branch | 2nd Floor (Branch Admin & Waiting Lounge)',
+    title: 'Second Branch | 2nd Floor Layout (Admin & IT Enclosure)',
     img: './blueprints/floorplan_branch_f2.png',
-    desc: '<strong>Floor 2 Layout:</strong> Central landing corridor. Left Room: 5 Branch Administration Workstations (VLAN 60, 192.168.60.0/24). Right Upper Room: Dedicated IT server enclosure housing Cisco 4331 ISR Router (RTR-BR) and Ticket Cache Server (SRV-BR). Right Lower Room: Client waiting lounge with U-shaped sofa seating.'
-  },
-  full: {
-    title: 'ClearScope Technologies | Complete Campus Blueprints',
-    img: './blueprints/floorplan_full.png',
-    desc: '<strong>Comprehensive Blueprint Sheet:</strong> Full architectural documentation covering Server Room compute core, Second Branch ground floor technical operations, and Second Branch upper executive administration.'
+    desc: '<strong>Floor 2 Management:</strong> Central landing corridor. Left Room: 5 Branch Administration Workstations (VLAN 60). Right Upper Room: Dedicated IT server enclosure housing Cisco 4331 ISR Router (RTR-BR) and Ticket Cache Server (SRV-BR). Right Lower Room: Client waiting lounge.'
   }
 };
 
@@ -3524,7 +3536,7 @@ function switchBlueprint(tabKey) {
   document.getElementById('bpImg').src = data.img;
   document.getElementById('bpLegend').innerHTML = '<div class="bp-legend-title">' + data.title + '</div><div>' + data.desc + '</div>';
 
-  var tabs = { server: 'bpTab1', branch1: 'bpTab2', branch2: 'bpTab3', full: 'bpTab4' };
+  var tabs = { server: 'bpTab1', employee: 'bpTab2', admin1: 'bpTab3', admin2: 'bpTab4', branch1: 'bpTab5', branch2: 'bpTab6' };
   for (var k in tabs) {
     var btn = document.getElementById(tabs[k]);
     if (btn) btn.className = (k === tabKey) ? 'bp-tab active' : 'bp-tab';
