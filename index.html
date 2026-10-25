@@ -189,10 +189,21 @@ body {
   bottom: 60px;
   left: 18px;
   width: 388px;
-  z-index: 50;
+  z-index: 1000;
   padding: 14px;
   display: none;
+  flex-direction: column !important;
+  box-sizing: border-box;
   animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.test-drawer-scrollable {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  flex: 1 1 auto;
+  min-height: 0;
 }
 .drawer-header {
   display: flex;
@@ -478,6 +489,22 @@ body {
 }
 .bs-act-primary:hover {
   background: #0369a1;
+}
+
+
+/* PINNED HEADERS & SMOOTH SCROLL CONTAINERS */
+#testDrawer, #inspectorDrawer, #simBigScreen {
+  flex-direction: column !important;
+}
+.big-screen-header, .drawer-header {
+  flex-shrink: 0 !important;
+}
+.big-screen-scrollable, .test-drawer-scrollable {
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  padding-right: 4px;
 }
 
 /* SLIDE-OVER DEVICE INSPECTOR (RIGHT) */
@@ -854,7 +881,7 @@ body {
 }
 
 /* Landscape Mode Specifically (max-height <= 480px) */
-@media (max-height: 480px) and (orientation: landscape) {
+@media (max-height: 560px) and (orientation: landscape) {
   #topNav {
     top: 4px;
   }
@@ -863,9 +890,11 @@ body {
     padding: 3px 6px;
   }
   .dock-btn {
-    padding: 4px 8px;
-    font-size: 10.5px;
+    padding: 3px 6px;
+    font-size: 10px;
   }
+
+  /* Fixed Bounded Inspector Drawer */
   #inspectorDrawer {
     position: fixed !important;
     top: max(6px, env(safe-area-inset-top, 6px)) !important;
@@ -875,33 +904,93 @@ body {
     width: min(340px, 46vw) !important;
     height: auto !important;
     max-height: calc(100dvh - 12px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)) !important;
-    border-radius: 14px !important;
+    border-radius: 12px !important;
     padding: 10px 12px !important;
+    /* display handled by JS */
+    flex-direction: column !important;
+    overflow: hidden !important;
     z-index: 1000 !important;
   }
-  .insp-name {
-    font-size: 13.5px !important;
-  }
-  .insp-sub {
-    font-size: 10.5px !important;
-  }
-  .insp-card {
-    padding: 8px 10px !important;
-  }
-  .insp-desc {
-    padding: 8px 10px !important;
-    font-size: 10.5px !important;
-  }
-  #testDrawer {
-    width: 380px;
-    left: auto;
-    right: 8px;
-    bottom: 8px;
-    max-height: 92vh;
-    border-radius: 14px;
-  }
-}
+  .insp-name { font-size: 13px !important; }
+  .insp-sub { font-size: 10px !important; }
+  .insp-card { padding: 6px 8px !important; }
+  .insp-desc { padding: 6px 8px !important; font-size: 10px !important; }
 
+  /* Fixed Bounded Test Drawer (Pinned header, never cut off) */
+  #testDrawer {
+    position: fixed !important;
+    top: max(6px, env(safe-area-inset-top, 6px)) !important;
+    bottom: max(6px, env(safe-area-inset-bottom, 6px)) !important;
+    right: max(8px, env(safe-area-inset-right, 8px)) !important;
+    left: auto !important;
+    width: min(330px, 45vw) !important;
+    height: auto !important;
+    max-height: calc(100dvh - 12px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)) !important;
+    border-radius: 12px !important;
+    padding: 8px 10px !important;
+    /* display handled by JS */
+    flex-direction: column !important;
+    overflow: hidden !important;
+    z-index: 1000 !important;
+  }
+  .drawer-header {
+    margin-bottom: 6px !important;
+    padding-bottom: 4px !important;
+  }
+  .drawer-title { font-size: 11.5px !important; }
+  .test-btn-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 5px !important;
+    margin-bottom: 5px !important;
+    width: 100% !important;
+  }
+  .t-btn {
+    width: 100% !important;
+    text-align: left !important;
+    justify-content: flex-start !important;
+    padding: 6px 9px !important;
+    font-size: 10.5px !important;
+  }
+  .t-btn {
+    padding: 4px 7px !important;
+    font-size: 9.5px !important;
+  }
+  .sim-console {
+    padding: 6px 8px !important;
+    font-size: 9.5px !important;
+  }
+
+  /* Fixed Bounded Simulation Debrief Report (Centered, never cut off, zero overlap) */
+  #simBigScreen {
+    position: fixed !important;
+    top: max(6px, env(safe-area-inset-top, 6px)) !important;
+    bottom: max(6px, env(safe-area-inset-bottom, 6px)) !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: min(600px, 92vw) !important;
+    height: auto !important;
+    max-height: calc(100dvh - 12px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)) !important;
+    padding: 8px 12px !important;
+    border-radius: 12px !important;
+    /* display handled by JS */
+    flex-direction: column !important;
+    overflow: hidden !important;
+    z-index: 1001 !important;
+  }
+  .big-screen-header {
+    margin-bottom: 5px !important;
+    padding-bottom: 4px !important;
+  }
+  .big-screen-title { font-size: 12px !important; }
+  .big-screen-subtitle { font-size: 9.5px !important; }
+  .big-screen-hops { gap: 4px !important; margin-bottom: 4px !important; }
+  .hop-pill { padding: 2px 5px !important; font-size: 9px !important; }
+  .big-screen-desc { padding: 6px 8px !important; font-size: 10px !important; margin-bottom: 4px !important; }
+  .bs-meta-grid { gap: 4px !important; font-size: 9.5px !important; }
+  .big-screen-actions { margin-top: 4px !important; }
+  .bs-act-btn { padding: 4px 8px !important; font-size: 9.5px !important; }
+}
 
 /* -------------------------------------------------------------
    2D ARCHITECTURAL BLUEPRINT VIEWER MODAL
@@ -1172,26 +1261,28 @@ if (typeof THREE === 'undefined') {
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="color:var(--cyan-accent);vertical-align:middle;margin-right:6px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
       Interactive Network Tests
     </div>
-    <button class="drawer-close" onclick="toggleTestDrawer()" title="Close">×</button>
+    <button class="drawer-close" onclick="toggleTestDrawer()" title="Close">✕</button>
   </div>
-  <div class="test-btn-grid">
-    <button class="t-btn" id="btnSim1" onclick="runSim('inter_vlan')">
-      <span style="color:#34d399;font-size:11px;">●</span> 1. Employee PC to Server
+  <div class="test-drawer-scrollable">
+    <div class="test-btn-grid">
+      <button class="t-btn" id="btnSim1" onclick="runSim('inter_vlan')">
+        <span style="color:#34d399;font-size:11px;">●</span> 1. Employee PC to Server
+      </button>
+      <button class="t-btn t-btn-red" id="btnSim2" onclick="runSim('acl_block')">
+        <span style="color:#ef4444;font-size:11px;">●</span> 2. Block Guest Access
+      </button>
+      <button class="t-btn" id="btnSim3" onclick="runSim('wan_sync')">
+        <span style="color:#38bdf8;font-size:11px;">●</span> 3. Main to Branch Link
+      </button>
+      <button class="t-btn" id="btnSim4" onclick="runSim('branch_dia')">
+        <span style="color:#34d399;font-size:11px;">●</span> 4. Branch Direct Internet
+      </button>
+    </div>
+    <button class="t-btn" id="btnFailover" style="width:100%;margin-bottom:8px;" onclick="toggleHSRP()">
+      <span style="color:#f59e0b;font-size:11px;">●</span> 5. Test Internet Backup (Failover)
     </button>
-    <button class="t-btn t-btn-red" id="btnSim2" onclick="runSim('acl_block')">
-      <span style="color:#ef4444;font-size:11px;">●</span> 2. Block Guest Access
-    </button>
-    <button class="t-btn" id="btnSim3" onclick="runSim('wan_sync')">
-      <span style="color:#38bdf8;font-size:11px;">●</span> 3. Main to Branch Link
-    </button>
-    <button class="t-btn" id="btnSim4" onclick="runSim('branch_dia')">
-      <span style="color:#34d399;font-size:11px;">●</span> 4. Branch Direct Internet
-    </button>
+    <div class="sim-console" id="simConsole"><span style="color:#64748b;">[READY]</span> Select any test above to watch data travel through the facility in 3D.</div>
   </div>
-  <button class="t-btn" id="btnFailover" style="width:100%;margin-bottom:8px;" onclick="toggleHSRP()">
-    <span style="color:#f59e0b;font-size:11px;">●</span> 5. Test Internet Backup (Failover)
-  </button>
-  <div class="sim-console" id="simConsole"><span style="color:#64748b;">[READY]</span> Select any test above to watch data travel through the facility in 3D.</div>
 </div>
 
 <!-- 2D ARCHITECTURAL BLUEPRINT VIEWER MODAL -->
@@ -2833,6 +2924,13 @@ function openBigScreen(plan) {
   activeTestPlan = plan;
   hideTrackingPill();
 
+  var td = document.getElementById('testDrawer');
+  if (td) td.style.display = 'none';
+  var id = document.getElementById('inspectorDrawer');
+  if (id) id.style.display = 'none';
+  var bp = document.getElementById('blueprintModal');
+  if (bp) bp.style.display = 'none';
+
   var bs = document.getElementById('simBigScreen');
   if (!bs) return;
 
@@ -2878,7 +2976,8 @@ function openBigScreen(plan) {
     });
   }
 
-  bs.style.display = 'block';
+  bs.style.display = 'flex';
+  bs.style.flexDirection = 'column';
 }
 
 function replayActiveTest() {
@@ -3075,15 +3174,29 @@ function toggleStyleMode() {
 }
 
 function toggleTestDrawer() {
+  var id = document.getElementById('inspectorDrawer');
+  if (id) id.style.display = 'none';
+  closeBigScreen();
+  var bp = document.getElementById('blueprintModal');
+  if (bp) bp.style.display = 'none';
+
   setTimeout(updateJoystickVisibility, 50);
   var d = document.getElementById('testDrawer');
-  d.style.display = (d.style.display === 'block') ? 'none' : 'block';
+  if (!d) return;
+  var isHidden = (d.style.display === 'none' || d.style.display === '');
+  d.style.display = isHidden ? 'flex' : 'none';
+  if (isHidden) d.style.flexDirection = 'column';
 }
 
 // -------------------------------------------------------------
 // SLIDE-OUT DEVICE INSPECTOR
 // -------------------------------------------------------------
 function inspectDevice(d) {
+  var td = document.getElementById('testDrawer');
+  if (td) td.style.display = 'none';
+  closeBigScreen();
+  var bp = document.getElementById('blueprintModal');
+  if (bp) bp.style.display = 'none';
   document.getElementById('inspName').textContent = d.id;
   document.getElementById('inspSub').textContent = d.dept || d.type;
   document.getElementById('inspVlan').textContent = d.vlan ? d.vlan.split(' ')[0] : 'NODE';
@@ -3102,6 +3215,7 @@ function inspectDevice(d) {
 
   var drawer = document.getElementById('inspectorDrawer');
   drawer.style.display = 'flex';
+  drawer.style.flexDirection = 'column';
   updateJoystickVisibility();
   document.getElementById('dockCoords').textContent = 'Inspecting: ' + d.id;
 }
@@ -3134,6 +3248,12 @@ var blueprintData = {
 };
 
 function openBlueprintModal(tabKey) {
+  var td = document.getElementById('testDrawer');
+  if (td) td.style.display = 'none';
+  var id = document.getElementById('inspectorDrawer');
+  if (id) id.style.display = 'none';
+  closeBigScreen();
+
   var m = document.getElementById('blueprintModal');
   if (m) m.style.display = 'flex';
   switchBlueprint(tabKey || 'server');
@@ -3299,6 +3419,12 @@ function toggleHSRP() {
 function runSim(type) {
   clearSimEffects();
   closeBigScreen();
+  var td = document.getElementById('testDrawer');
+  if (td) td.style.display = 'none';
+  var id = document.getElementById('inspectorDrawer');
+  if (id) id.style.display = 'none';
+  var bp = document.getElementById('blueprintModal');
+  if (bp) bp.style.display = 'none';
   currentTestKey = type;
   if (activeNav === 'walk') setNavMode('orbit');
 
