@@ -1760,7 +1760,7 @@ scene.fog = new THREE.Fog('#dbeafe', 90, 290);
 var currentStyle = 'realistic'; // 'realistic' (Option A) or 'studio' (Option B)
 var labelMode = 'smart';        // 'smart', 'minimal', 'off'
 
-var camera = new THREE.PerspectiveCamera(52, window.innerWidth / window.innerHeight, 0.1, 800);
+var camera = new THREE.PerspectiveCamera(68, window.innerWidth / window.innerHeight, 0.1, 800);
 camera.rotation.order = 'YXZ'; // Strict YXZ Euler to permanently eliminate gimbal lock & horizon tilt
 camera.position.set(-28, 38, 54);
 
@@ -1931,40 +1931,46 @@ var tourRoutes = {
     name: 'Admin Building',
     steps: [
       {
-        cam: [8.5, 1.65, 26.5], tgt: [13.5, 1.1, 20.0],
-        title: 'Floor 1: Suite 1 (Operations Bay · 10 PCs)',
-        desc: 'Corner perspective showing all perimeter workstations, dual displays, and departmental laser printer.',
+        cam: [9.0, 2.0, 22.0], tgt: [12.5, 1.1, 25.5],
+        title: 'Floor 1: Suite 1 (Operations Bay · 5 PCs & Printer)',
+        desc: 'Wide-angle corner view across executive workstations, dual monitors, and department laser printer.',
         duration: 3800, roof: false
       },
       {
-        cam: [8.5, 1.65, 10.5], tgt: [13.5, 1.1, 16.0],
-        title: 'Floor 1: Suite 2 (Administration · 5 PCs)',
-        desc: 'Corner view across private administrative workstations and dedicated network drops.',
+        cam: [9.0, 2.0, 16.5], tgt: [12.5, 1.1, 11.5],
+        title: 'Floor 1: Suite 2 (Administration · 5 PCs & Printer)',
+        desc: 'Wide corner perspective of administration workstations and network drops.',
         duration: 3800, roof: false
       },
       {
-        cam: [19.0, 1.65, 18.0], tgt: [23.0, 2.4, 20.5],
+        cam: [17.5, 2.0, 18.5], tgt: [22.5, 2.2, 20.5],
         title: 'Floor 1: East Service Core & Architectural Staircase',
-        desc: 'Architectural stepped treads, safety balusters, and structural elevator shaft connecting to Floor 2.',
+        desc: 'Clear hallway view framing the full architectural staircase, railings, and elevator shaft.',
         duration: 3600, roof: false
       },
       {
-        cam: [16.0, 5.0, 24.0], tgt: [16.0, 5.8, 17.0],
+        cam: [10.5, 5.0, 19.2], tgt: [16.0, 5.4, 19.2],
         title: 'Floor 2: Central Hallway & Enterprise Wi-Fi 6',
-        desc: 'Corridor view framing ceiling-mounted Cisco Catalyst 9115 Wi-Fi 6 Access Point.',
+        desc: 'Unobstructed corridor view framing the ceiling-mounted Cisco Catalyst 9115 Wi-Fi 6 Access Point.',
         duration: 3600, roof: false
       },
       {
-        cam: [8.5, 5.15, 26.0], tgt: [13.5, 4.6, 18.0],
-        title: 'Floor 2: Executive Management Suite (15 PCs)',
-        desc: 'Corner-to-corner panoramic view of Floor 2 executive desks, manager stations, and laser printer.',
+        cam: [9.0, 5.2, 16.5], tgt: [12.5, 4.6, 11.5],
+        title: 'Floor 2: Executive Directorate Suite (5 PCs & Printer)',
+        desc: 'Wide-angle view across executive director workstations, laser printer, and switch.',
         duration: 4000, roof: false
       },
       {
-        cam: [22.0, 10.5, 32.0], tgt: [16.0, 3.5, 18.0],
-        title: 'Admin Building Overview',
-        desc: 'Walkthrough completed. Restoring exterior view.',
-        duration: 3200, roof: true
+        cam: [9.0, 5.2, 22.0], tgt: [12.5, 4.6, 25.5],
+        title: 'Floor 2: Corporate Strategy Suite (5 PCs & Printer)',
+        desc: 'Wide-angle view across corporate strategy desks and network access ports.',
+        duration: 4000, roof: false
+      },
+      {
+        cam: [16.0, 15.0, 42.0], tgt: [16.0, 3.5, 18.0],
+        title: 'Admin Building Complete Overview',
+        desc: 'Walkthrough completed. Restoring full architectural roof and campus view.',
+        duration: 3400, roof: true
       }
     ]
   },
@@ -1972,31 +1978,31 @@ var tourRoutes = {
     name: 'Employee Building',
     steps: [
       {
-        cam: [-32.5, 1.65, 11.8], tgt: [-24.0, 1.1, 15.5],
+        cam: [-31.5, 1.8, 12.0], tgt: [-25.0, 1.1, 15.5],
         title: 'Floor 1: North Developer Wing (10 PCs · VLAN 10)',
-        desc: 'Corner perspective across the 10 developer workstations facing across central acoustic partition with dual displays.',
+        desc: 'Wide-angle corner view across 10 developer workstations facing across acoustic partition with dual displays.',
         duration: 4000, floor: 1, roof: false
       },
       {
-        cam: [-32.5, 1.65, 24.5], tgt: [-24.0, 1.1, 20.5],
+        cam: [-31.5, 1.8, 24.0], tgt: [-25.0, 1.1, 20.5],
         title: 'Floor 1: South Developer Wing (10 PCs · VLAN 10)',
-        desc: 'Corner perspective across the 10 south workstations and dual departmental laser printers.',
+        desc: 'Wide corner view across 10 developer workstations and departmental laser printers.',
         duration: 4000, floor: 1, roof: false
       },
       {
-        cam: [-18.0, 1.65, 18.0], tgt: [-12.5, 2.0, 21.0],
+        cam: [-18.5, 1.8, 18.0], tgt: [-12.5, 2.0, 21.0],
         title: 'Floor 1: East Service Core, Elevator & Switch SW-EMP-F1',
-        desc: 'Cisco 24-Port Floor Switch, structural elevator, and architectural staircase.',
+        desc: 'Lobby perspective framing Cisco 24-Port Floor Switch, structural elevator, and architectural staircase.',
         duration: 3600, floor: 1, roof: false
       },
       {
-        cam: [-32.5, 5.05, 24.5], tgt: [-24.0, 4.5, 18.0],
+        cam: [-31.5, 5.2, 24.0], tgt: [-25.0, 4.6, 18.0],
         title: 'Floor 2: Developer Operations Floor (VLAN 10)',
-        desc: 'Corner view of upper development floor with standardized 10 PCs/room layout.',
+        desc: 'Wide view of upper development floor with standardized 10 PCs/room layout.',
         duration: 3800, floor: 2, roof: false
       },
       {
-        cam: [-28, 22, 45], tgt: [-22, 7, 18],
+        cam: [-28, 24, 48], tgt: [-22, 7, 18],
         title: 'Employee Building Overview',
         desc: '5-floor employee operations overview completed.',
         duration: 3200, floor: 'all', roof: true
@@ -2007,28 +2013,28 @@ var tourRoutes = {
     name: 'Second Branch Office',
     steps: [
       {
-        cam: [28.5, 1.65, -24.0], tgt: [34.5, 1.1, -16.0],
+        cam: [29.5, 1.8, -23.5], tgt: [35.0, 1.1, -16.5],
         title: 'Floor 1: West Customer Support Bay (15 PCs · VLAN 50)',
-        desc: 'Corner view showcasing 15 customer support workstations and departmental laser printer.',
+        desc: 'Wide corner perspective showcasing 15 customer support workstations and laser printer.',
         duration: 4000, roof: false
       },
       {
-        cam: [47.5, 1.65, -24.0], tgt: [39.0, 1.2, -16.0],
+        cam: [46.5, 1.8, -23.5], tgt: [41.0, 1.1, -16.5],
         title: 'Floor 1: East Customer Support Bay (15 PCs) & Staircase',
-        desc: 'Corner perspective across support workstations and central corridor staircase.',
+        desc: 'Wide view across 15 support desks and central corridor staircase leading upstairs.',
         duration: 4000, roof: false
       },
       {
-        cam: [39.0, 5.05, -12.5], tgt: [45.5, 4.5, -18.5],
-        title: 'Floor 2: Accounting Suite & Branch Server (SRV-BR)',
-        desc: 'Corner view of Accounting workstations, laser printer, and Branch Server rack.',
+        cam: [39.5, 5.2, -13.0], tgt: [45.0, 4.5, -18.0],
+        title: 'Floor 2: Accounting Suite & Dedicated Branch Server (SRV-BR)',
+        desc: 'Wide corner view of Accounting workstations, laser printer, and Branch Server rack.',
         duration: 4000, roof: false
       },
       {
-        cam: [42.0, 9.5, -6.0], tgt: [38, 2.5, -18],
+        cam: [42.0, 14.0, 0.0], tgt: [38, 3.0, -18],
         title: 'Second Branch Overview',
         desc: 'Remote facility walkthrough completed.',
-        duration: 3200, roof: true
+        duration: 3400, roof: true
       }
     ]
   },
@@ -2036,25 +2042,25 @@ var tourRoutes = {
     name: 'Studio Server Room',
     steps: [
       {
-        cam: [-13.5, 1.7, -18.0], tgt: [-22.0, 1.6, -18.0],
+        cam: [-14.0, 1.8, -18.0], tgt: [-22.0, 1.6, -18.0],
         title: 'Studio Server Room: Entrance & Overhead Trays',
         desc: 'View from the doorway looking across structured fiber cable distribution trays.',
         duration: 3600, roof: false
       },
       {
-        cam: [-13.5, 1.7, -13.0], tgt: [-25.0, 1.6, -18.5],
+        cam: [-15.0, 1.8, -14.0], tgt: [-24.5, 1.6, -18.5],
         title: 'Network Core Rack: Cisco 3650 & Firepower NGFW',
-        desc: 'Corner view of Cisco Catalyst Core Switch and Firepower Firewall managing security.',
+        desc: 'Wide corner view of Cisco Catalyst Core Switch and Firepower Firewall managing security.',
         duration: 3800, roof: false
       },
       {
-        cam: [-25.5, 1.7, -13.5], tgt: [-20.5, 1.3, -18.5],
+        cam: [-24.5, 1.8, -14.0], tgt: [-21.0, 1.3, -18.5],
         title: 'Dedicated Server Farm: SRV-EMP & SRV-ADM',
-        desc: 'Corner inspection of dedicated enterprise servers connected at 1 Gbps.',
+        desc: 'Wide corner inspection of dedicated enterprise servers connected at 1 Gbps.',
         duration: 3800, roof: false
       },
       {
-        cam: [-18, 6.5, -9], tgt: [-20, 1.8, -18],
+        cam: [-18, 10.0, -5], tgt: [-20, 2.0, -18],
         title: 'Studio Server Room Overview',
         desc: 'Server farm inspection completed.',
         duration: 3200, roof: true
@@ -3506,8 +3512,8 @@ registerInteractable(apAdmin, {
 });
 makeTag('AP-ADM-F2 (WAP)', 16, f2Y + 3.55, 18 + 1.25, 0.22, 'device');
 
-// Floor 2 Solid Architectural Ceiling Plate (eliminating any sky / roof leaks)
-box(bAdmin, 0, f2Y + 3.4, 0, 20.2, 0.12, 20.2, mats.woodFloor);
+// Floor 2 Solid Architectural Ceiling Plate (clean white ceiling tile)
+var adminCeilingPlate = box(bAdmin, 0, f2Y + 3.4, 0, 20.2, 0.12, 20.2, mats.tileLight);
 
 // Translucent Cyan Wi-Fi Umbrella Ring representing circular CAD coverage zone
 var wifiGeo = new THREE.CylinderGeometry(8.5, 8.5, 0.15, 32);
@@ -3518,6 +3524,8 @@ bAdmin.add(wifiCircle);
 
 // Roof
 var adminRoof = createGabledRoof(bAdmin, 0.0, 6.9, 0.0, 20.4, 20.4, 3.2, mats.roofSlate, mats.wallExterior, mats.glassWall);
+bAdmin.remove(adminCeilingPlate);
+adminRoof.add(adminCeilingPlate);
 makeTag('ADMINISTRATION BUILDING\nMAIN BRANCH (30 PCs)', 16, 11.2, 18, 0.85, 'building');
 // 4. SECOND BRANCH OFFICE (2 Floors · 35 PCs Total)
 // -------------------------------------------------------------
