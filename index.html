@@ -2586,117 +2586,271 @@ makeTag('HVAC UNIT 2\nHOT STANDBY', -20 - 8.5, 2.40, -18 + 4.5, 0.22, 'device');
 makeTag('STUDIO SERVER ROOM\nMAIN BRANCH', -20, 7.5, -18, 0.85, 'building');
 
 // -------------------------------------------------------------
-// 3. ADMINISTRATION BUILDING (2 Floors · 30 PCs Total)
+// 3. ADMINISTRATION BUILDING (EXACT 2D CAD BLUEPRINT ARCHITECTURE)
+// Matches floorplan_main_admin_f1.png & floorplan_main_admin_f2.png:
+// - 3 Dedicated Office Suites per floor (Top-Left 5 PCs, Top-Right 5 PCs, Bottom-Left 5 PCs)
+// - Central Entrance Hallway Corridor with Inward-Swinging West Door
+// - East Core with Multi-Step Staircase, Structural Elevator Shaft, and Facilities Room
+// - Central Ceiling-Mounted Cisco Catalyst 9120 WAP (Floor 2 Wi-Fi Umbrella)
+// - Total: 30 Workstations (15 on F1, 15 on F2) + 6 Network Printers on VLAN 20
 // -------------------------------------------------------------
 var bAdmin = new THREE.Group();
 bAdmin.position.set(16, 0, 18);
 scene.add(bAdmin);
 
-box(bAdmin, 0, 0.15, 0, 22, 0.3, 16, mats.woodFloor);
-box(bAdmin, 0, 1.8, -8, 22, 3.4, 0.25, mats.wallExterior);
-box(bAdmin, 11, 1.8, 0, 0.25, 3.4, 16, mats.wallExterior);
-box(bAdmin, -11, 1.8, 0, 0.25, 3.4, 16, mats.glassWall);
-box(bAdmin, 0, 1.8, 8, 22, 3.4, 0.25, mats.glassWall);
+// Outer Dimensions: 20m x 20m footprint
+// FLOOR 1 (Y: 0.0 to 3.4m)
+box(bAdmin, 0, 0.15, 0, 20.4, 0.3, 20.4, mats.woodFloor);
 
-// Floor 1 timber accent cladding
-box(bAdmin, 11.15, 1.8, -2.5, 0.08, 3.4, 4.5, mats.timber);
-box(bAdmin, 0, 1.8, 8.15, 5.0, 3.4, 0.08, mats.timber);
+// Exterior Walls with Window Mullions
+box(bAdmin, 0, 1.7, -10.0, 20.4, 3.4, 0.25, mats.wallExterior);
+box(bAdmin, 0, 1.7, 10.0, 20.4, 3.4, 0.25, mats.wallExterior);
+box(bAdmin, -10.0, 1.7, 0.0, 0.25, 3.4, 20.4, mats.wallExterior);
+box(bAdmin, 10.0, 1.7, 0.0, 0.25, 3.4, 20.4, mats.wallExterior);
 
-box(bAdmin, 0, 1.8, -4.5, 0.25, 3.4, 7, mats.corridorWall);
-box(bAdmin, 0, 1.8, 4.5, 0.25, 3.4, 7, mats.corridorWall);
+// Exterior Timber Accents & Glass Windows
+box(bAdmin, -10.15, 1.7, -5.0, 0.08, 3.4, 4.0, mats.timber);
+box(bAdmin, 10.15, 1.7, -5.0, 0.08, 3.4, 4.0, mats.timber);
+box(bAdmin, 0.0, 1.7, 10.15, 5.0, 3.4, 0.08, mats.timber);
 
-makeTag('RM 101: FINANCE\n10 PCs', 16 - 5.5, 2.3, 18 - 5.5, 0.25, 'room');
-for (var i = 0; i < 5; i++) {
-  createWorkstation(bAdmin, -9 + i * 1.7, 0, -3.0, 0, 'PC-ADM-FIN-0' + (i+1), 'Finance & Accounting', 'VLAN 20', '192.168.20.' + (10+i), mats.screenAdmin);
-  createWorkstation(bAdmin, -9 + i * 1.7, 0, -1.2, Math.PI, 'PC-ADM-FIN-0' + (i+6), 'Finance & Accounting', 'VLAN 20', '192.168.20.' + (15+i), mats.screenAdmin);
+// West Hallway Entrance Door (inward swinging at X = -9.8, Z = 1.25)
+box(bAdmin, -9.8, 1.2, 1.25, 0.08, 2.4, 1.4, mats.doorWood);
+
+// =========================================================================
+// INTERIOR WALLS MATCHING BLUEPRINT:
+// 1. Horizontal Main Divider Wall (Z = 0) separating Top Rooms from Hallway
+// =========================================================================
+box(bAdmin, -7.5, 1.7, 0.0, 5.0, 3.4, 0.2, mats.corridorWall);  // West segment
+box(bAdmin, 0.0, 1.7, 0.0, 6.0, 3.4, 0.2, mats.corridorWall);   // Center segment
+box(bAdmin, 7.5, 1.7, 0.0, 5.0, 3.4, 0.2, mats.corridorWall);   // East segment
+// Double Doors: Top-Left at X = -3.8, Top-Right at X = 3.8
+box(bAdmin, -3.8, 1.2, 0.0, 1.6, 2.4, 0.08, mats.doorWood);
+box(bAdmin, 3.8, 1.2, 0.0, 1.6, 2.4, 0.08, mats.doorWood);
+
+// 2. Vertical Wall dividing Top-Left Room (RM 101) and Top-Right Room (RM 102) at X = 0
+box(bAdmin, 0.0, 1.7, -5.0, 0.2, 3.4, 10.0, mats.corridorWall);
+
+// 3. Bottom-Left Room (RM 103) Enclosure Walls
+// Top wall at Z = 2.5 (from X = -10.0 to X = 2.5) with double doors at X = -3.8
+box(bAdmin, -7.5, 1.7, 2.5, 5.0, 3.4, 0.2, mats.corridorWall);
+box(bAdmin, -0.6, 1.7, 2.5, 4.8, 3.4, 0.2, mats.corridorWall);
+box(bAdmin, -3.8, 1.2, 2.5, 1.6, 2.4, 0.08, mats.doorWood);
+// East wall of Bottom-Left Room at X = 2.5 (from Z = 2.5 to Z = 10.0)
+box(bAdmin, 2.5, 1.7, 6.25, 0.2, 3.4, 7.5, mats.corridorWall);
+
+// =========================================================================
+// EAST CORE: STAIRCASE, ELEVATOR SHAFT & FACILITIES ROOM
+// =========================================================================
+// 1. Staircase: 6 solid concrete steps leading up from Floor 1 toward Floor 2
+for (var st = 0; st < 6; st++) {
+  box(bAdmin, 6.5, 0.25 + st * 0.28, 0.8 + st * 0.55, 4.2, 0.28, 0.55, mats.concrete);
 }
+// 2. Structural Elevator Shaft (X = 4.8 to 9.8, Z = 4.8 to 7.8)
+box(bAdmin, 7.3, 1.7, 4.8, 4.8, 3.4, 0.2, mats.corridorWall);
+box(bAdmin, 4.8, 1.7, 6.3, 0.2, 3.4, 3.0, mats.corridorWall);
+box(bAdmin, 5.8, 1.2, 4.9, 1.3, 2.3, 0.08, mats.rackBlade); // Elevator Sliding Steel Doors
+// Elevator Shaft Diagonal Cross Struts (matching the 'X' in CAD blueprint)
+box(bAdmin, 7.3, 1.7, 6.3, 0.12, 3.0, 0.12, mats.rackFrame);
 
-makeTag('RM 102: HR & OPS\n10 PCs', 16 + 5.5, 2.3, 18 - 5.5, 0.25, 'room');
-  // Admin Floor 1: 3 Shared Network Laser Printers (Finance and HR)
-  createPrinter(bAdmin, -10.0, 0, -5.5, 0, {
-    id: 'PRN-ADM-F1-01',
-    dept: 'Finance and Accounting (RM 101)',
-    vlan: 'VLAN 20 (192.168.20.0/24)',
-    ip: '192.168.20.201',
-    switchPort: 'SW-ADM-F1 Port Gi0/21',
-    worldX: 16 - 10.0, worldY: 0, worldZ: 18 - 5.5
-  });
-  createPrinter(bAdmin, -1.5, 0, -5.5, 0, {
-    id: 'PRN-ADM-F1-02',
-    dept: 'Finance and Accounting (RM 101)',
-    vlan: 'VLAN 20 (192.168.20.0/24)',
-    ip: '192.168.20.202',
-    switchPort: 'SW-ADM-F1 Port Gi0/22',
-    worldX: 16 - 1.5, worldY: 0, worldZ: 18 - 5.5
-  });
-  createPrinter(bAdmin, 10.0, 0, -5.5, 0, {
-    id: 'PRN-ADM-F1-03',
-    dept: 'Human Resources and Operations (RM 102)',
-    vlan: 'VLAN 20 (192.168.20.0/24)',
-    ip: '192.168.20.203',
-    switchPort: 'SW-ADM-F1 Port Gi0/23',
-    worldX: 16 + 10.0, worldY: 0, worldZ: 18 - 5.5
-  });
-for (var i = 0; i < 5; i++) {
-  createWorkstation(bAdmin, 2.5 + i * 1.7, 0, -3.0, 0, 'PC-ADM-HR-0' + (i+1), 'Human Resources & Ops', 'VLAN 20', '192.168.20.' + (20+i), mats.screenAdmin);
-  createWorkstation(bAdmin, 2.5 + i * 1.7, 0, -1.2, Math.PI, 'PC-ADM-HR-0' + (i+6), 'Human Resources & Ops', 'VLAN 20', '192.168.20.' + (25+i), mats.screenAdmin);
-}
+// 3. Storage / Restroom Vestibule at Bottom-Right (Z = 7.8 to 10.0)
+box(bAdmin, 6.25, 1.7, 7.8, 7.5, 3.4, 0.2, mats.corridorWall);
+box(bAdmin, 3.8, 1.2, 7.8, 1.0, 2.4, 0.08, mats.doorWood); // Single door
 
-// Floor 2 (10 PCs Executive & Network Ops)
-box(bAdmin, 0, 3.5, 0, 22, 0.2, 16, mats.woodFloor);
-// Floor 2 Exterior Walls & Timber Accents
-box(bAdmin, 0, 5.2, -8, 22, 3.4, 0.25, mats.wallExterior);
-box(bAdmin, 11, 5.2, 0, 0.25, 3.4, 16, mats.wallExterior);
-box(bAdmin, -11, 5.2, 0, 0.25, 3.4, 16, mats.glassWall);
-box(bAdmin, 0, 5.2, 8, 22, 3.4, 0.25, mats.glassWall);
-box(bAdmin, 11.15, 5.2, -2.5, 0.08, 3.4, 4.5, mats.timber);
-box(bAdmin, 0, 5.2, 8.15, 5.0, 3.4, 0.08, mats.timber);
+// =========================================================================
+// FLOOR 1 WORKSTATIONS & PRINTERS (EXACT CAD POSITIONING)
+// =========================================================================
 
-var adminRoof = createGabledRoof(bAdmin, 0, 6.9, 0, 22, 16, 3.0, mats.roofSlate, mats.wallExterior);
-makeTag('RM 201: EXECUTIVE\n10 PCs', 16, 5.8, 18 - 5.5, 0.25, 'room');
-  // Admin Floor 2: 3 Shared Network Laser Printers (Executive & NetOps)
-  createPrinter(bAdmin, -9.5, 3.5, -5.5, 0, {
-    id: 'PRN-ADM-F2-01',
-    dept: 'Executive Director Suite (RM 201)',
-    vlan: 'VLAN 20 (192.168.20.0/24)',
-    ip: '192.168.20.204',
-    switchPort: 'SW-ADM-F2 Port Gi0/21',
-    worldX: 16 - 9.5, worldY: 3.5, worldZ: 18 - 5.5
-  });
-  createPrinter(bAdmin, 1.5, 3.5, -5.5, 0, {
-    id: 'PRN-ADM-F2-02',
-    dept: 'Network Operations & IT (RM 202)',
-    vlan: 'VLAN 20 (192.168.20.0/24)',
-    ip: '192.168.20.205',
-    switchPort: 'SW-ADM-F2 Port Gi0/22',
-    worldX: 16 + 1.5, worldY: 3.5, worldZ: 18 - 5.5
-  });
-  createPrinter(bAdmin, 9.5, 3.5, -5.5, 0, {
-    id: 'PRN-ADM-F2-03',
-    dept: 'Network Operations & IT (RM 202)',
-    vlan: 'VLAN 20 (192.168.20.0/24)',
-    ip: '192.168.20.206',
-    switchPort: 'SW-ADM-F2 Port Gi0/23',
-    worldX: 16 + 9.5, worldY: 3.5, worldZ: 18 - 5.5
-  });
-for (var i = 0; i < 5; i++) {
-  createWorkstation(bAdmin, -8 + i * 1.8, 3.5, 0, 0, 'PC-ADM-EXEC-0' + (i+1), 'Executive Suite', 'VLAN 20', '192.168.20.' + (30+i), mats.screenAdmin);
-  createWorkstation(bAdmin, 1.5 + i * 1.8, 3.5, 0, 0, 'PC-ADM-NET-0' + (i+1), 'Network Administration', 'VLAN 20', '192.168.20.' + (35+i), mats.screenAdmin);
-}
-
-var apAdmin = box(bAdmin, 0, 6.7, 0, 0.35, 0.08, 0.35, mats.ap);
-registerInteractable(apAdmin, {
-  id: 'AP-ADM-F2',
-  type: 'Dual-Band Enterprise Wi-Fi AP',
-  dept: 'Main Branch Wireless',
-  vlan: 'Staff SSID (VLAN 20) / Guest SSID (VLAN 40)',
-  ip: '192.168.20.5 (Mgmt)',
-  specs: 'Wi-Fi 6 (802.11ax) · Firepower ACL 110 Isolation for Guests'
+// ROOM 101: FINANCE & ACCOUNTING (Top-Left Suite: 5 PCs + Printer)
+makeTag('RM 101: FINANCE (5 PCs)', 16 - 5.0, 2.35, 18 - 5.0, 0.24, 'room');
+// 2 Desks along West wall (facing left)
+createWorkstation(bAdmin, -8.0, 0, -7.5, Math.PI / 2, 'PC-ADM-FIN-01', 'Finance & Accounting', 'VLAN 20', '192.168.20.10', mats.screenAdmin);
+createWorkstation(bAdmin, -8.0, 0, -3.5, Math.PI / 2, 'PC-ADM-FIN-02', 'Finance & Accounting', 'VLAN 20', '192.168.20.11', mats.screenAdmin);
+// 1 Desk along North wall (facing top)
+createWorkstation(bAdmin, -5.0, 0, -8.0, 0, 'PC-ADM-FIN-03', 'Finance & Accounting', 'VLAN 20', '192.168.20.12', mats.screenAdmin);
+// 2 Desks along East dividing wall (facing right)
+createWorkstation(bAdmin, -2.0, 0, -7.5, -Math.PI / 2, 'PC-ADM-FIN-04', 'Finance & Accounting', 'VLAN 20', '192.168.20.13', mats.screenAdmin);
+createWorkstation(bAdmin, -2.0, 0, -3.5, -Math.PI / 2, 'PC-ADM-FIN-05', 'Finance & Accounting', 'VLAN 20', '192.168.20.14', mats.screenAdmin);
+// Laser Printer near double doors (matching CAD icon)
+createPrinter(bAdmin, -2.2, 0, -1.0, 0, {
+  id: 'PRN-ADM-F1-01',
+  dept: 'Finance & Accounting (RM 101)',
+  vlan: 'VLAN 20 (192.168.20.0/24)',
+  ip: '192.168.20.201',
+  switchPort: 'SW-ADM-F1 Port Gi0/21',
+  worldX: 16 - 2.2, worldY: 0, worldZ: 18 - 1.0
 });
 
-makeTag('ADMINISTRATION BUILDING\nMAIN BRANCH (30 PCs)', 16, 10.6, 18, 0.85, 'building');
+// ROOM 102: HUMAN RESOURCES & OPERATIONS (Top-Right Suite: 5 PCs + Printer + Switch)
+makeTag('RM 102: HR & OPS (5 PCs)', 16 + 5.0, 2.35, 18 - 5.0, 0.24, 'room');
+// 2 Desks along West dividing wall (facing left)
+createWorkstation(bAdmin, 2.0, 0, -7.5, Math.PI / 2, 'PC-ADM-HR-01', 'Human Resources & Ops', 'VLAN 20', '192.168.20.15', mats.screenAdmin);
+createWorkstation(bAdmin, 2.0, 0, -3.5, Math.PI / 2, 'PC-ADM-HR-02', 'Human Resources & Ops', 'VLAN 20', '192.168.20.16', mats.screenAdmin);
+// 1 Desk along North wall (facing top)
+createWorkstation(bAdmin, 5.0, 0, -8.0, 0, 'PC-ADM-HR-03', 'Human Resources & Ops', 'VLAN 20', '192.168.20.17', mats.screenAdmin);
+// 2 Desks along East outer wall (facing right)
+createWorkstation(bAdmin, 8.0, 0, -7.5, -Math.PI / 2, 'PC-ADM-HR-04', 'Human Resources & Ops', 'VLAN 20', '192.168.20.18', mats.screenAdmin);
+createWorkstation(bAdmin, 8.0, 0, -3.5, -Math.PI / 2, 'PC-ADM-HR-05', 'Human Resources & Ops', 'VLAN 20', '192.168.20.19', mats.screenAdmin);
+// Laser Printer near double doors
+createPrinter(bAdmin, 2.2, 0, -1.0, 0, {
+  id: 'PRN-ADM-F1-02',
+  dept: 'Human Resources & Ops (RM 102)',
+  vlan: 'VLAN 20 (192.168.20.0/24)',
+  ip: '192.168.20.202',
+  switchPort: 'SW-ADM-F1 Port Gi0/22',
+  worldX: 16 + 2.2, worldY: 0, worldZ: 18 - 1.0
+});
+// Floor Access Switch on East Wall (matching switch icon in CAD blueprint)
+var swAdminF1 = box(bAdmin, 9.75, 1.8, -1.8, 0.35, 0.9, 0.7, mats.rackFrame);
+registerInteractable(swAdminF1, {
+  id: 'SW-ADM-F1',
+  type: 'Floor Access Switch (24-Port Gigabit)',
+  dept: 'Administration Building Floor 1',
+  vlan: 'VLAN 20 (192.168.20.0/24)',
+  ip: '192.168.20.2',
+  specs: 'Cisco Catalyst 1000-24T-4G-L · Dual 1G Fiber LACP Uplink to Core Switch',
+  desc: 'Wall-mounted access switch servicing Floor 1 Finance, HR, and Administration desktop drops.'
+});
+makeTag('SW-ADM-F1', 16 + 9.75, 2.45, 18 - 1.8, 0.20, 'device');
 
-// -------------------------------------------------------------
+// ROOM 103: CORPORATE ADMINISTRATION (Bottom-Left Suite: 5 PCs + Printer)
+makeTag('RM 103: CORP ADMIN (5 PCs)', 16 - 3.8, 2.35, 18 + 6.0, 0.24, 'room');
+// 1 Desk along West wall (facing left)
+createWorkstation(bAdmin, -7.5, 0, 5.5, Math.PI / 2, 'PC-ADM-CORP-01', 'Corporate Administration', 'VLAN 20', '192.168.20.20', mats.screenAdmin);
+// 1 Desk along East wall (facing right)
+createWorkstation(bAdmin, 0.5, 0, 5.5, -Math.PI / 2, 'PC-ADM-CORP-02', 'Corporate Administration', 'VLAN 20', '192.168.20.21', mats.screenAdmin);
+// 3 Desks along South wall (facing bottom)
+createWorkstation(bAdmin, -7.0, 0, 8.0, Math.PI, 'PC-ADM-CORP-03', 'Corporate Administration', 'VLAN 20', '192.168.20.22', mats.screenAdmin);
+createWorkstation(bAdmin, -3.8, 0, 8.0, Math.PI, 'PC-ADM-CORP-04', 'Corporate Administration', 'VLAN 20', '192.168.20.23', mats.screenAdmin);
+createWorkstation(bAdmin, -0.6, 0, 8.0, Math.PI, 'PC-ADM-CORP-05', 'Corporate Administration', 'VLAN 20', '192.168.20.24', mats.screenAdmin);
+// Laser Printer near double doors (matching CAD icon)
+createPrinter(bAdmin, -2.2, 0, 3.6, Math.PI, {
+  id: 'PRN-ADM-F1-03',
+  dept: 'Corporate Administration (RM 103)',
+  vlan: 'VLAN 20 (192.168.20.0/24)',
+  ip: '192.168.20.203',
+  switchPort: 'SW-ADM-F1 Port Gi0/23',
+  worldX: 16 - 2.2, worldY: 0, worldZ: 18 + 3.6
+});
+
+// =========================================================================
+// FLOOR 2 (Y: 3.5m to 6.9m) - EXACT MATCHING CAD LAYOUT + WAP COVERAGE
+// =========================================================================
+var f2Y = 3.5;
+box(bAdmin, 0, f2Y + 0.1, 0, 20.4, 0.2, 20.4, mats.woodFloor);
+
+// Floor 2 Exterior Walls
+box(bAdmin, 0, f2Y + 1.7, -10.0, 20.4, 3.4, 0.25, mats.wallExterior);
+box(bAdmin, 0, f2Y + 1.7, 10.0, 20.4, 3.4, 0.25, mats.wallExterior);
+box(bAdmin, -10.0, f2Y + 1.7, 0.0, 0.25, 3.4, 20.4, mats.wallExterior);
+box(bAdmin, 10.0, f2Y + 1.7, 0.0, 0.25, 3.4, 20.4, mats.wallExterior);
+box(bAdmin, -10.15, f2Y + 1.7, -5.0, 0.08, 3.4, 4.0, mats.timber);
+box(bAdmin, 10.15, f2Y + 1.7, -5.0, 0.08, 3.4, 4.0, mats.timber);
+box(bAdmin, 0.0, f2Y + 1.7, 10.15, 5.0, 3.4, 0.08, mats.timber);
+
+// Floor 2 Interior Walls
+box(bAdmin, -7.5, f2Y + 1.7, 0.0, 5.0, 3.4, 0.2, mats.corridorWall);
+box(bAdmin, 0.0, f2Y + 1.7, 0.0, 6.0, 3.4, 0.2, mats.corridorWall);
+box(bAdmin, 7.5, f2Y + 1.7, 0.0, 5.0, 3.4, 0.2, mats.corridorWall);
+box(bAdmin, -3.8, f2Y + 1.2, 0.0, 1.6, 2.4, 0.08, mats.doorWood);
+box(bAdmin, 3.8, f2Y + 1.2, 0.0, 1.6, 2.4, 0.08, mats.doorWood);
+box(bAdmin, 0.0, f2Y + 1.7, -5.0, 0.2, 3.4, 10.0, mats.corridorWall);
+box(bAdmin, -7.5, f2Y + 1.7, 2.5, 5.0, 3.4, 0.2, mats.corridorWall);
+box(bAdmin, -0.6, f2Y + 1.7, 2.5, 4.8, 3.4, 0.2, mats.corridorWall);
+box(bAdmin, -3.8, f2Y + 1.2, 2.5, 1.6, 2.4, 0.08, mats.doorWood);
+box(bAdmin, 2.5, f2Y + 1.7, 6.25, 0.2, 3.4, 7.5, mats.corridorWall);
+
+// Floor 2 Elevator Shaft & Stair Landing Core
+box(bAdmin, 7.3, f2Y + 1.7, 4.8, 4.8, 3.4, 0.2, mats.corridorWall);
+box(bAdmin, 4.8, f2Y + 1.7, 6.3, 0.2, 3.4, 3.0, mats.corridorWall);
+box(bAdmin, 5.8, f2Y + 1.2, 4.9, 1.3, 2.3, 0.08, mats.rackBlade);
+box(bAdmin, 6.25, f2Y + 1.7, 7.8, 7.5, 3.4, 0.2, mats.corridorWall);
+box(bAdmin, 3.8, f2Y + 1.2, 7.8, 1.0, 2.4, 0.08, mats.doorWood);
+
+// ROOM 201: EXECUTIVE SUITES (Top-Left Suite: 5 PCs + Printer)
+makeTag('RM 201: EXECUTIVE (5 PCs)', 16 - 5.0, f2Y + 2.35, 18 - 5.0, 0.24, 'room');
+createWorkstation(bAdmin, -8.0, f2Y, -7.5, Math.PI / 2, 'PC-ADM-EXEC-01', 'Executive Directorate', 'VLAN 20', '192.168.20.25', mats.screenAdmin);
+createWorkstation(bAdmin, -8.0, f2Y, -3.5, Math.PI / 2, 'PC-ADM-EXEC-02', 'Executive Directorate', 'VLAN 20', '192.168.20.26', mats.screenAdmin);
+createWorkstation(bAdmin, -5.0, f2Y, -8.0, 0, 'PC-ADM-EXEC-03', 'Executive Directorate', 'VLAN 20', '192.168.20.27', mats.screenAdmin);
+createWorkstation(bAdmin, -2.0, f2Y, -7.5, -Math.PI / 2, 'PC-ADM-EXEC-04', 'Executive Directorate', 'VLAN 20', '192.168.20.28', mats.screenAdmin);
+createWorkstation(bAdmin, -2.0, f2Y, -3.5, -Math.PI / 2, 'PC-ADM-EXEC-05', 'Executive Directorate', 'VLAN 20', '192.168.20.29', mats.screenAdmin);
+createPrinter(bAdmin, -2.2, f2Y, -1.0, 0, {
+  id: 'PRN-ADM-F2-01',
+  dept: 'Executive Directorate (RM 201)',
+  vlan: 'VLAN 20 (192.168.20.0/24)',
+  ip: '192.168.20.204',
+  switchPort: 'SW-ADM-F2 Port Gi0/21',
+  worldX: 16 - 2.2, worldY: f2Y, worldZ: 18 - 1.0
+});
+
+// ROOM 202: NETWORK OPERATIONS CENTER (Top-Right Suite: 5 PCs + Printer + Switch)
+makeTag('RM 202: NET OPS (5 PCs)', 16 + 5.0, f2Y + 2.35, 18 - 5.0, 0.24, 'room');
+createWorkstation(bAdmin, 2.0, f2Y, -7.5, Math.PI / 2, 'PC-ADM-NET-01', 'Network Administration', 'VLAN 20', '192.168.20.30', mats.screenAdmin);
+createWorkstation(bAdmin, 2.0, f2Y, -3.5, Math.PI / 2, 'PC-ADM-NET-02', 'Network Administration', 'VLAN 20', '192.168.20.31', mats.screenAdmin);
+createWorkstation(bAdmin, 5.0, f2Y, -8.0, 0, 'PC-ADM-NET-03', 'Network Administration', 'VLAN 20', '192.168.20.32', mats.screenAdmin);
+createWorkstation(bAdmin, 8.0, f2Y, -7.5, -Math.PI / 2, 'PC-ADM-NET-04', 'Network Administration', 'VLAN 20', '192.168.20.33', mats.screenAdmin);
+createWorkstation(bAdmin, 8.0, f2Y, -3.5, -Math.PI / 2, 'PC-ADM-NET-05', 'Network Administration', 'VLAN 20', '192.168.20.34', mats.screenAdmin);
+createPrinter(bAdmin, 2.2, f2Y, -1.0, 0, {
+  id: 'PRN-ADM-F2-02',
+  dept: 'Network Operations (RM 202)',
+  vlan: 'VLAN 20 (192.168.20.0/24)',
+  ip: '192.168.20.205',
+  switchPort: 'SW-ADM-F2 Port Gi0/22',
+  worldX: 16 + 2.2, worldY: f2Y, worldZ: 18 - 1.0
+});
+var swAdminF2 = box(bAdmin, 9.75, f2Y + 1.8, -1.8, 0.35, 0.9, 0.7, mats.rackFrame);
+registerInteractable(swAdminF2, {
+  id: 'SW-ADM-F2',
+  type: 'Floor Access Switch (24-Port Gigabit)',
+  dept: 'Administration Building Floor 2',
+  vlan: 'VLAN 20 (192.168.20.0/24)',
+  ip: '192.168.20.3',
+  specs: 'Cisco Catalyst 1000-24T-4G-L · Dual 1G Fiber LACP Uplink to Core Switch',
+  desc: 'Wall-mounted access switch servicing Floor 2 Executive, NetOps, and Corporate Strategy drops.'
+});
+makeTag('SW-ADM-F2', 16 + 9.75, f2Y + 2.45, 18 - 1.8, 0.20, 'device');
+
+// ROOM 203: CORPORATE STRATEGY (Bottom-Left Suite: 5 PCs + Printer)
+makeTag('RM 203: STRATEGY (5 PCs)', 16 - 3.8, f2Y + 2.35, 18 + 6.0, 0.24, 'room');
+createWorkstation(bAdmin, -7.5, f2Y, 5.5, Math.PI / 2, 'PC-ADM-OPS-01', 'Corporate Strategy', 'VLAN 20', '192.168.20.35', mats.screenAdmin);
+createWorkstation(bAdmin, 0.5, f2Y, 5.5, -Math.PI / 2, 'PC-ADM-OPS-02', 'Corporate Strategy', 'VLAN 20', '192.168.20.36', mats.screenAdmin);
+createWorkstation(bAdmin, -7.0, f2Y, 8.0, Math.PI, 'PC-ADM-OPS-03', 'Corporate Strategy', 'VLAN 20', '192.168.20.37', mats.screenAdmin);
+createWorkstation(bAdmin, -3.8, f2Y, 8.0, Math.PI, 'PC-ADM-OPS-04', 'Corporate Strategy', 'VLAN 20', '192.168.20.38', mats.screenAdmin);
+createWorkstation(bAdmin, -0.6, f2Y, 8.0, Math.PI, 'PC-ADM-OPS-05', 'Corporate Strategy', 'VLAN 20', '192.168.20.39', mats.screenAdmin);
+createPrinter(bAdmin, -2.2, f2Y, 3.6, Math.PI, {
+  id: 'PRN-ADM-F2-03',
+  dept: 'Corporate Strategy (RM 203)',
+  vlan: 'VLAN 20 (192.168.20.0/24)',
+  ip: '192.168.20.206',
+  switchPort: 'SW-ADM-F2 Port Gi0/23',
+  worldX: 16 - 2.2, worldY: f2Y, worldZ: 18 + 3.6
+});
+
+// =========================================================================
+// CENTRAL CORRIDOR CEILING WAP (Matching Blue Umbrella Coverage in CAD)
+// =========================================================================
+var apAdmin = box(bAdmin, 0.0, f2Y + 3.25, 1.25, 0.38, 0.09, 0.38, mats.ap);
+registerInteractable(apAdmin, {
+  id: 'AP-ADM-F2',
+  type: 'Dual-Band Enterprise Wi-Fi AP (WAP)',
+  dept: 'Administration Building Wireless',
+  vlan: 'Corporate Staff (VLAN 20) / Guest Portal (VLAN 40)',
+  ip: '192.168.20.5 (Mgmt)',
+  specs: 'Cisco Catalyst 9120AX Series · Wi-Fi 6 (802.11ax) · Firepower ACL 110 Isolation for Guests',
+  desc: 'Ceiling-mounted central corridor wireless access point providing seamless omnidirectional coverage across executive suites, meeting rooms, and guest reception.'
+});
+makeTag('AP-ADM-F2 (WAP)', 16, f2Y + 3.55, 18 + 1.25, 0.22, 'device');
+
+// Translucent Cyan Wi-Fi Umbrella Ring representing circular CAD coverage zone
+var wifiGeo = new THREE.CylinderGeometry(8.5, 8.5, 0.15, 32);
+var wifiMat = new THREE.MeshBasicMaterial({ color: '#38bdf8', transparent: true, opacity: 0.12 });
+var wifiCircle = new THREE.Mesh(wifiGeo, wifiMat);
+wifiCircle.position.set(0.0, f2Y + 0.15, 1.25);
+bAdmin.add(wifiCircle);
+
+// Roof
+var adminRoof = createGabledRoof(bAdmin, 0.0, 6.9, 0.0, 20.4, 20.4, 3.2, mats.roofSlate, mats.wallExterior);
+makeTag('ADMINISTRATION BUILDING\nMAIN BRANCH (30 PCs)', 16, 11.2, 18, 0.85, 'building');
+
 // 4. SECOND BRANCH OFFICE (2 Floors · 35 PCs Total)
 // -------------------------------------------------------------
 var bBranch = new THREE.Group();
