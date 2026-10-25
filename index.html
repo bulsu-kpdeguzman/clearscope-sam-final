@@ -1917,7 +1917,7 @@ function createWorkstation(parent, x, y, z, rotY, pcId, dept, vlan, ip, screenMa
 
   box(g, -0.20, 0.74 + 0.12, -0.16, 0.06, 0.24, 0.06, mats.monitorBezel);
   var mon1 = box(g, -0.20, 0.74 + 0.28, -0.16, 0.54, 0.32, 0.03, mats.monitorBezel);
-  box(g, -0.20, 0.74 + 0.28, -0.14, 0.50, 0.28, 0.01, screenMat || mats.screenCode, false);
+  var mon1Scr = box(g, -0.20, 0.74 + 0.28, -0.14, 0.50, 0.28, 0.01, screenMat || mats.screenCode, false);
 
   var mon2 = box(g, 0.26, 0.74 + 0.28, -0.12, 0.50, 0.32, 0.03, mats.monitorBezel);
   mon2.rotation.y = -0.22;
@@ -1942,9 +1942,14 @@ function createWorkstation(parent, x, y, z, rotY, pcId, dept, vlan, ip, screenMa
     switchPort: 'C1000-24T Access Port Gi0/' + (Math.floor(Math.random()*20)+1),
     desc: 'Developer/Staff client provisioned with dedicated 1 Gbps Cat6 access.'
   };
+
+  // FULL WORKSTATION HITBOX EXPANSION (Tabletop, monitors, screens, and tower all clickable!)
+  registerInteractable(top, data);
   registerInteractable(tower, data);
   registerInteractable(mon1, data);
-  top.userData = data;
+  registerInteractable(mon1Scr, data);
+  registerInteractable(mon2, data);
+  registerInteractable(mon2Scr, data);
 }
 
 // DEDICATED SERVER PC WORKBENCH & HARDWARE
@@ -1995,9 +2000,10 @@ function createServerPC(parent, x, y, z, rotY, pcId, labelTitle, labelSub, dept,
     switchPort: 'Core Switch 10G SFP+ Port Gi1/1',
     desc: desc
   };
+  registerInteractable(desk, data);
   registerInteractable(srvTower, data);
   registerInteractable(mon, data);
-  desk.userData = data;
+  registerInteractable(monScr, data);
 
   // Prominent label directly above monitor
   var wx = parent.position.x + x;
@@ -3654,12 +3660,10 @@ function runSim(type) {
 var raycaster = new THREE.Raycaster();
 var mouse = new THREE.Vector2();
 
-window.addEventListener('click', function(e) {
-  if (e.target.closest('#topNav') || e.target.closest('#bottomDock') || e.target.closest('#testDrawer') || e.target.closest('#inspectorDrawer') || e.target.closest('#simBigScreen')) {
-    return;
-  }
-  mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-  mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+// UNIFIED RAYCAST INSPECTION FOR DESKTOP & MOBILE TAPS
+function performRaycastInspect(clientX, clientY) {
+  mouse.x = (clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -(clientY / window.innerHeight) * 2 + 1;
   raycaster.setFromCamera(mouse, camera);
 
   var hits = raycaster.intersectObjects(interactiveObjects, true);
@@ -3670,9 +3674,46 @@ window.addEventListener('click', function(e) {
     }
     if (hitObj && hitObj.userData && hitObj.userData.id) {
       inspectDevice(hitObj.userData);
+      return true;
     }
   }
+  return false;
+}
+
+window.addEventListener('click', function(e) {
+  if (e.target.closest('#navCapsule') || e.target.closest('#topNav') || e.target.closest('#bottomDock') || e.target.closest('#testDrawer') || e.target.closest('#inspectorDrawer') || e.target.closest('#simBigScreen') || e.target.closest('#blueprintModal')) {
+    return;
+  }
+  performRaycastInspect(e.clientX, e.clientY);
 });
+
+// DEDICATED MOBILE TAP HANDLER (Prevents camera drag from swallowing desk taps)
+var touchTapState = { x: 0, y: 0, time: 0 };
+window.addEventListener('touchstart', function(e) {
+  if (e.touches.length === 1) {
+    touchTapState.x = e.touches[0].clientX;
+    touchTapState.y = e.touches[0].clientY;
+    touchTapState.time = performance.now();
+  }
+}, { passive: true });
+
+window.addEventListener('touchend', function(e) {
+  if (e.changedTouches.length === 1) {
+    var t = e.changedTouches[0];
+    var dx = t.clientX - touchTapState.x;
+    var dy = t.clientY - touchTapState.y;
+    var dt = performance.now() - touchTapState.time;
+
+    // Clean tap: finger moved < 10px and tap duration < 350ms
+    if (Math.hypot(dx, dy) < 10 && dt < 350) {
+      var el = document.elementFromPoint(t.clientX, t.clientY);
+      if (el && (el.closest('#navCapsule') || el.closest('#topNav') || el.closest('#bottomDock') || el.closest('#testDrawer') || el.closest('#inspectorDrawer') || el.closest('#simBigScreen') || el.closest('#blueprintModal') || el.closest('#mobileJoystickContainer'))) {
+        return;
+      }
+      performRaycastInspect(t.clientX, t.clientY);
+    }
+  }
+}, { passive: true });
 
 // WASD WALKTHROUGH CONTROLS
 var keys = {};
