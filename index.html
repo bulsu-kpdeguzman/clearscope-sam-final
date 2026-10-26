@@ -2723,7 +2723,7 @@ function createParkedCar(parent, x, z, rotY, colorHex) {
 // -------------------------------------------------------------
 var billboardTags = [];
 
-function makeTag(text, x, y, z, scale, tagType) {
+function makeTag(text, x, y, z, scale, tagType, targetId) {
   scale = scale || 1;
   tagType = tagType || 'device'; // 'building', 'room', 'device'
   var c = document.createElement('canvas');
@@ -2780,7 +2780,7 @@ function makeTag(text, x, y, z, scale, tagType) {
     new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.DoubleSide, depthWrite: false })
   );
   plane.position.set(x, y, z);
-  plane.userData = { tagType: tagType, text: text };
+  plane.userData = { tagType: tagType, text: text, targetId: targetId };
   scene.add(plane);
   billboardTags.push(plane);
   return plane;
@@ -2916,12 +2916,12 @@ function createServerCabinet(parent, x, y, z, rackId, labelText, specs) {
 
   // 1. 42U Heavy-Duty Server Cabinet Frame (Open-front with structural corner posts)
   // Base plinth
-  box(g, 0, 0.05, 0, 0.90, 0.10, 1.05, mats.rackFrame);
+  var basePlinth = box(g, 0, 0.05, 0, 0.90, 0.10, 1.05, mats.rackFrame);
   // Top canopy roof
-  box(g, 0, 2.18, 0, 0.90, 0.06, 1.05, mats.rackFrame);
+  var canopyRoof = box(g, 0, 2.18, 0, 0.90, 0.06, 1.05, mats.rackFrame);
   // 4 Vertical Corner Steel Posts
-  box(g, -0.42, 1.12, 0.49, 0.06, 2.14, 0.06, mats.rackFrame);
-  box(g, 0.42, 1.12, 0.49, 0.06, 2.14, 0.06, mats.rackFrame);
+  var postLF = box(g, -0.42, 1.12, 0.49, 0.06, 2.14, 0.06, mats.rackFrame);
+  var postRF = box(g, 0.42, 1.12, 0.49, 0.06, 2.14, 0.06, mats.rackFrame);
   box(g, -0.42, 1.12, -0.49, 0.06, 2.14, 0.06, mats.rackFrame);
   box(g, 0.42, 1.12, -0.49, 0.06, 2.14, 0.06, mats.rackFrame);
   // Solid side panels
@@ -2941,7 +2941,7 @@ function createServerCabinet(parent, x, y, z, rackId, labelText, specs) {
   // Overhead cable ladder segment
   box(g, 0, 2.30, 0, 0.90, 0.06, 0.35, mats.cableTray);
 
-  // Overall cabinet clickable background
+  // Overall cabinet clickable background & structural frame
   var cabinetData = {
     id: rackId,
     type: '42U Enterprise Datacenter Cabinet',
@@ -2952,6 +2952,10 @@ function createServerCabinet(parent, x, y, z, rackId, labelText, specs) {
     desc: specs.desc
   };
   registerInteractable(glassDoor, cabinetData);
+  registerInteractable(canopyRoof, cabinetData);
+  registerInteractable(basePlinth, cabinetData);
+  registerInteractable(postLF, cabinetData);
+  registerInteractable(postRF, cabinetData);
 
   // 2. Hardware Layout tailored to Cabinet Identity
   if (rackId === 'RACK-NET') {
@@ -3186,11 +3190,12 @@ function createServerCabinet(parent, x, y, z, rackId, labelText, specs) {
     });
   }
 
-  // 3. Floating 3D Device Tag
+  // 3. Floating 3D Device Tag (Clicking the tag directly inspects the primary device / VLAN 99 switch)
   var wx = parent.position.x + x;
   var wy = parent.position.y + y + 2.50;
   var wz = parent.position.z + z;
-  makeTag(labelText, wx, wy, wz, 0.30, 'device');
+  var primaryTargetId = (rackId === 'RACK-NET') ? 'SW-CORE-3650' : ((rackId === 'RACK-ROUTERS') ? 'RTR-MAIN-1' : 'RTR-BR');
+  makeTag(labelText, wx, wy, wz, 0.30, 'device', primaryTargetId);
 }
 
 // -------------------------------------------------------------
@@ -5186,20 +5191,62 @@ function runSim(type) {
 var raycaster = new THREE.Raycaster();
 var mouse = new THREE.Vector2();
 
-// UNIFIED RAYCAST INSPECTION FOR DESKTOP & MOBILE TAPS
+// UNIFIED RAYCAST INSPECTION FOR DESKTOP, MOBILE TAPS & FIRST-PERSON WALK
 function performRaycastInspect(clientX, clientY) {
-  mouse.x = (clientX / window.innerWidth) * 2 - 1;
-  mouse.y = -(clientY / window.innerHeight) * 2 + 1;
+  // If in first-person walk mode or pointer is locked, raycast directly from screen center (crosshair)
+  if (activeNav === 'walk' || document.pointerLockElement) {
+    mouse.x = 0;
+    mouse.y = 0;
+  } else {
+    mouse.x = (clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(clientY / window.innerHeight) * 2 + 1;
+  }
   raycaster.setFromCamera(mouse, camera);
 
-  var hits = raycaster.intersectObjects(interactiveObjects, true);
+  // Combine interactive physical devices and 3D billboard tags
+  var targetList = interactiveObjects.concat(billboardTags);
+  var hits = raycaster.intersectObjects(targetList, true);
   if (hits.length > 0) {
-    var hitObj = hits[0].object;
-    while (hitObj && !hitObj.userData.id && hitObj.parent) {
-      hitObj = hitObj.parent;
+    var chosenData = null;
+
+    // 1. First priority: Specific internal hardware devices (SW-CORE-3650, FW-MAIN, RTR-MAIN-1, etc.)
+    for (var i = 0; i < hits.length; i++) {
+      var hObj = hits[i].object;
+      
+      // Check if hit was a 3D billboard tag
+      if (hObj.userData && hObj.userData.text) {
+        var tId = hObj.userData.targetId;
+        if (tId && devicesMap[tId]) {
+          chosenData = devicesMap[tId];
+          break;
+        }
+        // Fallback match tag text to known device
+        if (hObj.userData.text.indexOf('CATALYST 3650') !== -1 || hObj.userData.text.indexOf('CORE ENCLOSURE') !== -1) {
+          chosenData = devicesMap['SW-CORE-3650'] || devicesMap['RACK-NET'];
+          break;
+        } else if (hObj.userData.text.indexOf('ROUTERS ENCLOSURE') !== -1) {
+          chosenData = devicesMap['RTR-MAIN-1'] || devicesMap['RACK-ROUTERS'];
+          break;
+        }
+      }
+
+      // Check if hit was a 3D mesh
+      while (hObj && !hObj.userData.id && hObj.parent) {
+        hObj = hObj.parent;
+      }
+      if (hObj && hObj.userData && hObj.userData.id) {
+        // If it's a specific device (e.g. SW-CORE-3650 or FW-MAIN), prioritize immediately!
+        if (!hObj.userData.id.startsWith('RACK-')) {
+          chosenData = hObj.userData;
+          break;
+        } else if (!chosenData) {
+          chosenData = hObj.userData;
+        }
+      }
     }
-    if (hitObj && hitObj.userData && hitObj.userData.id) {
-      inspectDevice(hitObj.userData);
+
+    if (chosenData) {
+      inspectDevice(chosenData);
       return true;
     }
   }
@@ -5243,7 +5290,13 @@ window.addEventListener('touchend', function(e) {
 
 // WASD WALKTHROUGH CONTROLS
 var keys = {};
-window.addEventListener('keydown', function(e) { keys[e.code] = true; });
+window.addEventListener('keydown', function(e) {
+  keys[e.code] = true;
+  // Press 'E' in walk mode to inspect object in crosshair
+  if (e.code === 'KeyE' && activeNav === 'walk') {
+    performRaycastInspect(window.innerWidth / 2, window.innerHeight / 2);
+  }
+});
 window.addEventListener('keyup', function(e) { keys[e.code] = false; });
 
 // -------------------------------------------------------------
