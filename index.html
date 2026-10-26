@@ -2980,7 +2980,7 @@ function createServerCabinet(parent, x, y, z, rackId, labelText, specs) {
       type: 'Cisco Firepower 1010 NGFW Security Appliance',
       dept: 'Studio Server Room · Perimeter Defense',
       vlan: 'Perimeter / DMZ (172.16.0.0/24)',
-      ip: '172.16.0.4 (FW Inside) · 203.0.113.1 (Outside Transit)',
+      ip: '172.16.1.2 (Inside Port to Core) · 172.16.0.3 (Outside DMZ)',
       specs: 'Cisco Firepower 1010 · 880 Mbps Threat/IPS Throughput · 400 Mbps IPsec VPN',
       desc: 'Perimeter next-generation firewall inspecting all external traffic, filtering malware and intrusions, and terminating encrypted IPsec VPN tunnels with the branch.'
     });
@@ -3030,7 +3030,7 @@ function createServerCabinet(parent, x, y, z, rackId, labelText, specs) {
       type: '16TB Enterprise Rackmount Storage NAS',
       dept: 'Studio Server Room · Central Storage Farm',
       vlan: 'VLAN 30 (192.168.30.0/24)',
-      ip: '192.168.30.20',
+      ip: '192.168.30.12 (Table 11: Core Gi0/8)',
       specs: 'Synology RackStation · 16TB RAW (4x 4TB Enterprise SAS in RAID 6) + Dual 10G SFP+',
       desc: 'Central automated backup repository hosting daily snapshots, Active Directory system images, and encrypted ERP accounting backups.'
     });
@@ -3580,7 +3580,7 @@ createServerCabinet(bDatacenter, -5.5, 0, 0.0, 'RACK-ROUTERS', 'ROUTERS ENCLOSUR
 // Center Column: Core Switch & Cisco Firepower NGFW Enclosure
 createServerCabinet(bDatacenter, 0.0, 0, 0.0, 'RACK-NET', 'CORE ENCLOSURE\nCATALYST 3650 (VLAN 99) & NGFW', {
   vlan: 'VLAN 99 (Management Subnet 192.168.99.0/24) & VLAN 10-60 Core SVI',
-  ip: '192.168.99.1 (VLAN 99 SVI / Mgmt) · 172.16.1.1 (Core SVI) · 172.16.0.4 (FW)',
+  ip: '192.168.99.1 (VLAN 99 SVI) · 172.16.1.1 (Core SVI) · 172.16.1.2 (FW Inside) · 192.168.30.12 (NAS)',
   specs: 'Cisco Catalyst 3650-24TS L3 Core Switch + Cisco Firepower 1010 NGFW + 16TB NAS',
   desc: 'Central routing backbone enforcing inter-VLAN routing, ACL security policies, carrier failover, and dedicated VLAN 99 out-of-band management.'
 });
@@ -3599,6 +3599,21 @@ createServerPC(bDatacenter, 5.5, 0, 3.2, 0, 'SRV-ADM', 'SRV-ADM', 'SERVER PC (AD
   'Dedicated Server PC · 2.0 TB SAS Storage · 64GB RAM · Xeon Processor',
   'The dedicated server PC for the administration, hosting Microsoft Active Directory Domain Controller, accounting suites, and enterprise ERP database.'
 );
+
+// UPS #3: Dedicated APC Smart-UPS 3000VA for Enterprise Server PCs (SRV-EMP & SRV-ADM)
+var srvUps = box(bDatacenter, 5.5, 0.15, 0.0, 0.70, 0.28, 0.55, mats.rackUpsBlack);
+box(bDatacenter, 5.5, 0.15, 0.285, 0.16, 0.06, 0.005, mats.printerScreen, false); // Blue LCD
+box(bDatacenter, 5.3, 0.15, 0.285, 0.035, 0.035, 0.005, mats.ledGreen, false);
+registerInteractable(srvUps, {
+  id: 'UPS-SERVERS-3000VA',
+  type: 'APC Smart-UPS On-Line 3000VA Battery Backup Unit',
+  dept: 'Studio Server Room · Dedicated Server Power',
+  vlan: 'N/A (Physical Electrical Backup)',
+  ip: 'Non-IP (Hardwired Battery Power)',
+  specs: '3000VA / 2700W · Dedicated UPS for SRV-EMP & SRV-ADM',
+  desc: 'Zero-transfer-time battery protection sustaining the employee web staging server and corporate domain controller during power anomalies.'
+});
+makeTag('UPS-SERVERS-3000VA', -20 + 5.5, 1.10, -18 + 0.0, 0.18, 'device');
 
 // Overhead Cable Tray spanning the 3 columns (matching blueprint connection)
 box(bDatacenter, 0.0, 2.30, 0.0, 11.5, 0.08, 0.35, mats.cableTray);
@@ -4069,11 +4084,11 @@ createPrinter(bBranch, -3.2, 3.5, 2.0, 0, {
   switchPort: 'SW-BR-F2 Port Gi0/21',
   worldX: 38 - 3.2, worldY: 3.5, worldZ: -18 + 2.0
 });
-createWorkstation(bBranch, -8.5, 3.5, -5.5, 0, 'PC-BR-ADM-01', 'Branch Administration', 'VLAN 60', '192.168.60.10', mats.screenAdmin);
-createWorkstation(bBranch, -8.5, 3.5, -2.0, 0, 'PC-BR-ADM-02', 'Branch Administration', 'VLAN 60', '192.168.60.11', mats.screenAdmin);
-createWorkstation(bBranch, -8.5, 3.5, 1.5, 0, 'PC-BR-ADM-03', 'Branch Administration', 'VLAN 60', '192.168.60.12', mats.screenAdmin);
-createWorkstation(bBranch, -8.5, 3.5, 5.0, 0, 'PC-BR-ADM-04', 'Branch Operations', 'VLAN 60', '192.168.60.13', mats.screenAdmin);
-createWorkstation(bBranch, -4.5, 3.5, 5.0, -Math.PI / 2, 'PC-BR-ADM-05', 'Branch Management', 'VLAN 60', '192.168.60.14', mats.screenAdmin);
+createWorkstation(bBranch, -8.5, 3.5, -5.5, 0, 'PC-BR-ADM-01', 'Branch Administration', 'VLAN 60', '192.168.60.11', mats.screenAdmin);
+createWorkstation(bBranch, -8.5, 3.5, -2.0, 0, 'PC-BR-ADM-02', 'Branch Administration', 'VLAN 60', '192.168.60.12', mats.screenAdmin);
+createWorkstation(bBranch, -8.5, 3.5, 1.5, 0, 'PC-BR-ADM-03', 'Branch Administration', 'VLAN 60', '192.168.60.13', mats.screenAdmin);
+createWorkstation(bBranch, -8.5, 3.5, 5.0, 0, 'PC-BR-ADM-04', 'Branch Operations', 'VLAN 60', '192.168.60.14', mats.screenAdmin);
+createWorkstation(bBranch, -4.5, 3.5, 5.0, -Math.PI / 2, 'PC-BR-ADM-05', 'Branch Management', 'VLAN 60', '192.168.60.15', mats.screenAdmin);
 
 // Right Top Room: Dedicated IT Enclosure (RTR-BR & SRV-BR)
 var brClosetLight = new THREE.PointLight(0xffffff, 2.5, 10);
@@ -4087,6 +4102,19 @@ createServerCabinet(bBranch, 6.5, 3.5, -4.5, 'RACK-BRANCH', 'BRANCH CABINET\nRTR
   specs: 'Cisco 4331 ISR + Dual Catalyst 1000-24T Switches + SRV-BR',
   desc: 'Branch edge cabinet terminating local Converge internet and leased lines, supplying connectivity across VLAN 50 and VLAN 60.'
 });
+
+// 3rd Enterprise WAP: AP-BR-F2 in Branch Lounge / Training Room (completing 3 WAPs in BOM)
+var apBranch = box(bBranch, 6.5, 6.4, 4.5, 0.38, 0.08, 0.38, mats.ap);
+registerInteractable(apBranch, {
+  id: 'AP-BR-F2',
+  type: 'Enterprise Wi-Fi 6 Access Point (WAP)',
+  dept: 'Second Branch · Client & Staff Wireless',
+  vlan: 'VLAN 60 (Staff) / Guest (VLAN 40)',
+  ip: '192.168.60.5',
+  specs: 'Dual-Band 802.11ax Wi-Fi 6 AP · Client Isolation for Guest Portal',
+  desc: 'Provides secure enterprise wireless coverage for branch administration and isolated guest Wi-Fi in the client lounge.'
+});
+makeTag('AP-BR-F2 (WAP)', 38 + 6.5, 6.7, -18 + 4.5, 0.20, 'device');
 
 // Right Bottom Room: Executive Waiting Lounge (Sofas in U-shape matching blueprint)
 makeTag('WAITING LOUNGE', 38 + 6.5, 5.8, -18 + 4.5, 0.22, 'room');
