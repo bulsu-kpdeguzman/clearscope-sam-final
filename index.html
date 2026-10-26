@@ -3571,6 +3571,7 @@ box(bDatacenter, -3.25, 2.30, -1.0, 4.5, 0.08, 0.35, mats.cableTray);
 
 // Left Column: Edge Routers Cabinet (Primary RTR-MAIN-1 & Secondary RTR-MAIN-2)
 createServerCabinet(bDatacenter, -5.5, 0, 0.0, 'RACK-ROUTERS', 'ROUTERS ENCLOSURE\nRTR-MAIN-1 & RTR-MAIN-2', {
+  vlan: 'WAN Transit (Public /29 PLDT & /30 Globe)',
   ip: '203.0.113.2 (PLDT) & 203.0.113.6 (Globe)',
   specs: 'Dual Cisco 4331 ISR Routers · HSRP Active/Standby · Diverse Dual Carrier Uplinks',
   desc: 'Terminates primary PLDT Enterprise 200M fiber and secondary Globe Business 100M backup connection.'
@@ -4079,10 +4080,12 @@ var brClosetLight = new THREE.PointLight(0xffffff, 2.5, 10);
 brClosetLight.position.set(6.5, 5.4, -4.5);
 bBranch.add(brClosetLight);
 makeTag('IT CLOSET\nRTR-BR & DUAL 24T SWITCHES', 38 + 6.5, 5.8, -18 - 4.5, 0.22, 'device');
-createServerCabinet(bBranch, 6.5, 3.5, -4.5, 'RACK-BRANCH', 'BRANCH CABINET\nRTR-BR & SRV-BR', {
-  ip: '203.0.113.10 & 192.168.60.10',
-  specs: 'Cisco 4331 ISR (Converge 100M DIA) + SRV-BR (1.0 TB Ticket Cache)',
-  desc: 'Branch edge router terminating local internet and leased lines back to Main Branch.'
+createServerCabinet(bBranch, 6.5, 3.5, -4.5, 'RACK-BRANCH', 'BRANCH CABINET\nRTR-BR, SWITCHES & SRV-BR', {
+  vlan: 'VLAN 50 & VLAN 60 (Branch Subnets)',
+  dept: 'Second Branch · IT Enclosure',
+  ip: '203.0.113.10 (Converge WAN) & 192.168.60.10 (SRV-BR)',
+  specs: 'Cisco 4331 ISR + Dual Catalyst 1000-24T Switches + SRV-BR',
+  desc: 'Branch edge cabinet terminating local Converge internet and leased lines, supplying connectivity across VLAN 50 and VLAN 60.'
 });
 
 // Right Bottom Room: Executive Waiting Lounge (Sofas in U-shape matching blueprint)
