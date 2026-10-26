@@ -2569,9 +2569,14 @@ var mats = {
   screenAdmin: new THREE.MeshBasicMaterial({ color: '#10b981' }),
   screenSupport: new THREE.MeshBasicMaterial({ color: '#f59e0b' }),
   
-  rackFrame: new THREE.MeshStandardMaterial({ color: '#020617', roughness: 0.4, metalness: 0.7 }),
-  rackGlass: new THREE.MeshStandardMaterial({ color: '#38bdf8', transparent: true, opacity: 0.3, metalness: 0.8 }),
+  rackFrame: new THREE.MeshStandardMaterial({ color: '#090d16', roughness: 0.35, metalness: 0.8 }),
+  rackGlass: new THREE.MeshStandardMaterial({ color: '#38bdf8', transparent: true, opacity: 0.18, metalness: 0.9, roughness: 0.1 }),
   rackBlade: new THREE.MeshStandardMaterial({ color: '#1e293b', roughness: 0.5, metalness: 0.6 }),
+  rackCiscoTeal: new THREE.MeshStandardMaterial({ color: '#0284c7', roughness: 0.35, metalness: 0.65 }),
+  rackFirewallRed: new THREE.MeshStandardMaterial({ color: '#b91c1c', roughness: 0.4, metalness: 0.5 }),
+  rackSilver: new THREE.MeshStandardMaterial({ color: '#94a3b8', roughness: 0.28, metalness: 0.85 }),
+  rackPortDark: new THREE.MeshStandardMaterial({ color: '#050811', roughness: 0.7, metalness: 0.3 }),
+  rackUpsBlack: new THREE.MeshStandardMaterial({ color: '#0f172a', roughness: 0.6, metalness: 0.4 }),
   ledGreen: new THREE.MeshBasicMaterial({ color: '#34d399' }),
   ledBlue: new THREE.MeshBasicMaterial({ color: '#38bdf8' }),
   ledAmber: new THREE.MeshBasicMaterial({ color: '#fbbf24' }),
@@ -2903,35 +2908,285 @@ function createServerPC(parent, x, y, z, rotY, pcId, labelTitle, labelSub, dept,
   makeTag(labelTitle + '\n' + labelSub, wx, wy, wz, 0.28, 'device');
 }
 
-// SERVER RACK
+// SERVER RACK (REALISTIC 42U DATA CENTER CABINET WITH VISIBLE HARDWARE & INDIVIDUAL DEVICE INSPECTION)
 function createServerCabinet(parent, x, y, z, rackId, labelText, specs) {
   var g = new THREE.Group();
   g.position.set(x, y, z);
   parent.add(g);
 
-  box(g, 0, 1.1, 0, 0.85, 2.2, 1.05, mats.rackFrame);
-  box(g, 0, 1.1, 0.53, 0.78, 2.1, 0.02, mats.rackGlass);
+  // 1. 42U Heavy-Duty Server Cabinet Frame (Open-front with structural corner posts)
+  // Base plinth
+  box(g, 0, 0.05, 0, 0.90, 0.10, 1.05, mats.rackFrame);
+  // Top canopy roof
+  box(g, 0, 2.18, 0, 0.90, 0.06, 1.05, mats.rackFrame);
+  // 4 Vertical Corner Steel Posts
+  box(g, -0.42, 1.12, 0.49, 0.06, 2.14, 0.06, mats.rackFrame);
+  box(g, 0.42, 1.12, 0.49, 0.06, 2.14, 0.06, mats.rackFrame);
+  box(g, -0.42, 1.12, -0.49, 0.06, 2.14, 0.06, mats.rackFrame);
+  box(g, 0.42, 1.12, -0.49, 0.06, 2.14, 0.06, mats.rackFrame);
+  // Solid side panels
+  box(g, -0.44, 1.12, 0, 0.02, 2.04, 0.92, mats.rackFrame);
+  box(g, 0.44, 1.12, 0, 0.02, 2.04, 0.92, mats.rackFrame);
+  // Perforated rear exhaust panel
+  box(g, 0, 1.12, -0.50, 0.82, 2.04, 0.02, mats.rackBlade);
+  // Inside 19" vertical EIA mounting rails (silver zinc-plated)
+  box(g, -0.36, 1.12, 0.45, 0.03, 2.04, 0.03, mats.rackSilver);
+  box(g, 0.36, 1.12, 0.45, 0.03, 2.04, 0.03, mats.rackSilver);
+  // Ultra-clear smoked tempered glass front door
+  var glassDoor = box(g, 0, 1.12, 0.51, 0.78, 2.06, 0.015, mats.rackGlass);
+  // Aluminum door trim and handle
+  box(g, -0.38, 1.12, 0.52, 0.02, 2.06, 0.02, mats.rackSilver, false);
+  box(g, 0.38, 1.12, 0.52, 0.02, 2.06, 0.02, mats.rackSilver, false);
+  box(g, 0.34, 1.12, 0.535, 0.025, 0.32, 0.025, mats.rackSilver, false);
+  // Overhead cable ladder segment
+  box(g, 0, 2.30, 0, 0.90, 0.06, 0.35, mats.cableTray);
 
-  for (var i = 0; i < 9; i++) {
-    var by = 0.35 + i * 0.20;
-    box(g, 0, by, 0.1, 0.76, 0.16, 0.80, mats.rackBlade);
-    box(g, -0.28, by, 0.51, 0.04, 0.03, 0.01, mats.ledGreen, false);
-    box(g, -0.22, by, 0.51, 0.04, 0.03, 0.01, mats.ledBlue, false);
-    box(g, -0.16, by, 0.51, 0.04, 0.03, 0.01, i === 4 ? mats.ledAmber : mats.ledGreen, false);
-  }
-  box(g, 0, 2.35, 0, 0.85, 0.08, 0.35, mats.cableTray);
-
-  var data = {
+  // Overall cabinet clickable background
+  var cabinetData = {
     id: rackId,
-    type: '42U Datacenter Cabinet',
+    type: '42U Enterprise Datacenter Cabinet',
     dept: 'Enterprise Core Infrastructure',
-    vlan: 'VLAN 30 (192.168.30.0/24)',
+    vlan: specs.vlan || 'VLAN 99 / VLAN 30 Trunk',
     ip: specs.ip,
     specs: specs.specs,
     desc: specs.desc
   };
-  registerInteractable(g.children[0], data);
+  registerInteractable(glassDoor, cabinetData);
 
+  // 2. Hardware Layout tailored to Cabinet Identity
+  if (rackId === 'RACK-NET') {
+    // -------------------------------------------------------------
+    // CENTER RACK: CORE ENCLOSURE (FIREPOWER, CATALYST 3650, NAS, UPS)
+    // -------------------------------------------------------------
+    // Device 1: Cisco Firepower 1010 NGFW (1U at Y = 1.86)
+    box(g, 0, 1.86, 0.10, 0.70, 0.075, 0.65, mats.rackBlade);
+    var fwFace = box(g, 0, 1.86, 0.45, 0.70, 0.075, 0.025, mats.rackBlade);
+    box(g, 0, 1.885, 0.465, 0.68, 0.01, 0.005, mats.rackFirewallRed, false);
+    box(g, -0.12, 1.85, 0.465, 0.22, 0.035, 0.005, mats.rackPortDark, false);
+    box(g, 0.18, 1.86, 0.465, 0.016, 0.016, 0.005, mats.ledGreen, false);
+    box(g, 0.22, 1.86, 0.465, 0.016, 0.016, 0.005, mats.ledGreen, false);
+    box(g, 0.26, 1.86, 0.465, 0.016, 0.016, 0.005, mats.ledAmber, false);
+    registerInteractable(fwFace, {
+      id: 'FW-MAIN',
+      type: 'Cisco Firepower 1010 NGFW Security Appliance',
+      dept: 'Studio Server Room · Perimeter Defense',
+      vlan: 'Perimeter / DMZ (172.16.0.0/24)',
+      ip: '172.16.0.4 (FW Inside) & 203.0.113.1 (Outside Transit)',
+      specs: 'Cisco Firepower 1010 · 880 Mbps Threat/IPS Throughput · 400 Mbps IPsec VPN',
+      desc: 'Perimeter next-generation firewall inspecting all external traffic, filtering malware and intrusions, and terminating encrypted IPsec VPN tunnels with the branch.'
+    });
+
+    // Device 2: Cisco Catalyst 3650-24TS Layer 3 Core Switch (1U at Y = 1.68)
+    box(g, 0, 1.68, 0.10, 0.70, 0.075, 0.65, mats.rackBlade);
+    var swFace = box(g, 0, 1.68, 0.45, 0.70, 0.075, 0.025, mats.rackCiscoTeal); // Distinct Cisco Teal faceplate
+    box(g, -0.28, 1.68, 0.465, 0.08, 0.028, 0.005, mats.rackSilver, false);
+    box(g, -0.06, 1.68, 0.465, 0.32, 0.042, 0.005, mats.rackPortDark, false);
+    for (var p = 0; p < 8; p++) {
+      box(g, -0.20 + p * 0.04, 1.708, 0.468, 0.014, 0.008, 0.004, mats.ledGreen, false);
+    }
+    box(g, 0.18, 1.68, 0.465, 0.11, 0.038, 0.005, mats.rackSilver, false);
+    box(g, 0.15, 1.708, 0.468, 0.012, 0.008, 0.004, mats.ledBlue, false);
+    box(g, 0.19, 1.708, 0.468, 0.012, 0.008, 0.004, mats.ledBlue, false);
+    registerInteractable(swFace, {
+      id: 'SW-CORE-3650',
+      type: 'Cisco Catalyst 3650-24TS Layer 3 Core Switch',
+      dept: 'Studio Server Room · Central Routing Backbone',
+      vlan: 'VLAN 99 (Management Subnet 192.168.99.0/24)',
+      ip: '192.168.99.1 (VLAN 99 SVI / Mgmt) & 172.16.1.1 (Inter-VLAN Core SVI)',
+      specs: 'Cisco Catalyst 3650-24TS-L · 24x 1G Ethernet + 4x 10G SFP+ Uplinks · 160 Gbps Switching Capacity',
+      desc: 'Central multilayer routing backbone enforcing inter-VLAN routing and ACL security policies across VLANs 10, 20, 30, 40, 50, 60. Hosts dedicated VLAN 99 Management SVI (192.168.99.1) accessible strictly via encrypted SSHv2 (RSA-2048).'
+    });
+
+    // Device 3: 24-Port Cat6A Fiber & Copper Patch Panel (1U at Y = 1.50)
+    box(g, 0, 1.50, 0.10, 0.70, 0.065, 0.20, mats.rackBlade);
+    box(g, 0, 1.50, 0.45, 0.70, 0.065, 0.02, mats.rackBlade);
+    box(g, 0, 1.50, 0.462, 0.52, 0.035, 0.005, mats.rackPortDark, false);
+    box(g, -0.30, 1.44, 0.45, 0.03, 0.03, 0.04, mats.cableTray, false);
+    box(g, 0.30, 1.44, 0.45, 0.03, 0.03, 0.04, mats.cableTray, false);
+
+    // Device 4: 16TB Enterprise Storage NAS (2U at Y = 1.25)
+    box(g, 0, 1.25, 0.10, 0.70, 0.14, 0.65, mats.rackBlade);
+    var nasFace = box(g, 0, 1.25, 0.45, 0.70, 0.14, 0.025, mats.rackSilver);
+    for (var r = 0; r < 2; r++) {
+      for (var c = 0; c < 4; c++) {
+        var bayX = -0.22 + c * 0.145;
+        var bayY = 1.21 + r * 0.065;
+        box(g, bayX, bayY, 0.464, 0.12, 0.052, 0.006, mats.rackBlade, false);
+        box(g, bayX - 0.04, bayY, 0.468, 0.015, 0.025, 0.005, mats.rackSilver, false);
+        box(g, bayX + 0.04, bayY + 0.012, 0.468, 0.010, 0.008, 0.005, mats.ledGreen, false);
+      }
+    }
+    registerInteractable(nasFace, {
+      id: 'NAS-STORAGE-16TB',
+      type: '16TB Enterprise Rackmount Storage NAS',
+      dept: 'Studio Server Room · Central Storage Farm',
+      vlan: 'VLAN 30 (192.168.30.0/24)',
+      ip: '192.168.30.20',
+      specs: 'Synology RackStation · 16TB RAW (4x 4TB Enterprise SAS in RAID 6) + Dual 10G SFP+',
+      desc: 'Central automated backup repository hosting daily snapshots, Active Directory system images, and encrypted ERP accounting backups.'
+    });
+
+    // Device 5: 1U Rackmount KVM Display Console & Local Management Terminal (Y = 0.95)
+    box(g, 0, 0.95, 0.10, 0.70, 0.05, 0.65, mats.rackBlade);
+    var kvmFace = box(g, 0, 0.95, 0.45, 0.70, 0.05, 0.025, mats.rackBlade);
+    box(g, 0, 0.95, 0.465, 0.20, 0.028, 0.005, mats.screenCode, false);
+    box(g, -0.25, 0.95, 0.465, 0.08, 0.025, 0.005, mats.rackSilver, false);
+    registerInteractable(kvmFace, {
+      id: 'KVM-CONSOLE',
+      type: '1U Rackmount KVM Console & IT Management Terminal',
+      dept: 'Studio Server Room · Out-of-Band Operations',
+      vlan: 'VLAN 99 (Management Subnet 192.168.99.0/24)',
+      ip: '192.168.99.2 (Out-of-Band Mgmt Terminal)',
+      specs: '17" TFT LCD Fold-out Console · 8-Port Integrated KVM Switch · Dedicated VLAN 99 Access',
+      desc: 'Local physical emergency management terminal providing direct out-of-band console access to Cisco Catalyst 3650 and Firepower appliances.'
+    });
+
+    // Device 6: APC Smart-UPS 3000VA Uninterruptible Power Supply (2U at Y = 0.38)
+    box(g, 0, 0.38, 0.10, 0.70, 0.14, 0.65, mats.rackUpsBlack);
+    var upsFace = box(g, 0, 0.38, 0.45, 0.70, 0.14, 0.025, mats.rackUpsBlack);
+    box(g, 0.18, 0.38, 0.465, 0.16, 0.06, 0.005, mats.printerScreen, false);
+    box(g, -0.22, 0.38, 0.465, 0.035, 0.035, 0.005, mats.ledGreen, false);
+    registerInteractable(upsFace, {
+      id: 'UPS-CORE-3000VA',
+      type: 'APC Smart-UPS On-Line 3000VA Power Protection',
+      dept: 'Studio Server Room · Critical Power',
+      vlan: 'VLAN 99 (Management Subnet 192.168.99.0/24)',
+      ip: '192.168.99.250 (Network Management Card)',
+      specs: '3000VA / 2700W · Pure Sine Wave Dual Conversion · Hot-swappable Battery Modules',
+      desc: 'Zero-transfer-time uninterrupted power supply protecting the Catalyst 3650 Core Switch and Firepower NGFW during power fluctuations.'
+    });
+
+  } else if (rackId === 'RACK-ROUTERS') {
+    // -------------------------------------------------------------
+    // LEFT RACK: WAN EDGE ROUTERS ENCLOSURE (RTR-MAIN-1 & RTR-MAIN-2)
+    // -------------------------------------------------------------
+    // Device 1: Cisco 4331 ISR Primary Router (PLDT Fiber, Y = 1.80)
+    box(g, 0, 1.80, 0.10, 0.70, 0.08, 0.65, mats.rackBlade);
+    var rtr1Face = box(g, 0, 1.80, 0.45, 0.70, 0.08, 0.025, mats.rackBlade);
+    box(g, -0.26, 1.80, 0.465, 0.09, 0.028, 0.005, mats.rackSilver, false);
+    box(g, -0.06, 1.80, 0.465, 0.18, 0.038, 0.005, mats.rackPortDark, false);
+    box(g, 0.12, 1.80, 0.465, 0.08, 0.035, 0.005, mats.rackSilver, false);
+    box(g, 0.10, 1.815, 0.468, 0.012, 0.008, 0.004, mats.ledGreen, false);
+    box(g, 0.24, 1.80, 0.465, 0.016, 0.016, 0.005, mats.ledGreen, false);
+    registerInteractable(rtr1Face, {
+      id: 'RTR-MAIN-1',
+      type: 'Cisco 4331 Integrated Services Router (Primary)',
+      dept: 'Studio Server Room · WAN Edge',
+      vlan: 'VLAN 99 (Management) & WAN Transit',
+      ip: '203.0.113.2 (PLDT Public WAN) & 192.168.99.253 (Mgmt SSH)',
+      specs: 'Cisco 4331 ISR · 200 Mbps Symmetric DIA (1:1 CIR) · HSRP Active (Priority 110)',
+      desc: 'Primary edge gateway terminating PLDT Enterprise 200M DIA fiber circuit. Active gateway handling outgoing and incoming corporate traffic.'
+    });
+
+    // Device 2: Cisco 4331 ISR Standby Router (Globe Backup, Y = 1.62)
+    box(g, 0, 1.62, 0.10, 0.70, 0.08, 0.65, mats.rackBlade);
+    var rtr2Face = box(g, 0, 1.62, 0.45, 0.70, 0.08, 0.025, mats.rackBlade);
+    box(g, -0.26, 1.62, 0.465, 0.09, 0.028, 0.005, mats.rackSilver, false);
+    box(g, -0.06, 1.62, 0.465, 0.18, 0.038, 0.005, mats.rackPortDark, false);
+    box(g, 0.12, 1.62, 0.465, 0.08, 0.035, 0.005, mats.rackSilver, false);
+    box(g, 0.10, 1.635, 0.468, 0.012, 0.008, 0.004, mats.ledGreen, false);
+    box(g, 0.24, 1.62, 0.465, 0.016, 0.016, 0.005, mats.ledAmber, false);
+    registerInteractable(rtr2Face, {
+      id: 'RTR-MAIN-2',
+      type: 'Cisco 4331 Integrated Services Router (Secondary)',
+      dept: 'Studio Server Room · WAN Edge',
+      vlan: 'VLAN 99 (Management) & WAN Transit',
+      ip: '203.0.113.6 (Globe Public WAN) & 192.168.99.254 (Mgmt SSH)',
+      specs: 'Cisco 4331 ISR · 100 Mbps Backup DIA · HSRP Standby (Priority 90)',
+      desc: 'Redundant edge gateway terminating secondary Globe Business 100M DIA connection. Instantly assumes traffic forwarding if primary router fails.'
+    });
+
+    // Device 3: Fiber Optic ODF Distribution Panel (Y = 1.42)
+    box(g, 0, 1.42, 0.10, 0.70, 0.06, 0.25, mats.rackBlade);
+    box(g, 0, 1.42, 0.45, 0.70, 0.06, 0.02, mats.rackBlade);
+    box(g, 0, 1.42, 0.462, 0.44, 0.03, 0.005, mats.rackSilver, false);
+
+    // Device 4: APC Smart-UPS 3000VA (Y = 0.38)
+    box(g, 0, 0.38, 0.10, 0.70, 0.14, 0.65, mats.rackUpsBlack);
+    var rtrUps = box(g, 0, 0.38, 0.45, 0.70, 0.14, 0.025, mats.rackUpsBlack);
+    box(g, 0.18, 0.38, 0.465, 0.16, 0.06, 0.005, mats.printerScreen, false);
+    box(g, -0.22, 0.38, 0.465, 0.035, 0.035, 0.005, mats.ledGreen, false);
+    registerInteractable(rtrUps, {
+      id: 'UPS-ROUTERS-3000VA',
+      type: 'APC Smart-UPS On-Line 3000VA Power Protection',
+      dept: 'Studio Server Room · Critical Power',
+      vlan: 'VLAN 99 (Management Subnet 192.168.99.0/24)',
+      ip: '192.168.99.251 (Network Management Card)',
+      specs: '3000VA / 2700W · Dedicated UPS for Edge Routers RTR-MAIN-1 & RTR-MAIN-2',
+      desc: 'Provides continuous battery backup ensuring zero carrier link interruption during grid power events.'
+    });
+
+  } else {
+    // -------------------------------------------------------------
+    // BRANCH RACK: RACK-BRANCH (RTR-BR, SW-BR, SRV-BR, UPS)
+    // -------------------------------------------------------------
+    // Device 1: Cisco 4331 ISR Branch Router (Y = 1.76)
+    box(g, 0, 1.76, 0.10, 0.70, 0.08, 0.65, mats.rackBlade);
+    var brRtrFace = box(g, 0, 1.76, 0.45, 0.70, 0.08, 0.025, mats.rackBlade);
+    box(g, -0.26, 1.76, 0.465, 0.09, 0.028, 0.005, mats.rackSilver, false);
+    box(g, -0.06, 1.76, 0.465, 0.18, 0.038, 0.005, mats.rackPortDark, false);
+    box(g, 0.12, 1.76, 0.465, 0.08, 0.035, 0.005, mats.rackSilver, false);
+    box(g, 0.24, 1.76, 0.465, 0.016, 0.016, 0.005, mats.ledGreen, false);
+    registerInteractable(brRtrFace, {
+      id: 'RTR-BR',
+      type: 'Cisco 4331 ISR Branch Edge Router',
+      dept: 'Second Branch · IT Enclosure',
+      vlan: 'VLAN 60 & WAN Transit',
+      ip: '203.0.113.10 (Converge DIA) & 192.168.60.1 (Branch Gateway)',
+      specs: 'Cisco 4331 ISR · 100 Mbps DIA · Site-to-Site IPsec VPN to Main Branch',
+      desc: 'Terminates Converge 100M DIA and maintains encrypted IPsec tunnel back to Main Branch Core.'
+    });
+
+    // Device 2: Branch Access Switch SW-BR (Y = 1.56)
+    box(g, 0, 1.56, 0.10, 0.70, 0.075, 0.65, mats.rackBlade);
+    var brSwFace = box(g, 0, 1.56, 0.45, 0.70, 0.075, 0.025, mats.rackCiscoTeal);
+    box(g, -0.06, 1.56, 0.465, 0.32, 0.042, 0.005, mats.rackPortDark, false);
+    for (var bp = 0; bp < 8; bp++) {
+      box(g, -0.20 + bp * 0.04, 1.588, 0.468, 0.014, 0.008, 0.004, mats.ledGreen, false);
+    }
+    registerInteractable(brSwFace, {
+      id: 'SW-BR-48T',
+      type: 'Cisco Catalyst 1000 48-Port Access Switch',
+      dept: 'Second Branch · IT Enclosure',
+      vlan: 'VLAN 50 & VLAN 60',
+      ip: '192.168.60.2 (Switch Management)',
+      specs: 'Cisco Catalyst 1000-48T-4G-L · 48x Gigabit RJ-45 + 4x 1G SFP Uplinks',
+      desc: 'Distributes high-speed local connectivity to 30 support workstations (VLAN 50), 5 branch admin PCs (VLAN 60), and network printers.'
+    });
+
+    // Device 3: Local Ticket Cache Server SRV-BR (2U at Y = 1.25)
+    box(g, 0, 1.25, 0.10, 0.70, 0.13, 0.65, mats.rackBlade);
+    var brSrvFace = box(g, 0, 1.25, 0.45, 0.70, 0.13, 0.025, mats.rackSilver);
+    box(g, -0.15, 1.25, 0.465, 0.22, 0.08, 0.006, mats.rackBlade, false);
+    box(g, 0.15, 1.25, 0.465, 0.22, 0.08, 0.006, mats.rackBlade, false);
+    box(g, 0.22, 1.25, 0.468, 0.012, 0.012, 0.005, mats.ledGreen, false);
+    registerInteractable(brSrvFace, {
+      id: 'SRV-BR',
+      type: 'Branch Server & Local Cache Node',
+      dept: 'Second Branch · IT Enclosure',
+      vlan: 'VLAN 60 (192.168.60.0/24)',
+      ip: '192.168.60.10',
+      specs: '1.0 TB NVMe Array · 32GB RAM · Local CRM Ticket Cache & Print Spooler',
+      desc: 'Provides low-latency ticket caching and local print queuing for branch operations, syncing asynchronously with Main Branch servers.'
+    });
+
+    // Device 4: UPS Battery Backup (Y = 0.38)
+    box(g, 0, 0.38, 0.10, 0.70, 0.14, 0.65, mats.rackUpsBlack);
+    var brUps = box(g, 0, 0.38, 0.45, 0.70, 0.14, 0.025, mats.rackUpsBlack);
+    box(g, 0.18, 0.38, 0.465, 0.16, 0.06, 0.005, mats.printerScreen, false);
+    box(g, -0.22, 0.38, 0.465, 0.035, 0.035, 0.005, mats.ledGreen, false);
+    registerInteractable(brUps, {
+      id: 'UPS-BRANCH-2000VA',
+      type: 'APC Smart-UPS 2000VA Backup',
+      dept: 'Second Branch · IT Enclosure',
+      vlan: 'VLAN 60',
+      ip: '192.168.60.250',
+      specs: '2000VA Power Protection for RTR-BR & SRV-BR',
+      desc: 'Ensures branch connectivity remains live during utility brownouts and power transfers.'
+    });
+  }
+
+  // 3. Floating 3D Device Tag
   var wx = parent.position.x + x;
   var wy = parent.position.y + y + 2.50;
   var wz = parent.position.z + z;
@@ -3308,10 +3563,11 @@ createServerCabinet(bDatacenter, -5.5, 0, 0.0, 'RACK-ROUTERS', 'ROUTERS ENCLOSUR
 });
 
 // Center Column: Core Switch & Cisco Firepower NGFW Enclosure
-createServerCabinet(bDatacenter, 0.0, 0, 0.0, 'RACK-NET', 'CORE ENCLOSURE\nCATALYST 3650 & FIREWALL', {
-  ip: '172.16.1.1 (Core SVI), 172.16.0.4 (FW) & 192.168.99.1 (Mgmt)',
-  specs: 'Cisco Catalyst 3650 L3 Core Switch + Cisco Firepower 1010 NGFW + 16TB NAS',
-  desc: 'Central routing backbone enforcing inter-VLAN routing, ACL security policies, and carrier failover.'
+createServerCabinet(bDatacenter, 0.0, 0, 0.0, 'RACK-NET', 'CORE ENCLOSURE\nCATALYST 3650 (VLAN 99) & NGFW', {
+  vlan: 'VLAN 99 (Management Subnet 192.168.99.0/24) & VLAN 10-60 Core SVI',
+  ip: '192.168.99.1 (VLAN 99 SVI / Mgmt) · 172.16.1.1 (Core SVI) · 172.16.0.4 (FW)',
+  specs: 'Cisco Catalyst 3650-24TS L3 Core Switch + Cisco Firepower 1010 NGFW + 16TB NAS',
+  desc: 'Central routing backbone enforcing inter-VLAN routing, ACL security policies, carrier failover, and dedicated VLAN 99 out-of-band management.'
 });
 
 // Right Column: Dedicated Server PCs (SRV-EMP on Top, SRV-ADM on Bottom)
@@ -4460,7 +4716,12 @@ function inspectDevice(d) {
   if (bp) bp.style.display = 'none';
   document.getElementById('inspName').textContent = d.id;
   document.getElementById('inspSub').textContent = d.dept || d.type;
-  document.getElementById('inspVlan').textContent = d.vlan ? d.vlan.split(' ')[0] : 'NODE';
+  var vBadge = 'NODE';
+  if (d.vlan) {
+    var vMatch = d.vlan.match(/VLAN\s*\d+/i);
+    vBadge = vMatch ? vMatch[0].toUpperCase() : d.vlan.split('(')[0].trim();
+  }
+  document.getElementById('inspVlan').textContent = vBadge;
 
   var box = document.getElementById('inspSpecs');
   box.innerHTML = `
