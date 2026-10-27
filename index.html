@@ -1483,18 +1483,7 @@ if (typeof THREE === 'undefined') {
 <body>
 <div id="scene"></div>
 <div id="crosshair"></div>
-<!-- MINECRAFT FLIGHT & FREE-LOOK HUD PILL -->
-<div class="glass" id="minecraftHUD" style="display:none; position:fixed; bottom:74px; left:50%; transform:translateX(-50%); z-index:90; padding:6px 14px; border-radius:20px; font-size:11.5px; font-weight:600; color:#e0f2fe; background:rgba(15,23,42,0.85); border:1px solid rgba(56,189,248,0.4); pointer-events:none; box-shadow:0 8px 24px rgba(0,0,0,0.45); align-items:center; gap:10px; white-space:nowrap;">
-  <span>🎮 <strong>Minecraft Controls:</strong> WASD to Move</span>
-  <span style="opacity:0.4;">|</span>
-  <span><kbd style="background:rgba(255,255,255,0.18);padding:1px 6px;border-radius:4px;color:#fff;">Space</kbd> Fly UP</span>
-  <span><kbd style="background:rgba(255,255,255,0.18);padding:1px 6px;border-radius:4px;color:#fff;">Shift / C</kbd> Fly DOWN</span>
-  <span><kbd style="background:rgba(255,255,255,0.18);padding:1px 6px;border-radius:4px;color:#fff;">Ctrl</kbd> Sprint</span>
-  <span style="opacity:0.4;">|</span>
-  <span style="color:#38bdf8;">Move Mouse to Look</span>
-  <span style="opacity:0.4;">|</span>
-  <span><kbd style="background:rgba(255,255,255,0.18);padding:1px 6px;border-radius:4px;color:#fff;">Esc</kbd> Unlock Mouse</span>
-</div>
+
 <!-- MOBILE VIRTUAL JOYSTICK (SHOWN IN WALK MODE ON TOUCH/MOBILE) -->
 <div id="mobileJoystickContainer">
   <div id="joystickSprintBadge">⚡ SPRINT</div>
@@ -1599,16 +1588,7 @@ if (typeof THREE === 'undefined') {
 
 <!-- FLOATING BOTTOM DOCK -->
 <div class="glass" id="bottomDock">
-  <button class="dock-btn active" id="btnDockOrbit" onclick="setNavMode('orbit')">
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18v-9h9"/></svg>
-    <span>Orbit</span>
-  </button>
-  <button class="dock-btn" id="btnDockWalk" onclick="setNavMode('walk')">
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 4v16"/><path d="M17 8l-4-4-4 4"/></svg>
-    <span id="lblWalkText">Fly / Walk</span>
-  </button>
-
-  <div class="dock-sep"></div>
+  
 
   <button class="dock-btn dock-opt-btn" id="btnDockTags" onclick="cycleLabels()">
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><circle cx="7" cy="7" r="1.5"/></svg>
@@ -1851,7 +1831,9 @@ walk.minPolarAngle = 0.08; // Clamp pitch to prevent gimbal singularity at zenit
 walk.maxPolarAngle = Math.PI - 0.08; // Clamp pitch to prevent gimbal singularity at nadir
 scene.add(walk.getObject());
 
-var activeNav = 'orbit';
+var activeNav = 'walk';
+walk.connect();
+orbit.enabled = false;
 
 var joystickInput = { x: 0, y: 0 };
 var isMobileSprint = false;
@@ -1900,22 +1882,21 @@ document.addEventListener('webkitfullscreenchange', updateFsButton);
 
 function setNavMode(mode) {
   activeNav = mode;
-  document.getElementById('btnDockOrbit').className = mode === 'orbit' ? 'dock-btn active' : 'dock-btn';
-  document.getElementById('btnDockWalk').className = mode === 'walk' ? 'dock-btn active' : 'dock-btn';
+  var bOrbit = document.getElementById('btnDockOrbit');
+  if (bOrbit) bOrbit.className = mode === 'orbit' ? 'dock-btn active' : 'dock-btn';
+  var bWalk = document.getElementById('btnDockWalk');
+  if (bWalk) bWalk.className = mode === 'walk' ? 'dock-btn active' : 'dock-btn';
   var crosshair = document.getElementById('crosshair');
-  var mHud = document.getElementById('minecraftHUD');
 
   if (mode === 'orbit') {
     walk.disconnect();
     orbit.enabled = true;
     if (crosshair && !document.pointerLockElement) crosshair.style.display = 'none';
-    if (mHud && !document.pointerLockElement) mHud.style.display = 'none';
   } else {
     orbit.enabled = false;
     walk.connect();
     if (crosshair) crosshair.style.display = 'block';
 
-    // Level horizon and preserve safe eye height
     camera.rotation.order = 'YXZ';
     var euler = new THREE.Euler(0, 0, 0, 'YXZ');
     euler.setFromQuaternion(camera.quaternion);
@@ -1935,9 +1916,7 @@ function setNavMode(mode) {
 document.addEventListener('pointerlockchange', function() {
   var isLocked = !!document.pointerLockElement;
   var crosshair = document.getElementById('crosshair');
-  var mHud = document.getElementById('minecraftHUD');
   if (crosshair) crosshair.style.display = isLocked ? 'block' : 'none';
-  if (mHud) mHud.style.display = isLocked ? 'flex' : 'none';
 });
 
 // Orbit Mode Mouse-Look (Move mouse without clicking to rotate around scene)
@@ -5356,11 +5335,7 @@ window.addEventListener('click', function(e) {
 
   // If empty space was clicked on desktop, lock pointer for effortless mouse-look!
   if (!hitDevice && !isTouchDevice && window.innerWidth > 860) {
-    if (activeNav === 'walk') {
-      walk.lock();
-    } else {
-      renderer.domElement.requestPointerLock();
-    }
+    walk.lock();
   }
 });
 
