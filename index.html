@@ -2024,7 +2024,7 @@ var tourRoutes = {
         cam: [20.5, 5.2, 16.5], tgt: [21.5, 4.6, 11.5],
         facility: 'admin',
         title: 'Floor 2: Room 202 (Network Operations Center · 5 PCs, Switch & Printer)',
-        desc: 'Cisco Catalyst 1000 Access Switch (SW-ADM-F2) and network administration monitoring stations.',
+        desc: 'Network administration monitoring stations connected via high-speed enterprise Wi-Fi 6 to AP-ADM-F2.',
         duration: 4000, roof: false
       },
       {
@@ -2797,7 +2797,7 @@ function registerInteractable(mesh, data) {
 }
 
 // WORKSTATION (PC + DUAL MONITORS + DESK)
-function createWorkstation(parent, x, y, z, rotY, pcId, dept, vlan, ip, screenMat) {
+function createWorkstation(parent, x, y, z, rotY, pcId, dept, vlan, ip, screenMat, wirelessOptions) {
   var g = new THREE.Group();
   g.position.set(x, y, z);
   g.rotation.y = rotY || 0;
@@ -2826,17 +2826,21 @@ function createWorkstation(parent, x, y, z, rotY, pcId, dept, vlan, ip, screenMa
   box(g, 0, 0.46, 0.48, 0.44, 0.06, 0.44, mats.chair);
   box(g, 0, 0.78, 0.66, 0.44, 0.56, 0.06, mats.chair);
 
+  var isWireless = !!wirelessOptions;
   var data = {
     id: pcId,
-    type: 'Workstation Client PC',
+    type: isWireless ? 'Wireless Workstation PC' : 'Workstation Client PC',
     dept: dept,
     vlan: vlan,
     ip: ip,
     mac: '00:50:79:66:' + (Math.floor(Math.random()*89)+10) + ':' + (Math.floor(Math.random()*89)+10),
-    specs: 'Intel Core i7-13700 · 32GB DDR5 · 512GB NVMe SSD',
+    specs: isWireless ? 'Intel Core i7-13700 · 32GB DDR5 · Wi-Fi 6E (802.11ax)' : 'Intel Core i7-13700 · 32GB DDR5 · 512GB NVMe SSD',
     diskUsage: '94 GB Used / 418 GB Free (Local Storage)',
-    switchPort: 'C1000-24T Access Port Gi0/' + (Math.floor(Math.random()*20)+1),
-    desc: 'Developer/Staff client provisioned with dedicated 1 Gbps Cat6 access.'
+    connection: isWireless ? (wirelessOptions.connection || 'Wi-Fi 6 (802.11ax) · SSID: CORP-WIFI') : null,
+    accessPoint: isWireless ? (wirelessOptions.ap || 'AP-ADM-F2 (Cisco Catalyst 9120AX)') : null,
+    signal: isWireless ? '-42 dBm · Excellent (5 GHz Ch 36)' : null,
+    switchPort: isWireless ? null : ('C1000-24T Access Port Gi0/' + (Math.floor(Math.random()*20)+1)),
+    desc: isWireless ? (wirelessOptions.desc || 'Second floor administrative client networked wirelessly via Cisco Catalyst 9120AX (AP-ADM-F2) on VLAN 20.') : 'Developer/Staff client provisioned with dedicated 1 Gbps Cat6 access.'
   };
 
   // FULL WORKSTATION HITBOX EXPANSION (Tabletop, monitors, screens, and tower all clickable!)
@@ -3298,17 +3302,21 @@ function createPrinter(parent, x, y, z, rotY, data) {
   box(g, -0.22, 0.73, 0.26, 0.03, 0.03, 0.02, mats.printerLed, false);
 
   // Interactive device data
+  var isWirelessPrinter = !!data.wireless;
   var devData = {
     id: data.id,
-    type: 'Departmental Network Laser Printer',
+    type: isWirelessPrinter ? 'Wireless Network Laser Printer' : 'Departmental Network Laser Printer',
     dept: data.dept,
     vlan: data.vlan,
     ip: data.ip,
     mac: data.mac || ('00:1B:77:4A:' + (Math.floor(Math.random()*89)+10) + ':' + (Math.floor(Math.random()*89)+10)),
-    specs: 'Enterprise Workgroup Multi-Function Laser (Duplex · 1 Gbps Cat6)',
+    specs: isWirelessPrinter ? 'Enterprise Multi-Function Laser (Duplex · Wi-Fi 6 / 802.11ax)' : 'Enterprise Workgroup Multi-Function Laser (Duplex · 1 Gbps Cat6)',
     diskUsage: 'Tray 1: 500 Sheets · Tray 2: 500 Sheets · Toner: 95%',
-    switchPort: data.switchPort || 'Access Switch Port Gi0/21 (1 Gbps)',
-    desc: 'Departmental shared network laser printer with secure print queue managed by SRV-ADM Active Directory.'
+    connection: isWirelessPrinter ? (data.connection || 'Wi-Fi 6 (802.11ax) · SSID: CORP-WIFI') : null,
+    accessPoint: isWirelessPrinter ? (data.accessPoint || 'AP-ADM-F2 (Cisco Catalyst 9120AX)') : null,
+    signal: isWirelessPrinter ? '-45 dBm · Excellent (5 GHz Ch 36)' : null,
+    switchPort: isWirelessPrinter ? null : (data.switchPort || 'Access Switch Port Gi0/21 (1 Gbps)'),
+    desc: isWirelessPrinter ? (data.desc || 'Wireless departmental laser printer connected via AP-ADM-F2 on VLAN 20 with secure print spooling managed by SRV-ADM.') : 'Departmental shared network laser printer with secure print queue managed by SRV-ADM Active Directory.'
   };
 
   registerInteractable(body, devData);
@@ -3465,24 +3473,26 @@ function buildEmployeeFloor(floorNum) {
     vlan: 'VLAN 10 (192.168.10.0/24)',
     ip: '192.168.10.' + (1 + floorNum),
     specs: 'Cisco Catalyst 1000-24T-4G-L · Dual 1G Fiber LACP Uplink to Core',
-    desc: 'Supplies 24 desktop ports across North and South collaborative pods.'
+    desc: 'Supplies 24 Gigabit ports across North and South bays (20 developer PCs + 4 network printers).'
   });
   makeTag('SW-EMP-F' + floorNum, -22 + 4.2, baseY + 2.45, 18 - 5.0, 0.22, 'device');
 
   // 7. Workstations (Exactly 10 PCs in Room 1 and 10 PCs in Room 2 = 20 PCs/Floor, 100 PCs in Building)
-  // Room 1 (North Wing): 10 PCs (5 facing 5 across central partition)
-  makeTag('RM ' + floorNum + '01: DEV NORTH (10 PCs)', -22 - 6.0, baseY + 2.3, 18 - 3.2, 0.25, 'room');
-  var nOffsets = [-10.0, -8.0, -6.0, -4.0, -2.0];
+  // Matching 2D Architectural Blueprint: Desks placed along perimeter and divider walls with open central walkway
+  var podOffsets = [-9.6, -8.1, -5.6, -4.1, -1.8]; // 2 paired pods of 2 + 1 single desk
+
+  // Room 1 (North Wing): 10 PCs (Row 1 along North wall, Row 2 along central divider)
+  makeTag('RM ' + floorNum + '01: DEV NORTH (10 PCs)', -22 - 5.5, baseY + 2.3, 18 - 4.0, 0.25, 'room');
   for (var i = 0; i < 5; i++) {
-    var pX = nOffsets[i];
+    var pX = podOffsets[i];
     var idA1 = (i + 1) < 10 ? '0' + (i + 1) : '' + (i + 1);
     var idA2 = (i + 6) < 10 ? '0' + (i + 6) : '' + (i + 6);
     var ipA1 = '192.168.10.' + ((floorNum - 1) * 20 + 10 + i);
     var ipA2 = '192.168.10.' + ((floorNum - 1) * 20 + 15 + i);
-    // Desk row 1 facing South (towards central divider)
-    createWorkstation(fg, pX, 0, -4.2, 0, 'PC-EMP-F' + floorNum + '-R1-' + idA1, 'Dev Team ' + floorNum + 'A', 'VLAN 10', ipA1, mats.screenCode);
-    // Desk row 2 facing North
-    createWorkstation(fg, pX, 0, -2.2, Math.PI, 'PC-EMP-F' + floorNum + '-R1-' + idA2, 'Dev Team ' + floorNum + 'A', 'VLAN 10', ipA2, mats.screenCode);
+    // Row 1: Along North exterior wall, facing North
+    createWorkstation(fg, pX, 0, -6.4, 0, 'PC-EMP-F' + floorNum + '-R1-' + idA1, 'Dev Team ' + floorNum + 'A', 'VLAN 10', ipA1, mats.screenCode);
+    // Row 2: Along central divider wall, facing South
+    createWorkstation(fg, pX, 0, -1.6, Math.PI, 'PC-EMP-F' + floorNum + '-R1-' + idA2, 'Dev Team ' + floorNum + 'A', 'VLAN 10', ipA2, mats.screenCode);
   }
 
   // North Wing Departmental Laser Printers
@@ -3503,19 +3513,18 @@ function buildEmployeeFloor(floorNum) {
     worldX: -22 + 1.8, worldY: baseY, worldZ: 18 - 6.2
   });
 
-  // Room 2 (South Wing): 10 PCs (5 facing 5 across central partition)
-  makeTag('RM ' + floorNum + '02: DEV SOUTH (10 PCs)', -22 - 6.0, baseY + 2.3, 18 + 3.2, 0.25, 'room');
-  var sOffsets = [-10.0, -8.0, -6.0, -4.0, -2.0];
+  // Room 2 (South Wing): 10 PCs (Row 1 along central divider, Row 2 along South window wall)
+  makeTag('RM ' + floorNum + '02: DEV SOUTH (10 PCs)', -22 - 5.5, baseY + 2.3, 18 + 4.0, 0.25, 'room');
   for (var j = 0; j < 5; j++) {
-    var pXs = sOffsets[j];
+    var pXs = podOffsets[j];
     var idB1 = (j + 1) < 10 ? '0' + (j + 1) : '' + (j + 1);
     var idB2 = (j + 6) < 10 ? '0' + (j + 6) : '' + (j + 6);
     var ipB1 = '192.168.10.' + ((floorNum - 1) * 20 + 20 + j);
     var ipB2 = '192.168.10.' + ((floorNum - 1) * 20 + 25 + j);
-    // Desk row 1 facing North (towards central divider)
-    createWorkstation(fg, pXs, 0, 2.2, 0, 'PC-EMP-F' + floorNum + '-R2-' + idB1, 'Dev Team ' + floorNum + 'B', 'VLAN 10', ipB1, mats.screenCode);
-    // Desk row 2 facing South
-    createWorkstation(fg, pXs, 0, 4.2, Math.PI, 'PC-EMP-F' + floorNum + '-R2-' + idB2, 'Dev Team ' + floorNum + 'B', 'VLAN 10', ipB2, mats.screenCode);
+    // Row 1: Along central divider wall, facing North
+    createWorkstation(fg, pXs, 0, 1.6, 0, 'PC-EMP-F' + floorNum + '-R2-' + idB1, 'Dev Team ' + floorNum + 'B', 'VLAN 10', ipB1, mats.screenCode);
+    // Row 2: Along South exterior glass wall, facing South
+    createWorkstation(fg, pXs, 0, 6.4, Math.PI, 'PC-EMP-F' + floorNum + '-R2-' + idB2, 'Dev Team ' + floorNum + 'B', 'VLAN 10', ipB2, mats.screenCode);
   }
 
   // South Wing Departmental Laser Printers
@@ -3801,7 +3810,7 @@ registerInteractable(swAdminF1, {
   vlan: 'VLAN 20 (192.168.20.0/24)',
   ip: '192.168.20.2',
   specs: 'Cisco Catalyst 1000-24T-4G-L · Dual 1G Fiber LACP Uplink to Core Switch',
-  desc: 'Wall-mounted access switch servicing Floor 1 Finance, HR, and Administration desktop drops.'
+  desc: 'Wall-mounted access switch servicing Floor 1 wired workstations and PoE Gigabit uplink to Floor 2 AP-ADM-F2.'
 });
 makeTag('SW-ADM-F1', 16 + 9.75, 2.45, 18 - 1.8, 0.20, 'device');
 
@@ -3878,62 +3887,51 @@ box(bAdmin, 4.0, f2Y + 1.15, 7.8, 1.0, 2.3, 0.08, mats.doorWood);
 box(bAdmin, 4.0, f2Y + 2.85, 7.8, 1.0, 1.1, 0.2, mats.corridorWall);
 box(bAdmin, 7.25, f2Y + 1.7, 7.8, 5.5, 3.4, 0.2, mats.corridorWall);
 
-// ROOM 201: EXECUTIVE SUITES (Top-Left Suite: 5 PCs + Printer)
+// ROOM 201: EXECUTIVE SUITES (Top-Left Suite: 5 Wireless PCs + Wireless Printer)
 makeTag('RM 201: EXECUTIVE (5 PCs)', 16 - 5.0, f2Y + 2.35, 18 - 5.0, 0.24, 'room');
-createWorkstation(bAdmin, -8.0, f2Y, -7.5, Math.PI / 2, 'PC-ADM-EXEC-01', 'Executive Directorate', 'VLAN 20', '192.168.20.25', mats.screenAdmin);
-createWorkstation(bAdmin, -8.0, f2Y, -3.5, Math.PI / 2, 'PC-ADM-EXEC-02', 'Executive Directorate', 'VLAN 20', '192.168.20.26', mats.screenAdmin);
-createWorkstation(bAdmin, -5.0, f2Y, -8.0, 0, 'PC-ADM-EXEC-03', 'Executive Directorate', 'VLAN 20', '192.168.20.27', mats.screenAdmin);
-createWorkstation(bAdmin, -2.0, f2Y, -7.5, -Math.PI / 2, 'PC-ADM-EXEC-04', 'Executive Directorate', 'VLAN 20', '192.168.20.28', mats.screenAdmin);
-createWorkstation(bAdmin, -2.0, f2Y, -3.5, -Math.PI / 2, 'PC-ADM-EXEC-05', 'Executive Directorate', 'VLAN 20', '192.168.20.29', mats.screenAdmin);
+createWorkstation(bAdmin, -8.0, f2Y, -7.5, Math.PI / 2, 'PC-ADM-EXEC-01', 'Executive Directorate', 'VLAN 20', '192.168.20.25', mats.screenAdmin, { wireless: true });
+createWorkstation(bAdmin, -8.0, f2Y, -3.5, Math.PI / 2, 'PC-ADM-EXEC-02', 'Executive Directorate', 'VLAN 20', '192.168.20.26', mats.screenAdmin, { wireless: true });
+createWorkstation(bAdmin, -5.0, f2Y, -8.0, 0, 'PC-ADM-EXEC-03', 'Executive Directorate', 'VLAN 20', '192.168.20.27', mats.screenAdmin, { wireless: true });
+createWorkstation(bAdmin, -2.0, f2Y, -7.5, -Math.PI / 2, 'PC-ADM-EXEC-04', 'Executive Directorate', 'VLAN 20', '192.168.20.28', mats.screenAdmin, { wireless: true });
+createWorkstation(bAdmin, -2.0, f2Y, -3.5, -Math.PI / 2, 'PC-ADM-EXEC-05', 'Executive Directorate', 'VLAN 20', '192.168.20.29', mats.screenAdmin, { wireless: true });
 createPrinter(bAdmin, -2.2, f2Y, -1.0, 0, {
   id: 'PRN-ADM-F2-01',
   dept: 'Executive Directorate (RM 201)',
   vlan: 'VLAN 20 (192.168.20.0/24)',
   ip: '192.168.20.204',
-  switchPort: 'SW-ADM-F2 Port Gi0/21',
+  wireless: true,
   worldX: 16 - 2.2, worldY: f2Y, worldZ: 18 - 1.0
 });
 
-// ROOM 202: NETWORK OPERATIONS CENTER (Top-Right Suite: 5 PCs + Printer + Switch)
+// ROOM 202: NETWORK OPERATIONS CENTER (Top-Right Suite: 5 Wireless PCs + Wireless Printer)
 makeTag('RM 202: NET OPS (5 PCs)', 16 + 5.0, f2Y + 2.35, 18 - 5.0, 0.24, 'room');
-createWorkstation(bAdmin, 2.0, f2Y, -7.5, Math.PI / 2, 'PC-ADM-NET-01', 'Network Administration', 'VLAN 20', '192.168.20.30', mats.screenAdmin);
-createWorkstation(bAdmin, 2.0, f2Y, -3.5, Math.PI / 2, 'PC-ADM-NET-02', 'Network Administration', 'VLAN 20', '192.168.20.31', mats.screenAdmin);
-createWorkstation(bAdmin, 5.0, f2Y, -8.0, 0, 'PC-ADM-NET-03', 'Network Administration', 'VLAN 20', '192.168.20.32', mats.screenAdmin);
-createWorkstation(bAdmin, 8.0, f2Y, -7.5, -Math.PI / 2, 'PC-ADM-NET-04', 'Network Administration', 'VLAN 20', '192.168.20.33', mats.screenAdmin);
-createWorkstation(bAdmin, 8.0, f2Y, -3.5, -Math.PI / 2, 'PC-ADM-NET-05', 'Network Administration', 'VLAN 20', '192.168.20.34', mats.screenAdmin);
+createWorkstation(bAdmin, 2.0, f2Y, -7.5, Math.PI / 2, 'PC-ADM-NET-01', 'Network Administration', 'VLAN 20', '192.168.20.30', mats.screenAdmin, { wireless: true });
+createWorkstation(bAdmin, 2.0, f2Y, -3.5, Math.PI / 2, 'PC-ADM-NET-02', 'Network Administration', 'VLAN 20', '192.168.20.31', mats.screenAdmin, { wireless: true });
+createWorkstation(bAdmin, 5.0, f2Y, -8.0, 0, 'PC-ADM-NET-03', 'Network Administration', 'VLAN 20', '192.168.20.32', mats.screenAdmin, { wireless: true });
+createWorkstation(bAdmin, 8.0, f2Y, -7.5, -Math.PI / 2, 'PC-ADM-NET-04', 'Network Administration', 'VLAN 20', '192.168.20.33', mats.screenAdmin, { wireless: true });
+createWorkstation(bAdmin, 8.0, f2Y, -3.5, -Math.PI / 2, 'PC-ADM-NET-05', 'Network Administration', 'VLAN 20', '192.168.20.34', mats.screenAdmin, { wireless: true });
 createPrinter(bAdmin, 2.2, f2Y, -1.0, 0, {
   id: 'PRN-ADM-F2-02',
   dept: 'Network Operations (RM 202)',
   vlan: 'VLAN 20 (192.168.20.0/24)',
   ip: '192.168.20.205',
-  switchPort: 'SW-ADM-F2 Port Gi0/22',
+  wireless: true,
   worldX: 16 + 2.2, worldY: f2Y, worldZ: 18 - 1.0
 });
-var swAdminF2 = box(bAdmin, 9.75, f2Y + 1.8, -1.8, 0.35, 0.9, 0.7, mats.rackFrame);
-registerInteractable(swAdminF2, {
-  id: 'SW-ADM-F2',
-  type: 'Floor Access Switch (24-Port Gigabit)',
-  dept: 'Administration Building Floor 2',
-  vlan: 'VLAN 20 (192.168.20.0/24)',
-  ip: '192.168.20.3',
-  specs: 'Cisco Catalyst 1000-24T-4G-L · Dual 1G Fiber LACP Uplink to Core Switch',
-  desc: 'Wall-mounted access switch servicing Floor 2 Executive, NetOps, and Corporate Strategy drops.'
-});
-makeTag('SW-ADM-F2', 16 + 9.75, f2Y + 2.45, 18 - 1.8, 0.20, 'device');
 
-// ROOM 203: CORPORATE STRATEGY (Bottom-Left Suite: 5 PCs + Printer)
+// ROOM 203: CORPORATE STRATEGY (Bottom-Left Suite: 5 Wireless PCs + Wireless Printer)
 makeTag('RM 203: STRATEGY (5 PCs)', 16 - 3.8, f2Y + 2.35, 18 + 6.0, 0.24, 'room');
-createWorkstation(bAdmin, -7.5, f2Y, 5.5, Math.PI / 2, 'PC-ADM-OPS-01', 'Corporate Strategy', 'VLAN 20', '192.168.20.35', mats.screenAdmin);
-createWorkstation(bAdmin, 0.5, f2Y, 5.5, -Math.PI / 2, 'PC-ADM-OPS-02', 'Corporate Strategy', 'VLAN 20', '192.168.20.36', mats.screenAdmin);
-createWorkstation(bAdmin, -7.0, f2Y, 8.0, Math.PI, 'PC-ADM-OPS-03', 'Corporate Strategy', 'VLAN 20', '192.168.20.37', mats.screenAdmin);
-createWorkstation(bAdmin, -3.8, f2Y, 8.0, Math.PI, 'PC-ADM-OPS-04', 'Corporate Strategy', 'VLAN 20', '192.168.20.38', mats.screenAdmin);
-createWorkstation(bAdmin, -0.6, f2Y, 8.0, Math.PI, 'PC-ADM-OPS-05', 'Corporate Strategy', 'VLAN 20', '192.168.20.39', mats.screenAdmin);
+createWorkstation(bAdmin, -7.5, f2Y, 5.5, Math.PI / 2, 'PC-ADM-OPS-01', 'Corporate Strategy', 'VLAN 20', '192.168.20.35', mats.screenAdmin, { wireless: true });
+createWorkstation(bAdmin, 0.5, f2Y, 5.5, -Math.PI / 2, 'PC-ADM-OPS-02', 'Corporate Strategy', 'VLAN 20', '192.168.20.36', mats.screenAdmin, { wireless: true });
+createWorkstation(bAdmin, -7.0, f2Y, 8.0, Math.PI, 'PC-ADM-OPS-03', 'Corporate Strategy', 'VLAN 20', '192.168.20.37', mats.screenAdmin, { wireless: true });
+createWorkstation(bAdmin, -3.8, f2Y, 8.0, Math.PI, 'PC-ADM-OPS-04', 'Corporate Strategy', 'VLAN 20', '192.168.20.38', mats.screenAdmin, { wireless: true });
+createWorkstation(bAdmin, -0.6, f2Y, 8.0, Math.PI, 'PC-ADM-OPS-05', 'Corporate Strategy', 'VLAN 20', '192.168.20.39', mats.screenAdmin, { wireless: true });
 createPrinter(bAdmin, -2.2, f2Y, 3.6, Math.PI, {
   id: 'PRN-ADM-F2-03',
   dept: 'Corporate Strategy (RM 203)',
   vlan: 'VLAN 20 (192.168.20.0/24)',
   ip: '192.168.20.206',
-  switchPort: 'SW-ADM-F2 Port Gi0/23',
+  wireless: true,
   worldX: 16 - 2.2, worldY: f2Y, worldZ: 18 + 3.6
 });
 
@@ -4785,6 +4783,9 @@ function inspectDevice(d) {
     <div class="spec-line"><span class="sk">Subnet:</span><span class="sv">${d.vlan || 'LAN'}</span></div>
     <div class="spec-line"><span class="sk">IP Address:</span><span class="sv">${d.ip || 'DHCP'}</span></div>
     ${d.mac ? `<div class="spec-line"><span class="sk">MAC:</span><span class="sv">${d.mac}</span></div>` : ''}
+    ${d.connection ? `<div class="spec-line"><span class="sk">Connection:</span><span class="sv" style="color:#38bdf8;font-weight:600;">📶 ${d.connection}</span></div>` : ''}
+    ${d.accessPoint ? `<div class="spec-line"><span class="sk">Access Point:</span><span class="sv">${d.accessPoint}</span></div>` : ''}
+    ${d.signal ? `<div class="spec-line"><span class="sk">Signal Strength:</span><span class="sv" style="color:#4ade80;">${d.signal}</span></div>` : ''}
     ${d.switchPort ? `<div class="spec-line"><span class="sk">Switchport:</span><span class="sv">${d.switchPort}</span></div>` : ''}
     <div class="spec-line"><span class="sk">Hardware:</span><span class="sv">${d.specs}</span></div>
     ${d.diskUsage ? `<div class="spec-line"><span class="sk">Storage:</span><span class="sv">${d.diskUsage}</span></div>` : ''}
@@ -4811,7 +4812,7 @@ var blueprintData = {
   employee: {
     title: 'Main Branch | Employee Building Floor Layout',
     img: './blueprints/floorplan_main_employee.png',
-    desc: '<strong>Employee Operations (Floors 1–5):</strong> Open workstation floor plan with 24 employee desktops (VLAN 10) organized into 4 collaborative pods of 6 workstations each, 4 networked printers, central acoustic wall divider, and right stairwell/elevator access core.'
+    desc: '<strong>Employee Operations (Floors 1–5):</strong> Open workstation floor plan with 20 employee desktops (VLAN 10) organized along perimeter and divider walls with central walkway, 4 networked printers (24 total switch endpoints), central acoustic wall divider, and right stairwell/elevator access core.'
   },
   admin1: {
     title: 'Main Branch | Administration Building (1st Floor Layout)',
@@ -4821,7 +4822,7 @@ var blueprintData = {
   admin2: {
     title: 'Main Branch | Administration Building (2nd Floor & WAP Layout)',
     img: './blueprints/floorplan_main_admin_f2.png',
-    desc: '<strong>Administration 2nd Floor & Wireless Coverage:</strong> Executive suites equipped with a central ceiling-mounted Cisco Catalyst 9120 WAP providing omnidirectional Wi-Fi coverage across the floor for secure staff and isolated guest access (VLAN 40).'
+    desc: '<strong>Administration 2nd Floor (Wireless Technology):</strong> Executive suites equipped with a central ceiling-mounted Cisco Catalyst 9120 WAP providing omnidirectional Wi-Fi 6 coverage (CORP-WIFI on VLAN 20) across all 15 workstations and 3 wireless printers in Rooms 201, 202, and 203.'
   },
   branch1: {
     title: 'Second Branch | 1st Floor Layout (Technical Support)',
