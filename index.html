@@ -3643,10 +3643,10 @@ createServerPC(bDatacenter, 5.5, 0, 3.2, 0, 'SRV-ADM', 'SRV-ADM', 'SERVER PC (AD
   'The dedicated server PC for the administration, hosting Microsoft Active Directory Domain Controller, accounting suites, and enterprise ERP database.'
 );
 
-// UPS #3: Dedicated APC Smart-UPS 3000VA for Enterprise Server PCs (SRV-EMP & SRV-ADM)
-var srvUps = box(bDatacenter, 5.5, 0.15, 0.0, 0.70, 0.28, 0.55, mats.rackUpsBlack);
-box(bDatacenter, 5.5, 0.15, 0.285, 0.16, 0.06, 0.005, mats.printerScreen, false); // Blue LCD
-box(bDatacenter, 5.3, 0.15, 0.285, 0.035, 0.035, 0.005, mats.ledGreen, false);
+// UPS #3: Dedicated APC Smart-UPS 3000VA for Enterprise Server PCs (docked neatly under SRV-EMP workbench)
+var srvUps = box(bDatacenter, 5.5, 0.15, -2.6, 0.70, 0.28, 0.55, mats.rackUpsBlack);
+box(bDatacenter, 5.5, 0.15, -2.6 + 0.285, 0.16, 0.06, 0.005, mats.printerScreen, false); // Blue LCD
+box(bDatacenter, 5.3, 0.15, -2.6 + 0.285, 0.035, 0.035, 0.005, mats.ledGreen, false);
 registerInteractable(srvUps, {
   id: 'UPS-SERVERS-3000VA',
   type: 'APC Smart-UPS On-Line 3000VA Battery Backup Unit',
@@ -3656,7 +3656,6 @@ registerInteractable(srvUps, {
   specs: '3000VA / 2700W · Dedicated UPS for SRV-EMP & SRV-ADM',
   desc: 'Zero-transfer-time battery protection sustaining the employee web staging server and corporate domain controller during power anomalies.'
 });
-makeTag('UPS-SERVERS-3000VA', -20 + 5.5, 1.10, -18 + 0.0, 0.18, 'device');
 
 // Overhead Cable Tray spanning the 3 columns (matching blueprint connection)
 box(bDatacenter, 0.0, 2.30, 0.0, 11.5, 0.08, 0.35, mats.cableTray);
@@ -5279,8 +5278,8 @@ var mouse = new THREE.Vector2();
 
 // UNIFIED RAYCAST INSPECTION FOR DESKTOP, MOBILE TAPS & FIRST-PERSON WALK
 function performRaycastInspect(clientX, clientY) {
-  // If in first-person walk mode or pointer is locked, raycast directly from screen center (crosshair)
-  if (activeNav === 'walk' || document.pointerLockElement) {
+  // If pointer is actively locked, raycast directly from screen center (crosshair)
+  if (document.pointerLockElement) {
     mouse.x = 0;
     mouse.y = 0;
   } else {
@@ -5339,10 +5338,62 @@ function performRaycastInspect(clientX, clientY) {
   return false;
 }
 
+// DRAG-TO-LOOK FALLBACK WHEN POINTER IS UNLOCKED ON DESKTOP
+var isDraggingLook = false;
+var prevMousePos = { x: 0, y: 0 };
+var dragThresholdCrossed = false;
+
+window.addEventListener('mousedown', function(e) {
+  if (e.target.closest('#navCapsule') || e.target.closest('#topNav') || e.target.closest('#bottomDock') || e.target.closest('#testDrawer') || e.target.closest('#inspectorDrawer') || e.target.closest('#simBigScreen') || e.target.closest('#blueprintModal') || e.target.closest('#mobileJoystickContainer')) {
+    return;
+  }
+  if (!document.pointerLockElement && e.button === 0) {
+    isDraggingLook = true;
+    prevMousePos.x = e.clientX;
+    prevMousePos.y = e.clientY;
+    dragThresholdCrossed = false;
+  }
+});
+
+window.addEventListener('mousemove', function(e) {
+  if (isDraggingLook && !document.pointerLockElement) {
+    var dx = e.clientX - prevMousePos.x;
+    var dy = e.clientY - prevMousePos.y;
+    if (Math.hypot(dx, dy) > 4) dragThresholdCrossed = true;
+    prevMousePos.x = e.clientX;
+    prevMousePos.y = e.clientY;
+
+    var euler = new THREE.Euler(0, 0, 0, 'YXZ');
+    euler.setFromQuaternion(camera.quaternion);
+    var sens = 0.0018;
+    euler.y -= dx * sens;
+    euler.x -= dy * sens;
+    euler.x = Math.max(-Math.PI / 2.05, Math.min(Math.PI / 2.05, euler.x));
+    euler.z = 0;
+    camera.quaternion.setFromEuler(euler);
+  }
+});
+
+window.addEventListener('mouseup', function(e) {
+  isDraggingLook = false;
+});
+
 window.addEventListener('click', function(e) {
   if (e.target.closest('#navCapsule') || e.target.closest('#topNav') || e.target.closest('#bottomDock') || e.target.closest('#testDrawer') || e.target.closest('#inspectorDrawer') || e.target.closest('#simBigScreen') || e.target.closest('#blueprintModal') || e.target.closest('#mobileJoystickContainer')) {
     return;
   }
+
+  // If user just finished a mouse drag look, do not trigger raycast or relock
+  if (dragThresholdCrossed) {
+    dragThresholdCrossed = false;
+    return;
+  }
+
+  // Auto-close any open drawers when clicking back onto the 3D scene
+  var td = document.getElementById('testDrawer');
+  if (td && td.style.display !== 'none') td.style.display = 'none';
+  var id = document.getElementById('inspectorDrawer');
+  if (id && id.style.display !== 'none') id.style.display = 'none';
 
   // If already locked in Minecraft mode, click inspects object in crosshairs
   if (document.pointerLockElement) {
@@ -5350,10 +5401,10 @@ window.addEventListener('click', function(e) {
     return;
   }
 
-  // If unlocked, check if an interactive device was clicked directly
+  // If unlocked, check if an interactive device was clicked directly with cursor
   var hitDevice = performRaycastInspect(e.clientX, e.clientY);
 
-  // If empty space was clicked on desktop, lock pointer for effortless mouse-look!
+  // If empty space was clicked on desktop, re-lock pointer for effortless Minecraft mouse-look!
   if (!hitDevice && !isTouchDevice && window.innerWidth > 860) {
     walk.lock();
   }
@@ -5444,7 +5495,9 @@ function animate() {
     var inBranch = (pPos.x >= 26 && pPos.x <= 50 && pPos.z >= -26 && pPos.z <= -10);
     var isOutdoors = !(inServer || inEmp || inAdmin || inBranch);
 
-    if (walk.isLocked || document.pointerLockElement) {
+    // Continuous Minecraft movement whenever user is not typing in a form input
+    var isInputActive = document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA');
+    if (!isInputActive) {
       var isSprint = keys.ControlLeft || keys.ControlRight;
       var baseSpd = isOutdoors ? 0.36 : 0.20;
       var speed = isSprint ? (isOutdoors ? 0.85 : 0.48) : baseSpd;
