@@ -3479,18 +3479,37 @@ function buildEmployeeFloor(floorNum) {
   // Ceiling plate / structural lintels
   box(fg, 0, 3.35, 0, 24, 0.1, 16, mats.tileLight);
 
-  // 6. Floor Access Switch SW-EMP-F{floorNum} mounted in utility room
-  var swRack = box(fg, 4.2, 1.8, -5.0, 0.5, 1.1, 0.7, mats.rackFrame);
-  registerInteractable(swRack, {
+  // 6. Floor Access Switch SW-EMP-F{floorNum} mounted on East Central Corridor Wall
+  // Prominently mounted at X = 3.32, Y = 1.80, Z = 0.0 facing the central developer walkway
+  var swBox = box(fg, 3.32, 1.80, 0.0, 0.35, 0.75, 0.85, mats.rackFrame);
+  var swDoor = box(fg, 3.14, 1.80, 0.0, 0.015, 0.72, 0.82, mats.rackGlass);
+  var swFace = box(fg, 3.25, 1.88, 0.0, 0.06, 0.075, 0.70, mats.rackCiscoTeal); // Glowing Cisco Teal faceplate
+  box(fg, 3.20, 1.88, -0.25, 0.01, 0.025, 0.07, mats.rackSilver, false); // Cisco logo plate
+  box(fg, 3.20, 1.88, 0.05, 0.01, 0.040, 0.32, mats.rackPortDark, false); // 24x Ports Grid
+  for (var sp = 0; sp < 8; sp++) {
+    box(fg, 3.19, 1.905, -0.09 + sp * 0.038, 0.008, 0.008, 0.012, mats.ledGreen, false); // Active green port LEDs
+  }
+  box(fg, 3.20, 1.88, 0.28, 0.01, 0.035, 0.08, mats.rackSilver, false); // SFP+ cage
+  box(fg, 3.19, 1.905, 0.26, 0.008, 0.008, 0.010, mats.ledBlue, false); // Fiber uplink 1
+  box(fg, 3.19, 1.905, 0.30, 0.008, 0.008, 0.010, mats.ledBlue, false); // Fiber uplink 2
+
+  // 24-Port Cat6 Patch Panel directly beneath switch
+  box(fg, 3.25, 1.70, 0.0, 0.06, 0.065, 0.70, mats.rackBlade);
+  box(fg, 3.20, 1.70, 0.0, 0.01, 0.035, 0.52, mats.rackPortDark, false);
+
+  var swData = {
     id: 'SW-EMP-F' + floorNum,
     type: 'Floor Access Switch (24-Port Gigabit)',
     dept: "Employees' Building Floor " + floorNum,
     vlan: 'VLAN 10 (192.168.10.0/24)',
     ip: '192.168.10.' + (1 + floorNum),
     specs: 'Cisco Catalyst 1000-24T-4G-L · Dual 1G Fiber LACP Uplink to Core',
-    desc: 'Supplies 24 Gigabit ports across North and South bays (20 developer PCs + 4 network printers).'
-  });
-  makeTag('SW-EMP-F' + floorNum, -22 + 4.2, baseY + 2.45, 18 - 5.0, 0.22, 'device');
+    desc: 'Wall-mounted floor distribution switch servicing 24 Gigabit endpoints (20 developer workstations + 4 network printers) on Floor ' + floorNum + '.'
+  };
+  registerInteractable(swBox, swData);
+  registerInteractable(swDoor, swData);
+  registerInteractable(swFace, swData);
+  makeTag('SW-EMP-F' + floorNum, -22 + 3.1, baseY + 2.45, 18 + 0.0, 0.22, 'device');
 
   // 7. Workstations (Exactly 10 PCs in Room 1 and 10 PCs in Room 2 = 20 PCs/Floor, 100 PCs in Building)
   // Matching 2D Architectural Blueprint: Desks placed along perimeter and divider walls with open central walkway
@@ -5042,7 +5061,7 @@ function runSim(type) {
     var pts = [
       new THREE.Vector3(-28.0, 1.4, 14.8),  // PC-DEV-F1-01 (Room 101 Desk)
       new THREE.Vector3(-21.6, 1.4, 14.8),  // Exit room into hallway
-      new THREE.Vector3(-21.6, 2.0, 18.0),  // SW-EMP-F1 Access Switch
+      new THREE.Vector3(-18.9, 2.0, 18.0),  // SW-EMP-F1 Access Switch
       new THREE.Vector3(-21.6, 2.2, 0.0),   // Campus fiber conduit
       new THREE.Vector3(-25.0, 2.4, -16.0), // Enter Studio Server Room cable ladder
       new THREE.Vector3(-25.0, 2.0, -19.0), // RACK-NET Catalyst 3650 Core SVI
