@@ -16,7 +16,7 @@ This interactive application visualizes the complete campus network infrastructu
   1. *Employee PC to Server:* Smooth drone chase camera glides inside Room 101 tracking the packet out through the doorway and across the campus conduit into the Server Room.
   2. *Block Guest Access:* Visualizes Cisco Firepower ACL 110 intercepting and dropping unauthorized guest traffic at the firewall.
   3. *Main to Branch Leased Line:* High-speed WAN sync over a 500 Mbps CIR private point-to-point link.
-  4. *Branch Direct Internet:* Direct DIA internet routing through the Cisco 4331 ISR branch router.
+  4. *Branch Direct Internet:* Direct DIA internet routing through the Cisco 2911 ISR branch router.
   5. *Failover (HSRP):* Simulates primary PLDT carrier outage and instant sub-3-second failover to Globe Business.
 - **Dual Navigation Modes:**
   - **Orbit Mode:** Smooth 3D CAD orbit, pan, and zoom.

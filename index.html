@@ -2146,8 +2146,8 @@ var tourRoutes = {
       {
         cam: [45.5, 5.2, -13.0], tgt: [46.0, 4.8, -18.0],
         facility: 'branch', roof: false,
-        title: 'Floor 2: Branch Server Room & Cisco 4331 ISR Edge Router',
-        desc: 'Dedicated Branch Server (SRV-BR) and Cisco 4331 ISR Router terminating 500M private WAN link.',
+        title: 'Floor 2: Branch Server Room & Cisco 2911 ISR Edge Router',
+        desc: 'Dedicated Branch Server (SRV-BR) and Cisco 2911 ISR Router terminating 500M private WAN link.',
         duration: 4000
       },
       {
@@ -3073,7 +3073,7 @@ function createServerCabinet(parent, x, y, z, rackId, labelText, specs) {
     // -------------------------------------------------------------
     // LEFT RACK: WAN EDGE ROUTERS ENCLOSURE (RTR-MAIN-1 & RTR-MAIN-2)
     // -------------------------------------------------------------
-    // Device 1: Cisco 4331 ISR Primary Router (PLDT Fiber, Y = 1.80)
+    // Device 1: Cisco 2911 ISR Primary Router (PLDT Fiber, Y = 1.80)
     box(g, 0, 1.80, 0.10, 0.70, 0.08, 0.65, mats.rackBlade);
     var rtr1Face = box(g, 0, 1.80, 0.45, 0.70, 0.08, 0.025, mats.rackBlade);
     box(g, -0.26, 1.80, 0.465, 0.09, 0.028, 0.005, mats.rackSilver, false);
@@ -3083,15 +3083,15 @@ function createServerCabinet(parent, x, y, z, rackId, labelText, specs) {
     box(g, 0.24, 1.80, 0.465, 0.016, 0.016, 0.005, mats.ledGreen, false);
     registerInteractable(rtr1Face, {
       id: 'RTR-MAIN-1',
-      type: 'Cisco 4331 Integrated Services Router (Primary)',
+      type: 'Cisco 2911 Integrated Services Router (Primary)',
       dept: 'Studio Server Room · WAN Edge',
       vlan: 'VLAN 99 (Management) & WAN Transit',
       ip: '203.0.113.2 (PLDT Public WAN) & 192.168.99.253 (Mgmt SSH)',
-      specs: 'Cisco 4331 ISR · 200 Mbps Symmetric DIA (1:1 CIR) · HSRP Active (Priority 110)',
+      specs: 'Cisco 2911 ISR · 200 Mbps Symmetric DIA (1:1 CIR) · HSRP Active (Priority 110)',
       desc: 'Primary edge gateway terminating PLDT Enterprise 200M DIA fiber circuit. Active gateway handling outgoing and incoming corporate traffic.'
     });
 
-    // Device 2: Cisco 4331 ISR Standby Router (Globe Backup, Y = 1.62)
+    // Device 2: Cisco 2911 ISR Standby Router (Globe Backup, Y = 1.62)
     box(g, 0, 1.62, 0.10, 0.70, 0.08, 0.65, mats.rackBlade);
     var rtr2Face = box(g, 0, 1.62, 0.45, 0.70, 0.08, 0.025, mats.rackBlade);
     box(g, -0.26, 1.62, 0.465, 0.09, 0.028, 0.005, mats.rackSilver, false);
@@ -3101,11 +3101,11 @@ function createServerCabinet(parent, x, y, z, rackId, labelText, specs) {
     box(g, 0.24, 1.62, 0.465, 0.016, 0.016, 0.005, mats.ledAmber, false);
     registerInteractable(rtr2Face, {
       id: 'RTR-MAIN-2',
-      type: 'Cisco 4331 Integrated Services Router (Secondary)',
+      type: 'Cisco 2911 Integrated Services Router (Secondary)',
       dept: 'Studio Server Room · WAN Edge',
       vlan: 'VLAN 99 (Management) & WAN Transit',
       ip: '203.0.113.6 (Globe Public WAN) & 192.168.99.254 (Mgmt SSH)',
-      specs: 'Cisco 4331 ISR · 100 Mbps Backup DIA · HSRP Standby (Priority 90)',
+      specs: 'Cisco 2911 ISR · 100 Mbps Backup DIA · HSRP Standby (Priority 90)',
       desc: 'Redundant edge gateway terminating secondary Globe Business 100M DIA connection. Instantly assumes traffic forwarding if primary router fails.'
     });
 
@@ -3133,7 +3133,7 @@ function createServerCabinet(parent, x, y, z, rackId, labelText, specs) {
     // -------------------------------------------------------------
     // BRANCH RACK: RACK-BRANCH (RTR-BR, DUAL 24-PORT SWITCHES, SRV-BR, UPS)
     // -------------------------------------------------------------
-    // Device 1: Cisco 4331 ISR Branch Router (Y = 1.80)
+    // Device 1: Cisco 2911 ISR Branch Router (Y = 1.80)
     box(g, 0, 1.80, 0.10, 0.70, 0.08, 0.65, mats.rackBlade);
     var brRtrFace = box(g, 0, 1.80, 0.45, 0.70, 0.08, 0.025, mats.rackBlade);
     box(g, -0.26, 1.80, 0.465, 0.09, 0.028, 0.005, mats.rackSilver, false);
@@ -3142,11 +3142,11 @@ function createServerCabinet(parent, x, y, z, rackId, labelText, specs) {
     box(g, 0.24, 1.80, 0.465, 0.016, 0.016, 0.005, mats.ledGreen, false);
     registerInteractable(brRtrFace, {
       id: 'RTR-BR',
-      type: 'Cisco 4331 ISR Branch Edge Router',
+      type: 'Cisco 2911 ISR Branch Edge Router',
       dept: 'Second Branch · IT Enclosure',
       vlan: 'VLAN 60 & WAN Transit',
       ip: '203.0.113.10 (Converge DIA) & 192.168.60.1 (Branch Gateway)',
-      specs: 'Cisco 4331 ISR · 100 Mbps DIA · Site-to-Site IPsec VPN to Main Branch',
+      specs: 'Cisco 2911 ISR · 100 Mbps DIA · Site-to-Site IPsec VPN to Main Branch',
       desc: 'Terminates Converge 100M DIA and maintains encrypted IPsec tunnel back to Main Branch Core.'
     });
 
@@ -3595,18 +3595,18 @@ box(bDatacenter, -3.25, 2.30, -1.0, 4.5, 0.08, 0.35, mats.cableTray);
 
 // Left Column: Edge Routers Cabinet (Primary RTR-MAIN-1 & Secondary RTR-MAIN-2)
 createServerCabinet(bDatacenter, -5.5, 0, 0.0, 'RACK-ROUTERS', 'ROUTERS ENCLOSURE\nRTR-MAIN-1 & RTR-MAIN-2', {
-  vlan: 'WAN Transit (Public /29 PLDT & /30 Globe)',
-  ip: '203.0.113.2 (PLDT) & 203.0.113.6 (Globe)',
-  specs: 'Dual Cisco 4331 ISR Routers · HSRP Active/Standby · Diverse Dual Carrier Uplinks',
-  desc: 'Terminates primary PLDT Enterprise 200M fiber and secondary Globe Business 100M backup connection.'
+  vlan: 'Passive Equipment Enclosure (Housing Dual Edge Routers)',
+  ip: 'Non-IP (Physical 42U Enclosure · Click routers inside for IP details)',
+  specs: 'Dual Cisco 2911 ISR Routers · HSRP Active/Standby · Dual ISP Fiber Demarcation',
+  desc: 'Physical 42U server cabinet housing edge routing hardware. Click on the individual routers (RTR-MAIN-1 or RTR-MAIN-2) inside to view their active IP addresses, HSRP priority, and WAN subnets.'
 });
 
 // Center Column: Core Switch & Cisco Firepower NGFW Enclosure
 createServerCabinet(bDatacenter, 0.0, 0, 0.0, 'RACK-NET', 'CORE ENCLOSURE\nCATALYST 3650 (VLAN 99) & NGFW', {
-  vlan: 'VLAN 99 (Management Subnet 192.168.99.0/24) & VLAN 10-60 Core SVI',
-  ip: '192.168.99.1 (VLAN 99 SVI) · 172.16.1.1 (Core SVI) · 172.16.1.2 (FW Inside) · 192.168.30.12 (NAS)',
-  specs: 'Cisco Catalyst 3650-24TS L3 Core Switch + Cisco Firepower 1010 NGFW + 16TB NAS',
-  desc: 'Central routing backbone enforcing inter-VLAN routing, ACL security policies, carrier failover, and dedicated VLAN 99 out-of-band management.'
+  vlan: 'Passive Equipment Enclosure (Housing Core Switch, NGFW & NAS)',
+  ip: 'Non-IP (Physical 42U Enclosure · Click internal hardware for IP details)',
+  specs: 'Cisco Catalyst 3560G Core Switch + Cisco Firepower 1010 NGFW + 16TB NAS',
+  desc: 'Physical 42U core datacenter cabinet. Click directly on the Cisco Catalyst switch, Firepower firewall, or 16TB NAS inside to view their individual IP addresses and VLAN details.'
 });
 
 // Right Column: Dedicated Server PCs (SRV-EMP on Top, SRV-ADM on Bottom)
@@ -4112,7 +4112,7 @@ createServerCabinet(bBranch, 6.5, 3.5, -4.5, 'RACK-BRANCH', 'BRANCH CABINET\nRTR
   vlan: 'VLAN 50 & VLAN 60 (Branch Subnets)',
   dept: 'Second Branch · IT Enclosure',
   ip: '203.0.113.10 (Converge WAN) & 192.168.60.10 (SRV-BR)',
-  specs: 'Cisco 4331 ISR + Dual Catalyst 1000-24T Switches + SRV-BR',
+  specs: 'Cisco 2911 ISR + Dual Catalyst 1000-24T Switches + SRV-BR',
   desc: 'Branch edge cabinet terminating local Converge internet and leased lines, supplying connectivity across VLAN 50 and VLAN 60.'
 });
 
@@ -4847,7 +4847,7 @@ var blueprintData = {
   branch2: {
     title: 'Second Branch | 2nd Floor Layout (Admin & IT Enclosure)',
     img: './blueprints/floorplan_branch_f2.png',
-    desc: '<strong>Floor 2 Management:</strong> Central landing corridor. Left Room: 5 Branch Administration Workstations (VLAN 60). Right Upper Room: Dedicated IT server enclosure housing Cisco 4331 ISR Router (RTR-BR) and Ticket Cache Server (SRV-BR). Right Lower Room: Client waiting lounge.'
+    desc: '<strong>Floor 2 Management:</strong> Central landing corridor. Left Room: 5 Branch Administration Workstations (VLAN 60). Right Upper Room: Dedicated IT server enclosure housing Cisco 2911 ISR Router (RTR-BR) and Ticket Cache Server (SRV-BR). Right Lower Room: Client waiting lounge.'
   }
 };
 
