@@ -1483,6 +1483,18 @@ if (typeof THREE === 'undefined') {
 <body>
 <div id="scene"></div>
 <div id="crosshair"></div>
+<!-- MINECRAFT FLIGHT & FREE-LOOK HUD PILL -->
+<div class="glass" id="minecraftHUD" style="display:none; position:fixed; bottom:74px; left:50%; transform:translateX(-50%); z-index:90; padding:6px 14px; border-radius:20px; font-size:11.5px; font-weight:600; color:#e0f2fe; background:rgba(15,23,42,0.85); border:1px solid rgba(56,189,248,0.4); pointer-events:none; box-shadow:0 8px 24px rgba(0,0,0,0.45); align-items:center; gap:10px; white-space:nowrap;">
+  <span>🎮 <strong>Minecraft Controls:</strong> WASD to Move</span>
+  <span style="opacity:0.4;">|</span>
+  <span><kbd style="background:rgba(255,255,255,0.18);padding:1px 6px;border-radius:4px;color:#fff;">Space</kbd> Fly UP</span>
+  <span><kbd style="background:rgba(255,255,255,0.18);padding:1px 6px;border-radius:4px;color:#fff;">Shift / C</kbd> Fly DOWN</span>
+  <span><kbd style="background:rgba(255,255,255,0.18);padding:1px 6px;border-radius:4px;color:#fff;">Ctrl</kbd> Sprint</span>
+  <span style="opacity:0.4;">|</span>
+  <span style="color:#38bdf8;">Move Mouse to Look</span>
+  <span style="opacity:0.4;">|</span>
+  <span><kbd style="background:rgba(255,255,255,0.18);padding:1px 6px;border-radius:4px;color:#fff;">Esc</kbd> Unlock Mouse</span>
+</div>
 <!-- MOBILE VIRTUAL JOYSTICK (SHOWN IN WALK MODE ON TOUCH/MOBILE) -->
 <div id="mobileJoystickContainer">
   <div id="joystickSprintBadge">⚡ SPRINT</div>
@@ -1593,7 +1605,7 @@ if (typeof THREE === 'undefined') {
   </button>
   <button class="dock-btn" id="btnDockWalk" onclick="setNavMode('walk')">
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 4v16"/><path d="M17 8l-4-4-4 4"/></svg>
-    <span id="lblWalkText">Walk</span>
+    <span id="lblWalkText">Fly / Walk</span>
   </button>
 
   <div class="dock-sep"></div>
@@ -1891,24 +1903,26 @@ function setNavMode(mode) {
   document.getElementById('btnDockOrbit').className = mode === 'orbit' ? 'dock-btn active' : 'dock-btn';
   document.getElementById('btnDockWalk').className = mode === 'walk' ? 'dock-btn active' : 'dock-btn';
   var crosshair = document.getElementById('crosshair');
-  var jContainer = document.getElementById('mobileJoystickContainer');
+  var mHud = document.getElementById('minecraftHUD');
 
   if (mode === 'orbit') {
-    walk.unlock();
+    walk.disconnect();
     orbit.enabled = true;
-    if (crosshair) crosshair.style.display = 'none';
+    if (crosshair && !document.pointerLockElement) crosshair.style.display = 'none';
+    if (mHud && !document.pointerLockElement) mHud.style.display = 'none';
   } else {
     orbit.enabled = false;
+    walk.connect();
     if (crosshair) crosshair.style.display = 'block';
 
-    // Level horizon and eye-height when transitioning into walk mode
+    // Level horizon and preserve safe eye height
     camera.rotation.order = 'YXZ';
     var euler = new THREE.Euler(0, 0, 0, 'YXZ');
     euler.setFromQuaternion(camera.quaternion);
-    euler.x = Math.max(-0.35, Math.min(0.35, euler.x));
+    euler.x = Math.max(-0.45, Math.min(0.45, euler.x));
     euler.z = 0;
     camera.quaternion.setFromEuler(euler);
-    camera.position.y = 1.65;
+    if (camera.position.y < 1.65) camera.position.y = 1.65;
 
     if (!isTouchDevice && window.innerWidth > 860) {
       walk.lock();
@@ -1916,6 +1930,27 @@ function setNavMode(mode) {
   }
   updateJoystickVisibility();
 }
+
+// POINTER LOCK & MINECRAFT LOOK LISTENER
+document.addEventListener('pointerlockchange', function() {
+  var isLocked = !!document.pointerLockElement;
+  var crosshair = document.getElementById('crosshair');
+  var mHud = document.getElementById('minecraftHUD');
+  if (crosshair) crosshair.style.display = isLocked ? 'block' : 'none';
+  if (mHud) mHud.style.display = isLocked ? 'flex' : 'none';
+});
+
+// Orbit Mode Mouse-Look (Move mouse without clicking to rotate around scene)
+window.addEventListener('mousemove', function(e) {
+  if (document.pointerLockElement && activeNav === 'orbit' && (!tourState || !tourState.running)) {
+    var mx = e.movementX || e.mozMovementX || e.webkitMovementX || 0;
+    var my = e.movementY || e.mozMovementY || e.webkitMovementY || 0;
+    var rotSpd = 0.0035;
+    orbit.rotateLeft(mx * rotSpd);
+    orbit.rotateUp(my * rotSpd);
+    orbit.update();
+  }
+});
 
 // SETUP MOBILE VIRTUAL JOYSTICK & TOUCH LOOK CONTROLS
 
@@ -5306,10 +5341,27 @@ function performRaycastInspect(clientX, clientY) {
 }
 
 window.addEventListener('click', function(e) {
-  if (e.target.closest('#navCapsule') || e.target.closest('#topNav') || e.target.closest('#bottomDock') || e.target.closest('#testDrawer') || e.target.closest('#inspectorDrawer') || e.target.closest('#simBigScreen') || e.target.closest('#blueprintModal')) {
+  if (e.target.closest('#navCapsule') || e.target.closest('#topNav') || e.target.closest('#bottomDock') || e.target.closest('#testDrawer') || e.target.closest('#inspectorDrawer') || e.target.closest('#simBigScreen') || e.target.closest('#blueprintModal') || e.target.closest('#mobileJoystickContainer')) {
     return;
   }
-  performRaycastInspect(e.clientX, e.clientY);
+
+  // If already locked in Minecraft mode, click inspects object in crosshairs
+  if (document.pointerLockElement) {
+    performRaycastInspect(window.innerWidth / 2, window.innerHeight / 2);
+    return;
+  }
+
+  // If unlocked, check if an interactive device was clicked directly
+  var hitDevice = performRaycastInspect(e.clientX, e.clientY);
+
+  // If empty space was clicked on desktop, lock pointer for effortless mouse-look!
+  if (!hitDevice && !isTouchDevice && window.innerWidth > 860) {
+    if (activeNav === 'walk') {
+      walk.lock();
+    } else {
+      renderer.domElement.requestPointerLock();
+    }
+  }
 });
 
 // DEDICATED MOBILE TAP HANDLER (Prevents camera drag from swallowing desk taps)
@@ -5345,7 +5397,7 @@ var keys = {};
 window.addEventListener('keydown', function(e) {
   keys[e.code] = true;
   // Press 'E' in walk mode to inspect object in crosshair
-  if (e.code === 'KeyE' && activeNav === 'walk') {
+  if (e.code === 'KeyE') {
     performRaycastInspect(window.innerWidth / 2, window.innerHeight / 2);
   }
 });
@@ -5358,22 +5410,27 @@ function animate() {
   requestAnimationFrame(animate);
 
   if (activeNav === 'orbit' && (!packetAnim || !packetAnim.chaseCamera) && (!tourState || !tourState.running)) {
-    // Desktop WASD + Arrow Keys Smooth Glide in Orbit Mode
+    // Desktop WASD + Space/Shift Flying Glide in Orbit Mode
     var isInputActive = document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA');
     if (!isInputActive) {
-      var hasWASD = keys.KeyW || keys.ArrowUp || keys.KeyS || keys.ArrowDown || keys.KeyA || keys.ArrowLeft || keys.KeyD || keys.ArrowRight;
-      if (hasWASD) {
+      var hasMove = keys.KeyW || keys.ArrowUp || keys.KeyS || keys.ArrowDown || keys.KeyA || keys.ArrowLeft || keys.KeyD || keys.ArrowRight || keys.Space || keys.ShiftLeft || keys.ShiftRight || keys.KeyC;
+      if (hasMove) {
         var fwd = new THREE.Vector3();
         camera.getWorldDirection(fwd);
         fwd.y = 0;
         fwd.normalize();
         var right = new THREE.Vector3().crossVectors(fwd, camera.up).normalize();
-        var moveSpd = (keys.ShiftLeft || keys.ShiftRight) ? 0.75 : 0.35;
+        var isSprint = keys.ControlLeft || keys.ControlRight;
+        var moveSpd = isSprint ? 0.85 : 0.40;
         var delta = new THREE.Vector3();
         if (keys.KeyW || keys.ArrowUp) delta.addScaledVector(fwd, moveSpd);
         if (keys.KeyS || keys.ArrowDown) delta.addScaledVector(fwd, -moveSpd);
         if (keys.KeyD || keys.ArrowRight) delta.addScaledVector(right, moveSpd);
         if (keys.KeyA || keys.ArrowLeft) delta.addScaledVector(right, -moveSpd);
+        // Vertical flying in Orbit
+        if (keys.Space) delta.y += moveSpd;
+        if (keys.ShiftLeft || keys.ShiftRight || keys.KeyC) delta.y -= moveSpd;
+
         camera.position.add(delta);
         orbit.target.add(delta);
       }
@@ -5383,6 +5440,7 @@ function animate() {
     // Strict YXZ zero-roll enforcement in first-person walk mode
     if (camera.rotation.order !== 'YXZ') camera.rotation.order = 'YXZ';
     if (camera.rotation.z !== 0) camera.rotation.z = 0;
+
     // Outdoor vs Indoor walk speed optimization
     var pPos = walk.getObject().position;
     var inServer = (pPos.x >= -27 && pPos.x <= -13 && pPos.z >= -23 && pPos.z <= -13);
@@ -5391,13 +5449,27 @@ function animate() {
     var inBranch = (pPos.x >= 26 && pPos.x <= 50 && pPos.z >= -26 && pPos.z <= -10);
     var isOutdoors = !(inServer || inEmp || inAdmin || inBranch);
 
-    if (walk.isLocked) {
-      var baseSpd = isOutdoors ? 0.36 : 0.18;
-      var speed = keys.ShiftLeft ? (isOutdoors ? 0.65 : 0.38) : baseSpd;
+    if (walk.isLocked || document.pointerLockElement) {
+      var isSprint = keys.ControlLeft || keys.ControlRight;
+      var baseSpd = isOutdoors ? 0.36 : 0.20;
+      var speed = isSprint ? (isOutdoors ? 0.85 : 0.48) : baseSpd;
+
       if (keys.KeyW || keys.ArrowUp) walk.moveForward(speed);
       if (keys.KeyS || keys.ArrowDown) walk.moveForward(-speed);
       if (keys.KeyA || keys.ArrowLeft) walk.moveRight(-speed);
       if (keys.KeyD || keys.ArrowRight) walk.moveRight(speed);
+
+      // Minecraft Vertical Flight (Space = Ascend, Shift/C = Descend)
+      var flySpeed = isSprint ? (isOutdoors ? 0.70 : 0.40) : (isOutdoors ? 0.35 : 0.22);
+      if (keys.Space) {
+        pPos.y += flySpeed;
+      }
+      if (keys.ShiftLeft || keys.ShiftRight || keys.KeyC) {
+        pPos.y -= flySpeed;
+      }
+      // Ground clamp (minimum 1.65m standing eye-level, up to 80m sky flight)
+      if (pPos.y < 1.65) pPos.y = 1.65;
+      if (pPos.y > 80.0) pPos.y = 80.0;
     }
     // Mobile Virtual Joystick Input (Comfortable Walk + 2x Tap / Outer-Rim Sprint)
     var jMag = Math.hypot(joystickInput.x, joystickInput.y);
@@ -5406,8 +5478,6 @@ function animate() {
       var sprintBadge = document.getElementById('joystickSprintBadge');
       if (sprintBadge) sprintBadge.style.display = isSprinting ? 'block' : 'none';
 
-      // Comfortable swift walk: 0.14 indoors, 0.25 outdoors
-      // Fast sprint: 0.28 indoors, 0.50 outdoors
       var walkBase = isOutdoors ? 0.25 : 0.14;
       var sprintBase = isOutdoors ? 0.50 : 0.28;
       var baseSpeed = isSprinting ? sprintBase : walkBase;
@@ -5420,7 +5490,6 @@ function animate() {
       if (sprintBadge) sprintBadge.style.display = 'none';
       isMobileSprint = false;
     }
-    walk.getObject().position.y = 1.65;
   }
 
   // Refined Smart Distance LOD (Zero Sky Clutter)
