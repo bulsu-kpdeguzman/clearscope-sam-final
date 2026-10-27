@@ -1827,6 +1827,7 @@ orbit.maxPolarAngle = Math.PI / 2.05;
 orbit.target.set(6, 2, 0);
 
 var walk = new THREE.PointerLockControls(camera, renderer.domElement);
+walk.pointerSpeed = 0.0009; // Silky-smooth reduced mouse sensitivity (Minecraft standard)
 walk.minPolarAngle = 0.08; // Clamp pitch to prevent gimbal singularity at zenith
 walk.maxPolarAngle = Math.PI - 0.08; // Clamp pitch to prevent gimbal singularity at nadir
 scene.add(walk.getObject());
@@ -1924,7 +1925,7 @@ window.addEventListener('mousemove', function(e) {
   if (document.pointerLockElement && activeNav === 'orbit' && (!tourState || !tourState.running)) {
     var mx = e.movementX || e.mozMovementX || e.webkitMovementX || 0;
     var my = e.movementY || e.mozMovementY || e.webkitMovementY || 0;
-    var rotSpd = 0.0035;
+    var rotSpd = 0.0012; // Silky-smooth reduced sensitivity
     orbit.rotateLeft(mx * rotSpd);
     orbit.rotateUp(my * rotSpd);
     orbit.update();

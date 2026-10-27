@@ -37,6 +37,8 @@
 
 			this.maxPolarAngle = Math.PI; // radians
 
+			this.pointerSpeed = 0.0009; // Reduced mouse sensitivity for smooth, precise Minecraft look
+
 			const scope = this;
 
 			function onMouseMove( event ) {
@@ -47,8 +49,9 @@
 
 				_euler.setFromQuaternion( camera.quaternion );
 
-				_euler.y -= movementX * 0.002;
-				_euler.x -= movementY * 0.002;
+				const speed = scope.pointerSpeed !== undefined ? scope.pointerSpeed : 0.0009;
+				_euler.y -= movementX * speed;
+				_euler.x -= movementY * speed;
 				_euler.x = Math.max( _PI_2 - scope.maxPolarAngle, Math.min( _PI_2 - scope.minPolarAngle, _euler.x ) );
 				camera.quaternion.setFromEuler( _euler );
 				scope.dispatchEvent( _changeEvent );
