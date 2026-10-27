@@ -2137,24 +2137,31 @@ var tourRoutes = {
         duration: 3600
       },
       {
-        cam: [39.5, 5.2, -13.0], tgt: [45.0, 4.5, -18.0],
+        cam: [34.5, 5.2, -13.5], tgt: [29.5, 4.5, -20.0],
         facility: 'branch', roof: false,
-        title: 'Floor 2: Room B201 (Accounting Department · 5 PCs & Printer)',
-        desc: 'Accounting workstations (VLAN 60) and dedicated laser printer on Floor 2.',
+        title: 'Floor 2: Room B201 (Branch Administration & Accounting · 5 PCs & Printer)',
+        desc: 'Branch administration and accounting workstations (VLAN 60) with dedicated laser printer.',
         duration: 4000
       },
       {
-        cam: [45.5, 5.2, -13.0], tgt: [46.0, 4.8, -18.0],
+        cam: [44.5, 5.0, -19.5], tgt: [44.5, 4.6, -22.5],
         facility: 'branch', roof: false,
-        title: 'Floor 2: Branch Server Room & Cisco 2911 ISR Edge Router',
-        desc: 'Dedicated Branch Server (SRV-BR) and Cisco 2911 ISR Router terminating 500M private WAN link.',
+        title: 'Floor 2: Dedicated Branch Server Room & Cisco 2911 ISR Edge Router',
+        desc: '42U Server Cabinet housing RTR-BR (Cisco 2911 ISR terminating 500M private WAN link), Dual Catalyst 1000-24T switches, and SRV-BR.',
+        duration: 4400
+      },
+      {
+        cam: [41.2, 5.2, -14.0], tgt: [45.5, 4.3, -14.0],
+        facility: 'branch', roof: false,
+        title: 'Floor 2: Executive Client Waiting Lounge & Enterprise Wi-Fi 6',
+        desc: 'Client reception lounge with U-shaped designer seating and ceiling-mounted Wi-Fi 6 Access Point (AP-BR-F2).',
         duration: 4000
       },
       {
         cam: [42.0, 14.0, 0.0], tgt: [38, 3.0, -18],
         facility: 'branch', roof: true,
         title: 'Second Branch Complete Overview',
-        desc: 'Full remote facility walkthrough completed (35 Workstations total).',
+        desc: 'Full remote facility walkthrough completed (35 Workstations total across 2 floors).',
         duration: 3400
       }
     ]
@@ -2216,7 +2223,7 @@ tourRoutes.all = {
     .concat(tourRoutes.datacenter.steps.slice(0, 4))
     .concat(tourRoutes.emp.steps.slice(0, 5))
     .concat(tourRoutes.admin.steps.slice(0, 9))
-    .concat(tourRoutes.branch.steps.slice(0, 6))
+    .concat(tourRoutes.branch.steps.slice(0, 7))
     .concat([
       {
         cam: [-30, 48, 65], tgt: [6, 2, 0],
